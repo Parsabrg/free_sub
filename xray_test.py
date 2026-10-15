@@ -163,6 +163,8 @@ def _probe_worker(payload):
         context = ssl.create_default_context()
     outbound = pin_endpoint(candidate.outbound, addresses)
     if fixture:
+        # Windows Xray uses custom CA certificates only with its isolated root pool.
+        outbound['streamSettings']['tlsSettings']['disableSystemRoot'] = True
         outbound['streamSettings']['tlsSettings']['certificates'] = [
             {'usage':'verify', 'certificateFile':fixture['ca_file']}]
     successes = []; attempts = 0; last_error = ''

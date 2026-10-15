@@ -35,3 +35,15 @@ PowerShell scripts on Windows. Those CI results occur after the repository push.
 Physical sleep/wake, firmware support, Windows account credentials, the operator's
 ISP and actual Pages deployment still require the one-time setup on the user's
 Windows PC/GitHub account. They have not been represented as tested remotely.
+
+## Windows validation on the operator PC
+
+- Python 3.14.7; official Windows Xray v26.3.27.
+- All 30 tests passed, including all four actual Xray integration tests; no skips.
+- Duration: 16.76 seconds.
+- Windows Xray binary SHA-256: `15c2d007954ac53ba69b80ec91242786b3c0b71d52649165b4ca1d5cc96ef8f1`.
+- Fixed the local fixture CA configuration: Windows Xray needs `disableSystemRoot`
+  to use its custom CA pool. This applies only to the loopback fixture and keeps
+  certificate and hostname verification enabled. Production TLS is unchanged.
+- All three PowerShell installation/runtime/check scripts parsed without errors.
+- Physical sleep/wake is not yet verified.
