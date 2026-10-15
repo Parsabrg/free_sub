@@ -10,6 +10,8 @@ escaped on export so reserved characters survive client import.
 For v2rayN, use `https://parsabrg.github.io/free_sub/xray.json`: its native Xray
 outbounds retain the tested settings and select Xray on each subscription update.
 This applies to that subscription group without changing other groups' defaults.
+On Android **v2rayNG**, use `https://parsabrg.github.io/free_sub/sub.b64`
+instead; the Xray JSON outbound feed is intended for desktop v2rayN.
 
 **The scheduled task wakes your PC from supported sleep on AC power. You do not
 need to sit at the keyboard, unlock Windows, or approve each test or push.**
