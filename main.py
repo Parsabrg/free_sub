@@ -146,7 +146,8 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
         # Preserve the budget for exploration even if the live list occupies most slots.
         queue=queue[:max(args.max_tests,len(old))]
     print(f'[RUN] mode={mode}; candidates={len(queue)}; previous={len(old)}',flush=True)
-    first,first_results,first_counts=test_batch(queue,args.xray,args.workers,args.timeout,'CHECK',probe,quick=True)
+    first_timeout=args.screen_timeout if mode=='full' else args.timeout
+    first,first_results,first_counts=test_batch(queue,args.xray,args.workers,first_timeout,'CHECK',probe,quick=True)
     first.sort(key=lambda pair:rank_key(pair[0],pair[1],state,now))
     second=[]; second_results={}; second_counts={}
     if mode=='full':
@@ -208,6 +209,8 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
     report={'mode':mode,'health':health,'tested_on':'operator network; local Xray',
             'xray_version':args.xray_version,'source_status':stats,'unique_selected_for_test':len(queue),
             'first_pass':first_counts,'second_pass':second_counts,'_verified_keys':list(passed),
+            'max_tests':args.max_tests,'workers':args.workers,
+            'first_pass_timeout_seconds':first_timeout,'verification_timeout_seconds':args.timeout,
             'failure_reason':None if passed else 'No current verified transfer; previous nodes age normally'}
     report=write_outputs(root/'docs',selected,state,report,now,args.ttl_hours*3600)
     state['published']=[c.key for c,r in selected]
@@ -223,9 +226,10 @@ def arguments(argv=None):
     ap.add_argument('--xray',default=str(ROOT/'tools'/('xray.exe' if os.name=='nt' else 'xray')))
     ap.add_argument('--mode',choices=('auto','full','health'),default='auto')
     ap.add_argument('--limit',type=int,default=300)
-    ap.add_argument('--max-tests',type=int,default=1600,help='0 means all supported source entries; no per-source truncation')
-    ap.add_argument('--workers',type=int,default=32)
-    ap.add_argument('--timeout',type=float,default=30,help='Total wall-clock deadline per candidate including DNS and all probes')
+    ap.add_argument('--max-tests',type=int,default=0,help='0 means all supported source entries; no per-source truncation')
+    ap.add_argument('--workers',type=int,default=64)
+    ap.add_argument('--screen-timeout',type=float,default=2,help='Discovery first-pass deadline, including worker startup, DNS and HTTPS')
+    ap.add_argument('--timeout',type=float,default=30,help='Full verification and health deadline per candidate including DNS and all probes')
     ap.add_argument('--recheck',type=int,default=400)
     ap.add_argument('--geo-workers',type=int,default=3)
     ap.add_argument('--require-country',action='store_true',help='Optional; otherwise preserve good nodes with a globe flag')
@@ -234,7 +238,7 @@ def arguments(argv=None):
     ap.add_argument('--publish',action='store_true')
     args=ap.parse_args(argv)
     if not (1<=args.limit<=300 and 1<=args.workers<=64 and 1<=args.geo_workers<=8 and
-            args.max_tests>=0 and 5<=args.timeout<=120 and args.recheck>=args.limit and
+            args.max_tests>=0 and 5<=args.timeout<=120 and 1<=args.screen_timeout<=args.timeout and args.recheck>=args.limit and
             1<=args.discovery_hours<=24 and 1<=args.ttl_hours<=24):
         ap.error('Invalid budget, worker count, deadline, TTL or discovery interval')
     binary=Path(args.xray).expanduser()

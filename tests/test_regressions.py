@@ -1,4 +1,6 @@
 import base64
+from contextlib import redirect_stdout
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -20,10 +22,36 @@ class RegressionTests(unittest.TestCase):
         from main import arguments
         version = subprocess.CompletedProcess([], 0, stdout='Xray fixture')
         with patch('main.subprocess.run', return_value=version):
-            self.assertEqual(arguments(['--xray', sys.executable]).workers, 32)
+            defaults=arguments(['--xray', sys.executable])
+            self.assertEqual((defaults.workers, defaults.max_tests, defaults.screen_timeout, defaults.timeout), (64, 0, 2, 30))
             self.assertEqual(arguments(['--xray', sys.executable, '--workers', '64']).workers, 64)
-            with self.assertRaises(SystemExit):
+            with self.assertRaises(SystemExit), patch('sys.stderr', new=io.StringIO()):
                 arguments(['--xray', sys.executable, '--workers', '65'])
+            with self.assertRaises(SystemExit), patch('sys.stderr', new=io.StringIO()):
+                arguments(['--xray', sys.executable, '--screen-timeout', '0.5'])
+
+    def test_uncapped_discovery_uses_fast_screen_and_full_verification(self):
+        import sys
+        from main import arguments, run_cycle
+        candidates=[parse(f'trojan://fixture{i}@example.com:443?security=tls') for i in range(1601)]
+        calls=[]
+        def probe(candidate, xray, timeout, *, quick):
+            calls.append((candidate.key, timeout, quick))
+            return ProbeResult(candidate.key==candidates[0].key, endpoint_ip='8.8.8.8', body_bytes=16384)
+        version=subprocess.CompletedProcess([], 0, stdout='Xray fixture')
+        with patch('main.subprocess.run', return_value=version):
+            args=arguments(['--xray', sys.executable, '--mode', 'full', '--workers', '4'])
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            report=run_cycle(args, folder, probe, lambda **kw: {'Fixture':candidates}, lambda *a, **kw: {})
+            self.assertEqual(report['unique_selected_for_test'],1601)
+            self.assertEqual({k for k,t,q in calls if q},{c.key for c in candidates})
+            self.assertTrue(all(t==2 for k,t,q in calls if q))
+            self.assertEqual([(t,q) for k,t,q in calls if not q],[(30,False)])
+            self.assertEqual(report['published'],1)
+            calls.clear()
+            args.mode='health'
+            run_cycle(args, folder, probe, lambda **kw: {}, lambda *a, **kw: {})
+            self.assertEqual([(t,q) for k,t,q in calls],[(30,True)])
 
     def test_strict_url_settings_and_grpc_mode(self):
         base='vless://id@example.com:443?security=tls'

@@ -25,10 +25,10 @@ def source_fingerprint(root):
 def validate_outputs(docs):
     docs=Path(docs)
     plain=(docs/'sub.txt').read_bytes()
-    encoded=(docs/'sub.b64').read_text().strip()
+    encoded=(docs/'sub.b64').read_text(encoding='utf-8').strip()
     if base64.b64decode(encoded,validate=True)!=plain:
         raise ValueError('Subscription encodings differ')
-    report=json.loads((docs/'status.json').read_text())
+    report=json.loads((docs/'status.json').read_text(encoding='utf-8'))
     urls=links(plain.decode('utf-8'))
     if len(urls)!=report['published'] or len(report['nodes'])!=len(urls):
         raise ValueError('Subscription count mismatch')

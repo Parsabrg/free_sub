@@ -119,14 +119,18 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
   candidate sources, not endorsed providers.
 - Sources have an 8 MiB fetch limit. No hidden per-source 1,800-node cap.
 - Source candidates are balanced and rotated between discovery runs. Previously
-  published nodes are checked first. `--max-tests 0` tests every supported unique
-  configuration collected within those documented fetch limits.
+  published nodes are checked first. Full discovery tests every supported unique
+  configuration by default (`--max-tests 0`) within the documented fetch limits.
+  Set a positive `--max-tests` only when deliberately choosing a sample.
 - Private, loopback, link-local and mixed public/private DNS endpoint answers are
   rejected. DNS resolution runs with a deadline. The Xray endpoint is pinned to
   the validated public IP; SNI and transport Host values remain intact.
 - Each candidate runs in its own Xray process with a loopback SOCKS inbound and
   candidate-only routing. No direct fallback outbound exists in the tester.
-- Initial checks retrieve real certificate-verified HTTPS body data. Discovery
+- Discovery first-pass checks have a two-second total deadline (`--screen-timeout 2`),
+  including worker startup, DNS, Xray startup and certificate-verified HTTPS body data.
+  This favors speed and can reject working but slower nodes. Full verification and
+  health checks retain a 30-second deadline (`--timeout 30`). Discovery
   finalists require a new process and successful transfers to two different
   probe hostnames. Health checks revisit already fully verified nodes.
 - Roughly 16 KiB download and smaller fallback endpoints prove connectivity.
@@ -236,7 +240,7 @@ Do not upload these directories or add private subscription sources.
   owner; do not use `SYSTEM`, S4U, or an SSH key requiring unavailable prompts.
 - Task runs but does not wake: check `powercfg /a`, `powercfg /waketimers`, the
   task's WakeToRun property, AC power, firmware wake support, and Modern Standby.
-- Full scans use 32 parallel workers by default (`--workers 1` through `64`).
+- Full scans use 64 parallel workers by default (`--workers 1` through `64`).
   This operator PC has 20 logical CPUs and 32 GiB RAM; reduce workers on smaller PCs.
 - Long full scans: reduce `--max-tests`/timeout or adjust workers;
   scheduled trigger overlap is suppressed. Do not assume a 30-minute trigger
