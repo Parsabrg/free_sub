@@ -25,6 +25,11 @@ PROBES = [
     ('https://www.cloudflare.com/cdn-cgi/trace', 128),
     ('https://www.google.com/robots.txt', 128),
 ]
+# Real-delay screening must not spend its short budget on a speed download.
+SCREEN_PROBES = [
+    ('https://www.gstatic.com/generate_204', 0),
+    ('https://www.google.com/generate_204', 0),
+]
 
 @dataclass
 class ProbeResult:
@@ -73,7 +78,7 @@ def socks_connect(port, host, dest_port, timeout):
         s.close()
         raise
 
-def https_get_via_socks(local_port, target, timeout, ssl_context, max_bytes=65536):
+def https_get_via_socks(local_port, target, timeout, ssl_context, max_bytes=65536, *, expected_status=200):
     u=urlsplit(target)
     if u.scheme!='https': raise ValueError('HTTPS only')
     started=time.monotonic()
@@ -90,7 +95,7 @@ def https_get_via_socks(local_port, target, timeout, ssl_context, max_bytes=6553
             body=resp.read(max_bytes+1)
             if len(body)>max_bytes: raise OSError('OversizeBody')
             elapsed=max(time.monotonic()-started, 0.001)
-            if resp.status!=200: raise OSError(f'HTTP status {resp.status}')
+            if resp.status!=expected_status: raise OSError(f'HTTP status {resp.status}')
             return body,elapsed
     finally:
         raw.close()
@@ -160,10 +165,10 @@ def _probe_worker(payload):
         context = ssl.create_default_context(cafile=fixture['ca_file'])
     else:
         addresses = resolve_public(candidate.host)
-        probes = list(PROBES)
+        probes = list(SCREEN_PROBES if payload.get('quick') else PROBES)
         # Rotate destinations across runs; failure of one provider need not kill the node.
         if int(time.time()//1800) % 2:
-            probes = [probes[2], probes[0], probes[1]]
+            probes = probes[-1:] + probes[:-1]
         context = ssl.create_default_context()
     outbound = pin_endpoint(candidate.outbound, addresses)
     if fixture:
@@ -188,7 +193,8 @@ def _probe_worker(payload):
             for url, minimum in probes:
                 attempts += 1
                 try:
-                    body, elapsed = https_get_via_socks(p,url,min(6,payload['timeout']),context)
+                    body, elapsed = https_get_via_socks(p,url,min(6,payload['timeout']),context,
+                                                      expected_status=204 if minimum==0 else 200)
                     if len(body)<minimum:
                         raise OSError('ShortBody')
                     successes.append((url, len(body), elapsed, minimum>=8192))

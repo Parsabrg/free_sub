@@ -134,15 +134,20 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
   the validated public IP; SNI and transport Host values remain intact.
 - Each candidate runs in its own Xray process with a loopback SOCKS inbound and
   candidate-only routing. No direct fallback outbound exists in the tester.
-- Discovery first-pass network checks have a two-second deadline (`--screen-timeout 2`)
+- Discovery first-pass network checks have a five-second deadline (`--screen-timeout 5`)
   after Xray is ready. Python/DNS/Xray startup remains inside a separate 30-second
   total candidate deadline, so CPU startup delays are not mistaken for proxy timeouts.
-  The network check still requires certificate-verified HTTPS body data. It favors
+  The screen requires a certificate-verified HTTPS 204 response, matching a real-delay
+  check without spending the short budget on a body download. It favors
   speed and can reject working but slower nodes. Full verification and health checks
   retain a 30-second deadline (`--timeout 30`). Discovery
   finalists require a new process and successful transfers to two different
   probe hostnames. Every health check also requires successful transfers to two
   different probe hostnames before marking a node freshly verified.
+  Discovery uses up to 64 workers; full verification and health checks use at most 16.
+  The lightweight screen follows the approach used by
+  [v2rayNG](https://github.com/2dust/v2rayNG/blob/master/V2rayNG/app/src/main/java/com/v2ray/ang/AppConfig.kt)
+  and [v2rayN](https://github.com/2dust/v2rayN/blob/7.25.4/v2rayN/ServiceLib/Handler/ConnectionHandler.cs).
 - Roughly 16 KiB download and smaller fallback endpoints prove connectivity.
   Transfer estimates include handshake time and **are not sustained-speed
   benchmarks**. Timing variation across different endpoints is reported separately
@@ -180,7 +185,7 @@ hard deadline, rechecks health, preserves stable names, and expires old nodes.
 The loopback-only fixture override is internal to tests; production has no CLI
 switch to bypass public-address checks or accept untrusted TLS certificates.
 
-Generated plain/Base64 subscriptions and metadata must agree. Only the four
+Generated plain/Base64/Xray subscriptions and metadata must agree. Only the five
 `docs/` output paths are staged; pre-existing staged changes, a detached HEAD, or
 a divergent remote stop publishing. Git is noninteractive and bounded; there
 are no force pushes, automatic merges, or private-history uploads. A failed push

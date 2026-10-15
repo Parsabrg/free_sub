@@ -45,6 +45,10 @@ class RealXrayEndToEnd(unittest.TestCase):
         class Handler(http.server.BaseHTTPRequestHandler):
             def do_GET(self):
                 cls.requests.append(self.path)
+                if self.path=='/generate_204':
+                    self.send_response(204)
+                    self.end_headers()
+                    return
                 if self.path=='/feed':
                     data=cls.feed.encode()
                 else:
@@ -110,6 +114,17 @@ class RealXrayEndToEnd(unittest.TestCase):
     def test_025_wrong_tls_hostname_is_rejected(self):
         wrong=parse(self.url.replace('sni=localhost','sni=wrong.invalid'))
         self.assertFalse(run_probe(wrong,BINARY,8,local_fixture=self.fixture).passed)
+
+    def test_026_real_delay_is_authenticated_https_not_a_body_download(self):
+        fixture=dict(self.fixture,probes=[(f'https://localhost:{self.origin.server_port}/generate_204',0)])
+        result=run_probe(parse(self.url),BINARY,8,quick=True,screen_timeout=2,local_fixture=fixture)
+        self.assertTrue(result.passed,result.error)
+        self.assertEqual((result.successes,result.body_bytes),(1,0))
+        # A 200 captive response must not impersonate the expected 204 endpoint.
+        wrong=dict(fixture,probes=[(f'https://localhost:{self.origin.server_port}/payload-a',0)])
+        self.assertFalse(run_probe(parse(self.url),BINARY,8,quick=True,local_fixture=wrong).passed)
+        # Screening success alone cannot pass the two-transfer publication gate.
+        self.assertFalse(run_probe(parse(self.url),BINARY,8,quick=False,local_fixture=fixture).passed)
 
     def test_03_full_pipeline_then_health_and_expiry(self):
         with tempfile.TemporaryDirectory() as folder:

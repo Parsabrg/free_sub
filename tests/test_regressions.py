@@ -23,7 +23,7 @@ class RegressionTests(unittest.TestCase):
         version = subprocess.CompletedProcess([], 0, stdout='Xray fixture')
         with patch('main.subprocess.run', return_value=version):
             defaults=arguments(['--xray', sys.executable])
-            self.assertEqual((defaults.workers, defaults.max_tests, defaults.screen_timeout, defaults.timeout), (64, 0, 2, 30))
+            self.assertEqual((defaults.workers, defaults.max_tests, defaults.screen_timeout, defaults.timeout), (64, 0, 5, 30))
             self.assertEqual(arguments(['--xray', sys.executable, '--workers', '64']).workers, 64)
             with self.assertRaises(SystemExit), patch('sys.stderr', new=io.StringIO()):
                 arguments(['--xray', sys.executable, '--workers', '65'])
@@ -32,7 +32,7 @@ class RegressionTests(unittest.TestCase):
 
     def test_uncapped_discovery_uses_fast_screen_and_full_verification(self):
         import sys
-        from main import arguments, run_cycle
+        from main import arguments, run_cycle, test_batch
         candidates=[parse(f'trojan://fixture{i}@example.com:443?security=tls') for i in range(1601)]
         calls=[]
         def probe(candidate, xray, timeout, *, quick, screen_timeout=None):
@@ -40,18 +40,20 @@ class RegressionTests(unittest.TestCase):
             return ProbeResult(candidate.key==candidates[0].key, endpoint_ip='8.8.8.8', body_bytes=16384)
         version=subprocess.CompletedProcess([], 0, stdout='Xray fixture')
         with patch('main.subprocess.run', return_value=version):
-            args=arguments(['--xray', sys.executable, '--mode', 'full', '--workers', '4'])
-        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            args=arguments(['--xray', sys.executable, '--mode', 'full', '--workers', '64'])
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()), patch('main.test_batch',wraps=test_batch) as batch:
             report=run_cycle(args, folder, probe, lambda **kw: {'Fixture':candidates}, lambda *a, **kw: {})
             self.assertEqual(report['unique_selected_for_test'],1601)
             self.assertEqual({k for k,t,q,n in calls if q},{c.key for c in candidates})
-            self.assertTrue(all(t==30 and n==2 for k,t,q,n in calls if q))
+            self.assertTrue(all(t==30 and n==5 for k,t,q,n in calls if q))
             self.assertEqual([(t,q,n) for k,t,q,n in calls if not q],[(30,False,None)])
             self.assertEqual(report['published'],1)
+            self.assertEqual([call.args[2] for call in batch.call_args_list],[64,16])
             calls.clear()
             args.mode='health'
             run_cycle(args, folder, probe, lambda **kw: {}, lambda *a, **kw: {})
             self.assertEqual([(t,q,n) for k,t,q,n in calls],[(30,False,None)])
+            self.assertEqual(batch.call_args_list[-1].args[2],16)
             exported=Path(folder)/'docs/xray.json'
             config=json.loads(exported.read_text(encoding='utf-8'))
             config['outbounds'][0]['protocol']='freedom'
