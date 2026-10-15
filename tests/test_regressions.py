@@ -1,5 +1,5 @@
 import base64
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout, redirect_stderr
 import io
 import json
 from pathlib import Path
@@ -215,3 +215,11 @@ class RegressionTests(unittest.TestCase):
                 publish(root,'xray',root/'docs')
             self.assertTrue(any(c[:2]==['git','push'] for c in calls))
             self.assertFalse(any(c[:2]==['git','commit'] for c in calls))
+            def offline(command,**kwargs):
+                if command[:2]==['git','fetch']:
+                    raise subprocess.CalledProcessError(128,command,stderr='Could not resolve host: private-token-fixture')
+                return clean(command,**kwargs)
+            with patch('publishing.subprocess.run',side_effect=offline),patch('publishing.validate_outputs'),redirect_stderr(io.StringIO()) as errors:
+                with self.assertRaises(subprocess.CalledProcessError): publish(root,'xray',root/'docs')
+            self.assertIn('Git fetch exited 128; category=network',errors.getvalue())
+            self.assertNotIn('private-token-fixture',errors.getvalue())

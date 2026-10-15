@@ -65,8 +65,16 @@ def publish(root, xray, docs):
     subprocess.run([sys.executable,str(root/'verify.py'),'--xray',str(xray)],cwd=root,check=True,timeout=180)
     validate_outputs(docs)
     def git(*args,check=True):
-        return subprocess.run(['git',*args],cwd=root,check=check,capture_output=True,text=True,
-                              encoding='utf-8',env=noninteractive_env(),timeout=90)
+        try:
+            return subprocess.run(['git',*args],cwd=root,check=check,capture_output=True,text=True,
+                                  encoding='utf-8',env=noninteractive_env(),timeout=90)
+        except subprocess.CalledProcessError as exc:
+            error=(exc.stderr or '').lower()
+            category=('authentication' if any(s in error for s in ('authentication','credential','username'))
+                      else 'network' if any(s in error for s in ('resolve','connect','ssl','tls','timeout','http/')) else 'repository')
+            # Never log raw stderr: a remote or credential helper can include secrets.
+            print(f'[PUBLISH ERROR] Git {args[0]} exited {exc.returncode}; category={category}',file=sys.stderr,flush=True)
+            raise
     if Path(git('rev-parse','--show-toplevel').stdout.strip()).resolve()!=root:
         raise RuntimeError('Publish from a dedicated clone of this project')
     if git('diff','--cached','--name-only').stdout.strip():
