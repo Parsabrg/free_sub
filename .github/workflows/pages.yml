@@ -1,0 +1,35 @@
+name: Deploy locally verified subscription
+on:
+  push:
+    branches: [main]
+    paths: ['docs/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    # Configure Settings > Pages > GitHub Actions once. No source collection on hosted runners.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate generated subscription
+        if: hashFiles('docs/status.json') != ''
+        run: python -c "from publishing import validate_outputs; validate_outputs('docs')"
+      - uses: actions/configure-pages@v5
+        if: hashFiles('docs/status.json') != ''
+      - uses: actions/upload-pages-artifact@v4
+        if: hashFiles('docs/status.json') != ''
+        with:
+          path: docs
+      - id: deployment
+        if: hashFiles('docs/status.json') != ''
+        uses: actions/deploy-pages@v4
