@@ -16,6 +16,9 @@ SOURCES = {
     'Radikal': 'https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/main/verified/configs.txt',
     'Pawdroid': 'https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub',
     'MahdiblandPublic': 'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/Eternity.txt',
+    'Patterniha': 'https://raw.githubusercontent.com/patterniha/Free-Configs/main/configs.txt',
+    'Whitedns': 'https://raw.githubusercontent.com/iampedii/whitedns-sub/refs/heads/main/base64.txt',
+    'Kahrobas': 'https://bot.kahrobas.shop/sub.txt',
 }
 SCHEMES = ('vless://', 'vmess://', 'trojan://', 'ss://')
 ACCEPTED_SS = {'aes-128-gcm','aes-256-gcm','chacha20-ietf-poly1305','2022-blake3-aes-128-gcm','2022-blake3-aes-256-gcm'}

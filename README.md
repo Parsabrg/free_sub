@@ -114,7 +114,8 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
 ## What actually gets tested
 
 - Feeds: Barry, EbraSha, Epodonios, Shadowmere, 0xRadikal, Pawdroid, Mahdibland
-  Public (`Eternity.txt`, not the account/airport list). These are untrusted
+  Public (`Eternity.txt`, not the account/airport list), Patterniha, Whitedns,
+  and Kahrobas. These are untrusted
   candidate sources, not endorsed providers.
 - Sources have an 8 MiB fetch limit. No hidden per-source 1,800-node cap.
 - Source candidates are balanced and rotated between discovery runs. Previously
@@ -212,6 +213,9 @@ maintainers endorse this project or guarantee the proxy operators.
 | [0xRadikal](https://github.com/0xRadikal/Free-v2ray-Configs) | MIT |
 | [Pawdroid](https://github.com/Pawdroid/Free-servers) | No license detected by GitHub; check upstream terms |
 | [Mahdibland / V2RayAggregator](https://github.com/mahdibland/V2RayAggregator) | GPL-3.0; public `Eternity.txt` feed only |
+| [Patterniha](https://github.com/patterniha/Free-Configs) | MIT |
+| [Whitedns](https://github.com/iampedii/whitedns-sub) | No license detected by GitHub; check upstream terms |
+| [Kahrobas](https://bot.kahrobas.shop/sub.txt) | Check the provider's terms |
 | [XTLS / Xray-core](https://github.com/XTLS/Xray-core) | MPL-2.0; official binary downloaded locally, not committed |
 
 License metadata was checked on 2026-10-15 and may change. Consult each upstream

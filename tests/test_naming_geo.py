@@ -46,12 +46,15 @@ class RenameTests(unittest.TestCase):
         self.assertEqual(decoded['id'], config['id'])
         self.assertEqual(parse(changed).key, parse(src).key)
 
-    def test_all_seven_sources_configured(self):
-        self.assertEqual(len(SOURCES), 7)
+    def test_all_ten_sources_configured(self):
+        self.assertEqual(len(SOURCES), 10)
         self.assertIn('Shadowmere', SOURCES)
         self.assertIn('Pawdroid', SOURCES)
         self.assertIn('Radikal', SOURCES)
         self.assertIn('MahdiblandPublic', SOURCES)
+        self.assertEqual(SOURCES['Patterniha'], 'https://raw.githubusercontent.com/patterniha/Free-Configs/main/configs.txt')
+        self.assertEqual(SOURCES['Whitedns'], 'https://raw.githubusercontent.com/iampedii/whitedns-sub/refs/heads/main/base64.txt')
+        self.assertEqual(SOURCES['Kahrobas'], 'https://bot.kahrobas.shop/sub.txt')
 
 
 class GeolocationTests(unittest.TestCase):
