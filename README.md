@@ -147,6 +147,8 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
   probe hostnames. Every health check also requires successful transfers to two
   different probe hostnames before marking a node freshly verified.
   Discovery uses up to 64 workers; full verification and health checks use at most 16.
+  Unexpected runner exceptions get one retry with at most 16 workers. Sanitized
+  exception types are logged; the last failure reason is retained in local history.
   The lightweight screen follows the approach used by
   [v2rayNG](https://github.com/2dust/v2rayNG/blob/master/V2rayNG/app/src/main/java/com/v2ray/ang/AppConfig.kt)
   and [v2rayN](https://github.com/2dust/v2rayN/blob/7.25.4/v2rayN/ServiceLib/Handler/ConnectionHandler.cs).

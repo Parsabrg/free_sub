@@ -80,6 +80,27 @@ class RegressionTests(unittest.TestCase):
             communicate_bounded(startup_stall, '', 0.2, ready_timeout=0.1)
         self.assertLess(time.monotonic()-start,2)
 
+    def test_runner_exception_has_one_lower_concurrency_retry(self):
+        from concurrent.futures import ThreadPoolExecutor
+        from main import test_batch
+        candidate=parse('trojan://fixture@example.com:443?security=tls')
+        attempts=[]
+        def probe(*a,**kw):
+            attempts.append(kw)
+            if len(attempts)==1: raise PermissionError('Do not log fixture credentials')
+            return ProbeResult(True,body_bytes=8192)
+        with redirect_stdout(io.StringIO()), patch('main.cf.ThreadPoolExecutor',wraps=ThreadPoolExecutor) as pool:
+            found,results,counts=test_batch([candidate],'unused',64,30,'CHECK',probe,quick=True,screen_timeout=5)
+        self.assertEqual([c.kwargs['max_workers'] for c in pool.call_args_list],[64,16])
+        self.assertEqual(len(attempts),2)
+        self.assertEqual(attempts[0],attempts[1])
+        self.assertEqual((len(found),counts),(1,{'pass':1}))
+        with redirect_stdout(io.StringIO()) as log:
+            def fails(*a,**kw): raise PermissionError('Do not log fixture credentials')
+            _,results,counts=test_batch([candidate],'unused',64,30,'CHECK',fails)
+        self.assertEqual(counts,{'ProbeError/PermissionError':1})
+        self.assertNotIn('fixture credentials',log.getvalue())
+
     def test_probe_deadline_removes_worker_temp_files(self):
         from xray_test import run_probe
         workspace=[]

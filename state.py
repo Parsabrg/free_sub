@@ -92,7 +92,7 @@ def observe(state, candidate, result, now, verified=False):
                'history':[], 'last_success':0,'verified':False,'country_code':None}
         state['next_number'] += 1
         state['nodes'][candidate.key] = row
-    row.update(url=candidate.url,source=candidate.source,last_seen=now,last_attempt=now)
+    row.update(url=candidate.url,source=candidate.source,last_seen=now,last_attempt=now,last_error=result.error if not result.passed else '')
     row['history'] = (row['history']+[{'at':now,'ok':result.passed,'latency_ms':result.latency_ms}])[-48:]
     if result.passed:
         from dataclasses import asdict

@@ -45,8 +45,8 @@ def rank_key(candidate, result, state, now):
             result.jitter_ms, candidate.key)
 
 
-def test_batch(nodes, xray, workers, timeout, label, probe=run_probe, quick=False, screen_timeout=None):
-    found=[]; results={}; counts=Counter(); start=time.monotonic()
+def test_batch(nodes, xray, workers, timeout, label, probe=run_probe, quick=False, screen_timeout=None, retry_unexpected=True):
+    found=[]; results={}; counts=Counter(); unexpected=[]; start=time.monotonic()
     probe_options={'quick':quick}
     if screen_timeout is not None:
         probe_options['screen_timeout']=screen_timeout
@@ -56,13 +56,21 @@ def test_batch(nodes, xray, workers, timeout, label, probe=run_probe, quick=Fals
             candidate=futures[job]
             try:
                 result=job.result()
-            except Exception:
-                result=ProbeResult(False,error='InternalProbeError')
+            except Exception as exc:
+                result=ProbeResult(False,error='ProbeError/'+type(exc).__name__)
+                unexpected.append(candidate)
             results[candidate.key]=result
             counts['pass' if result.passed else result.error or 'failed']+=1
             if result.passed: found.append((candidate,result))
             if index%25==0 or index==len(nodes):
                 print(f'[{label}] {index}/{len(nodes)}; passed={len(found)}; elapsed={time.monotonic()-start:.0f}s',flush=True)
+    if unexpected and retry_unexpected:
+        errors={k:v for k,v in counts.items() if k.startswith('ProbeError/')}
+        print(f'[{label}] Retrying {len(unexpected)} runner errors with at most 16 workers: {errors}',flush=True)
+        recovered,retried,_=test_batch(unexpected,xray,min(workers,16),timeout,label+'-RETRY',probe,
+                                      quick=quick,screen_timeout=screen_timeout,retry_unexpected=False)
+        found.extend(recovered); results.update(retried)
+        counts=Counter('pass' if r.passed else r.error or 'failed' for r in results.values())
     return found,results,dict(counts)
 
 
