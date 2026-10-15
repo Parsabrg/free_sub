@@ -35,8 +35,8 @@ class RegressionTests(unittest.TestCase):
         from main import arguments, run_cycle
         candidates=[parse(f'trojan://fixture{i}@example.com:443?security=tls') for i in range(1601)]
         calls=[]
-        def probe(candidate, xray, timeout, *, quick):
-            calls.append((candidate.key, timeout, quick))
+        def probe(candidate, xray, timeout, *, quick, screen_timeout=None):
+            calls.append((candidate.key, timeout, quick, screen_timeout))
             return ProbeResult(candidate.key==candidates[0].key, endpoint_ip='8.8.8.8', body_bytes=16384)
         version=subprocess.CompletedProcess([], 0, stdout='Xray fixture')
         with patch('main.subprocess.run', return_value=version):
@@ -44,14 +44,33 @@ class RegressionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
             report=run_cycle(args, folder, probe, lambda **kw: {'Fixture':candidates}, lambda *a, **kw: {})
             self.assertEqual(report['unique_selected_for_test'],1601)
-            self.assertEqual({k for k,t,q in calls if q},{c.key for c in candidates})
-            self.assertTrue(all(t==2 for k,t,q in calls if q))
-            self.assertEqual([(t,q) for k,t,q in calls if not q],[(30,False)])
+            self.assertEqual({k for k,t,q,n in calls if q},{c.key for c in candidates})
+            self.assertTrue(all(t==30 and n==2 for k,t,q,n in calls if q))
+            self.assertEqual([(t,q,n) for k,t,q,n in calls if not q],[(30,False,None)])
             self.assertEqual(report['published'],1)
             calls.clear()
             args.mode='health'
             run_cycle(args, folder, probe, lambda **kw: {}, lambda *a, **kw: {})
-            self.assertEqual([(t,q) for k,t,q in calls],[(30,True)])
+            self.assertEqual([(t,q,n) for k,t,q,n in calls],[(30,True,None)])
+
+    def test_network_deadline_starts_after_worker_readiness(self):
+        import sys
+        command=[sys.executable, '-u', '-c',
+                 "import time; time.sleep(0.4); print('READY',flush=True); time.sleep(0.3); print('done')"]
+        output=communicate_bounded(command, '', 3, ready_timeout=0.5)
+        self.assertEqual(output.strip(),'done')
+        stalled=[sys.executable, '-u', '-c',
+                 "import time; time.sleep(0.4); print('READY',flush=True); time.sleep(30)"]
+        start=time.monotonic()
+        with self.assertRaises(subprocess.TimeoutExpired):
+            communicate_bounded(stalled, '', 3, ready_timeout=0.2)
+        self.assertLess(time.monotonic()-start,2)
+
+        startup_stall=[sys.executable, '-c', 'import time; time.sleep(30)']
+        start=time.monotonic()
+        with self.assertRaises(subprocess.TimeoutExpired):
+            communicate_bounded(startup_stall, '', 0.2, ready_timeout=0.1)
+        self.assertLess(time.monotonic()-start,2)
 
     def test_strict_url_settings_and_grpc_mode(self):
         base='vless://id@example.com:443?security=tls'

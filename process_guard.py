@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 import signal
 import subprocess
+import threading
+import time
 
 
 class ProcessTree:
@@ -61,15 +63,50 @@ class ProcessTree:
         self.proc.wait(timeout=5)
 
 
-def communicate_bounded(command, payload, timeout):
+def communicate_bounded(command, payload, timeout, *, ready_timeout=None):
     proc = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                             stderr=subprocess.DEVNULL, text=True, encoding='utf-8',
                             start_new_session=os.name != 'nt',
                             creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
     tree = None
+    exchange_thread = None
     try:
         tree = ProcessTree(proc)
-        stdout, _ = proc.communicate(payload, timeout=timeout)
+        if ready_timeout is None:
+            stdout, _ = proc.communicate(payload, timeout=timeout)
+        else:
+            # Start the short network deadline only after the worker's READY line.
+            deadline = time.monotonic() + timeout
+            ready_or_done = threading.Event()
+            done = threading.Event()
+            response = {}
+            def exchange():
+                try:
+                    proc.stdin.write(payload)
+                    proc.stdin.close()
+                    first = proc.stdout.readline()
+                    if first == 'READY\n':
+                        response['ready_at'] = time.monotonic()
+                        ready_or_done.set()
+                        first = ''
+                    response['stdout'] = first + proc.stdout.read()
+                except Exception as exc:
+                    response['error'] = exc
+                finally:
+                    done.set()
+                    ready_or_done.set()
+            exchange_thread = threading.Thread(target=exchange, daemon=True)
+            exchange_thread.start()
+            if not ready_or_done.wait(max(0, deadline-time.monotonic())):
+                raise subprocess.TimeoutExpired(command, timeout)
+            if 'ready_at' in response:
+                deadline = min(deadline, response['ready_at'] + ready_timeout)
+            if not done.wait(max(0, deadline-time.monotonic())):
+                raise subprocess.TimeoutExpired(command, ready_timeout)
+            if 'error' in response:
+                raise response['error']
+            stdout = response['stdout']
+            proc.wait(timeout=max(0.001, deadline-time.monotonic()))
         if proc.returncode:
             raise RuntimeError('ProbeWorkerFailed')
         return stdout
@@ -79,6 +116,8 @@ def communicate_bounded(command, payload, timeout):
         elif proc.poll() is None:
             proc.kill()
             proc.wait(timeout=5)
+        if exchange_thread is not None:
+            exchange_thread.join(timeout=5)
         for stream in (proc.stdin,proc.stdout,proc.stderr):
             if stream is not None:
                 stream.close()

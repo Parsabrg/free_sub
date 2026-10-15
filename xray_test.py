@@ -122,17 +122,19 @@ def make_config(outbound, local_port):
             {'type':'field','inboundTag':['local-test'],'outboundTag':'candidate'}]},
     }
 
-def run_probe(candidate, xray_bin, timeout=30.0, *, quick=False, local_fixture=None):
-    """One deadline covers DNS, startup, TLS, body reads and all fallback probes.
+def run_probe(candidate, xray_bin, timeout=30.0, *, quick=False, screen_timeout=None, local_fixture=None):
+    """An outer deadline covers DNS, startup, TLS, body reads and fallback probes.
+
+    screen_timeout optionally starts a shorter network deadline after Xray is ready.
 
     local_fixture is an internal integration-test hook: all addresses MUST be loopback.
     The production CLI never exposes this hook or accepts a custom trust anchor.
     """
     payload = {'candidate': asdict(candidate), 'xray_bin':str(xray_bin), 'timeout':timeout,
-               'quick':quick, 'fixture':local_fixture}
+               'quick':quick, 'screen_timeout':screen_timeout, 'fixture':local_fixture}
     try:
         output = communicate_bounded([sys.executable, str(Path(__file__).resolve()), '--worker'],
-                                     json.dumps(payload), timeout)
+                                     json.dumps(payload), timeout, ready_timeout=screen_timeout)
         result = ProbeResult(**json.loads(output))
         result.completed_epoch = time.time()
         return result
@@ -179,6 +181,8 @@ def _probe_worker(payload):
                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                                     creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
             check_ready(p,proc)
+            if payload.get('screen_timeout') is not None:
+                print('READY',flush=True)
             for url, minimum in probes:
                 attempts += 1
                 try:

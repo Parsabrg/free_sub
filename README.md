@@ -127,10 +127,12 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
   the validated public IP; SNI and transport Host values remain intact.
 - Each candidate runs in its own Xray process with a loopback SOCKS inbound and
   candidate-only routing. No direct fallback outbound exists in the tester.
-- Discovery first-pass checks have a two-second total deadline (`--screen-timeout 2`),
-  including worker startup, DNS, Xray startup and certificate-verified HTTPS body data.
-  This favors speed and can reject working but slower nodes. Full verification and
-  health checks retain a 30-second deadline (`--timeout 30`). Discovery
+- Discovery first-pass network checks have a two-second deadline (`--screen-timeout 2`)
+  after Xray is ready. Python/DNS/Xray startup remains inside a separate 30-second
+  total candidate deadline, so CPU startup delays are not mistaken for proxy timeouts.
+  The network check still requires certificate-verified HTTPS body data. It favors
+  speed and can reject working but slower nodes. Full verification and health checks
+  retain a 30-second deadline (`--timeout 30`). Discovery
   finalists require a new process and successful transfers to two different
   probe hostnames. Health checks revisit already fully verified nodes.
 - Roughly 16 KiB download and smaller fallback endpoints prove connectivity.
