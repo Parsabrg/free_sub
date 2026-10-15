@@ -197,6 +197,30 @@ After Pages is enabled and a successful local scan is pushed:
 Until then, the repository contains no fabricated tested subscription. The public
 HTML page initially reports status unavailable.
 
+## Sources and acknowledgments
+
+Public candidate feeds come from the projects below. Thanks to their maintainers.
+This project independently tests candidates; listing a source does not imply its
+maintainers endorse this project or guarantee the proxy operators.
+
+| Resource | Published repository license / terms |
+|---|---|
+| [Barry](https://github.com/barry-far/V2ray-Config) | MIT |
+| [EbraSha](https://github.com/ebrasha/free-v2ray-public-list) | No license detected by GitHub; check upstream terms |
+| [Epodonios](https://github.com/Epodonios/v2ray-configs) | GPL-3.0 |
+| [Shadowmere](https://shadowmere.xyz/) | Check the provider's terms |
+| [0xRadikal](https://github.com/0xRadikal/Free-v2ray-Configs) | MIT |
+| [Pawdroid](https://github.com/Pawdroid/Free-servers) | No license detected by GitHub; check upstream terms |
+| [Mahdibland / V2RayAggregator](https://github.com/mahdibland/V2RayAggregator) | GPL-3.0; public `Eternity.txt` feed only |
+| [XTLS / Xray-core](https://github.com/XTLS/Xray-core) | MPL-2.0; official binary downloaded locally, not committed |
+
+License metadata was checked on 2026-10-15 and may change. Consult each upstream
+license and retain required copyright/license notices when redistributing covered
+material. A repository's software license does not by itself establish permission
+from every proxy operator to redistribute credentials. Attribution is not a
+substitute for permission; public visibility alone does not grant a general reuse
+license. Do not add private or paid subscription credentials.
+
 ## Local data, troubleshooting and removal
 
 `.local/history.json` includes public feed credentials and stays off Git.
