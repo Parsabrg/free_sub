@@ -130,18 +130,20 @@ def run_probe(candidate, xray_bin, timeout=30.0, *, quick=False, screen_timeout=
     local_fixture is an internal integration-test hook: all addresses MUST be loopback.
     The production CLI never exposes this hook or accepts a custom trust anchor.
     """
-    payload = {'candidate': asdict(candidate), 'xray_bin':str(xray_bin), 'timeout':timeout,
-               'quick':quick, 'screen_timeout':screen_timeout, 'fixture':local_fixture}
-    try:
-        output = communicate_bounded([sys.executable, str(Path(__file__).resolve()), '--worker'],
-                                     json.dumps(payload), timeout, ready_timeout=screen_timeout)
-        result = ProbeResult(**json.loads(output))
-        result.completed_epoch = time.time()
-        return result
-    except subprocess.TimeoutExpired:
-        return ProbeResult(False, error='CandidateDeadline')
-    except (OSError, ValueError, RuntimeError):
-        return ProbeResult(False, error='ProbeWorkerFailed')
+    # Parent ownership cleans probe files even when the whole worker is killed.
+    with tempfile.TemporaryDirectory(prefix='xray-probe-') as work_dir:
+        payload = {'candidate': asdict(candidate), 'xray_bin':str(xray_bin), 'timeout':timeout,
+                   'quick':quick, 'screen_timeout':screen_timeout, 'fixture':local_fixture, 'work_dir':work_dir}
+        try:
+            output = communicate_bounded([sys.executable, str(Path(__file__).resolve()), '--worker'],
+                                         json.dumps(payload), timeout, ready_timeout=screen_timeout)
+            result = ProbeResult(**json.loads(output))
+            result.completed_epoch = time.time()
+            return result
+        except subprocess.TimeoutExpired:
+            return ProbeResult(False, error='CandidateDeadline')
+        except (OSError, ValueError, RuntimeError):
+            return ProbeResult(False, error='ProbeWorkerFailed')
 
 
 def _probe_worker(payload):
@@ -172,7 +174,7 @@ def _probe_worker(payload):
     successes = []; attempts = 0; last_error = ''
     target_successes = 1 if payload.get('quick') else 2
     p = allocate_port()
-    with tempfile.TemporaryDirectory(prefix='xray-check-') as tmp:
+    with tempfile.TemporaryDirectory(prefix='xray-check-',dir=payload.get('work_dir')) as tmp:
         cfg = Path(tmp)/'config.json'
         cfg.write_text(json.dumps(make_config(outbound,p)), encoding='utf-8')
         proc = None

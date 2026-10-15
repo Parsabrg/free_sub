@@ -72,6 +72,22 @@ class RegressionTests(unittest.TestCase):
             communicate_bounded(startup_stall, '', 0.2, ready_timeout=0.1)
         self.assertLess(time.monotonic()-start,2)
 
+    def test_probe_deadline_removes_worker_temp_files(self):
+        from xray_test import run_probe
+        workspace=[]
+        def timeout(command, payload, *args, **kwargs):
+            folder=Path(json.loads(payload)['work_dir'])
+            workspace.append(folder)
+            (folder/'worker-files').mkdir()
+            (folder/'worker-files/config.json').write_text('{}')
+            raise subprocess.TimeoutExpired(command,2)
+        with patch('xray_test.communicate_bounded',side_effect=timeout):
+            result=run_probe(parse('trojan://fixture@example.com:443?security=tls'),'unused',30,
+                             quick=True,screen_timeout=2)
+        self.assertEqual(result.error,'CandidateDeadline')
+        self.assertEqual(len(workspace),1)
+        self.assertFalse(workspace[0].exists())
+
     def test_strict_url_settings_and_grpc_mode(self):
         base='vless://id@example.com:443?security=tls'
         self.assertIsNone(parse(base+'&type=xhttp&extra=%7B%7D'))
