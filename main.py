@@ -2,6 +2,7 @@
 from __future__ import annotations
 import argparse
 import base64
+import copy
 from collections import Counter, deque
 import concurrent.futures as cf
 from dataclasses import asdict
@@ -67,7 +68,7 @@ def test_batch(nodes, xray, workers, timeout, label, probe=run_probe, quick=Fals
 
 def write_outputs(docs, selected, state, report, now, ttl):
     docs=Path(docs)
-    rows=[]; urls=[]
+    rows=[]; urls=[]; outbounds=[]
     for rank,(candidate,result) in enumerate(selected,1):
         row=state['nodes'][candidate.key]
         name=name_for_position(country_flag(row.get('country_code')),row['number'])
@@ -75,6 +76,9 @@ def write_outputs(docs, selected, state, report, now, ttl):
         if parse(url).key != candidate.key:
             raise ValueError('PublishedConfigDiffersFromTestedConfig')
         urls.append(url)
+        outbound=copy.deepcopy(candidate.outbound)
+        outbound['tag']=name
+        outbounds.append(outbound)
         rows.append({'id':candidate.key,'name':name,'rank':rank,'protocol':candidate.protocol,
                      'country_code':row.get('country_code'),'endpoint_ip':row.get('endpoint_ip'),
                      'last_success_epoch':row['last_success'],'expires_epoch':row['last_success']+ttl,
@@ -96,12 +100,13 @@ def write_outputs(docs, selected, state, report, now, ttl):
     staging.mkdir(parents=True,exist_ok=True)
     atomic_write(staging/'sub.txt',data)
     atomic_write(staging/'sub.b64',base64.b64encode(data.encode('utf-8')).decode()+'\n')
+    atomic_write(staging/'xray.json',json.dumps({'outbounds':outbounds},indent=2,ensure_ascii=False)+'\n')
     atomic_write(staging/'status.json',json.dumps(report,indent=2,ensure_ascii=False)+'\n')
     atomic_write(staging/'index.html',INDEX)
     validate_outputs(staging)
     # Each replacement is atomic; the Pages deployment publishes one complete Git snapshot.
     docs.mkdir(parents=True,exist_ok=True)
-    for name in ('sub.txt','sub.b64','status.json','index.html'):
+    for name in ('sub.txt','sub.b64','xray.json','status.json','index.html'):
         atomic_write(docs/name,(staging/name).read_text(encoding='utf-8'))
     return report
 
@@ -110,7 +115,7 @@ INDEX='''<!doctype html><html lang="en"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width"><title>Free Xray subscription</title>
 <style>body{font:16px system-ui;max-width:760px;margin:4rem auto;padding:0 1rem;line-height:1.6;background:#10151d;color:#dce6f4}a{color:#86c9ff}code{overflow-wrap:anywhere}.warning{color:#ffce83}</style>
 <h1>Free Xray subscription</h1><p id="health">Loading test status…</p>
-<p><a href="sub.txt">Plain subscription</a> · <a href="sub.b64">Base64 subscription</a> · <a href="status.json">Test report</a></p>
+<p><a href="sub.txt">Plain subscription</a> · <a href="sub.b64">Base64 subscription</a> · <a href="xray.json">Xray feed for v2rayN</a> · <a href="status.json">Test report</a></p>
 <p>Real HTTPS transfers through Xray, tested on the operator’s network. Country flags describe the connection endpoint, which can be a CDN ingress. Public proxies are untrusted.</p>
 <p>Refresh the subscription hourly. Clients should ignore nodes after their individual expiry in status.json.</p>
 <script>fetch('status.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(s=>{const now=Date.now()/1000;const fresh=s.nodes.filter(n=>n.expires_epoch>now).length;const age=Math.max(0,Math.round((now-s.generated_epoch)/60));const e=document.querySelector('#health');e.textContent=`${fresh} unexpired of ${s.published} nodes; last attempt ${age} minutes ago; mode: ${s.mode}; state: ${s.health}.`;if(age>60||s.health!=='ok'||fresh===0)e.className='warning';}).catch(()=>document.querySelector('#health').textContent='Status unavailable; freshness unknown.');</script></html>'''
@@ -151,7 +156,7 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
     print(f'[RUN] mode={mode}; candidates={len(queue)}; previous={len(old)}',flush=True)
     screen_timeout=args.screen_timeout if mode=='full' else None
     first,first_results,first_counts=test_batch(queue,args.xray,args.workers,args.timeout,'CHECK',probe,
-                                               quick=True,screen_timeout=screen_timeout)
+                                               quick=(mode=='full'),screen_timeout=screen_timeout)
     first.sort(key=lambda pair:rank_key(pair[0],pair[1],state,now))
     second=[]; second_results={}; second_counts={}
     if mode=='full':

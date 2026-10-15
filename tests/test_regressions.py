@@ -51,7 +51,13 @@ class RegressionTests(unittest.TestCase):
             calls.clear()
             args.mode='health'
             run_cycle(args, folder, probe, lambda **kw: {}, lambda *a, **kw: {})
-            self.assertEqual([(t,q,n) for k,t,q,n in calls],[(30,True,None)])
+            self.assertEqual([(t,q,n) for k,t,q,n in calls],[(30,False,None)])
+            exported=Path(folder)/'docs/xray.json'
+            config=json.loads(exported.read_text(encoding='utf-8'))
+            config['outbounds'][0]['protocol']='freedom'
+            exported.write_text(json.dumps(config),encoding='utf-8')
+            with self.assertRaisesRegex(ValueError,'differs from tested'):
+                validate_outputs(Path(folder)/'docs')
 
     def test_network_deadline_starts_after_worker_readiness(self):
         import sys

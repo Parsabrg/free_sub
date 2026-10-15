@@ -6,7 +6,7 @@ VLESS, Trojan, and Shadowsocks use a URL-encoded #fragment label.
 from __future__ import annotations
 import base64
 import json
-from urllib.parse import quote
+from urllib.parse import quote, unquote, urlsplit, urlunsplit
 
 
 def name_for_position(flag: str, position: int) -> str:
@@ -31,6 +31,13 @@ def rename_share_link(url: str, name: str) -> str:
         encoded = base64.b64encode(json.dumps(config, ensure_ascii=False,
                                                separators=(',', ':')).encode('utf-8')).decode('ascii')
         return 'vmess://' + encoded
-    if scheme in ('vless', 'trojan', 'ss'):
+    if scheme in ('vless', 'trojan'):
+        uri = urlsplit(scheme + '://' + payload)
+        if uri.username is None or uri.password is not None:
+            raise ValueError('Invalid share-link credentials')
+        # Raw @ and + in passwords break .NET URI import or URL decoding.
+        authority = quote(unquote(uri.username), safe='') + '@' + uri.netloc.rsplit('@', 1)[1]
+        return urlunsplit((scheme, authority, uri.path, uri.query, quote(name, safe='')))
+    if scheme == 'ss':
         return scheme + '://' + payload + '#' + quote(name, safe='')
     raise ValueError('Unsupported share link scheme')

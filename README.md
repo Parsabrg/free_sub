@@ -4,6 +4,13 @@ Collect public VLESS, VMess, Trojan and Shadowsocks share links, verify real HTT
 response data through the official Xray core on your Windows PC, remember node
 reliability, and publish up to 300 working configurations to GitHub Pages.
 
+Use the **Xray core** for this subscription in your client. Passing Xray tests
+does not establish compatibility with sing-box. Share-link passwords are URL
+escaped on export so reserved characters survive client import.
+For v2rayN, use `https://parsabrg.github.io/free_sub/xray.json`: its native Xray
+outbounds retain the tested settings and select Xray on each subscription update.
+This applies to that subscription group without changing other groups' defaults.
+
 **The scheduled task wakes your PC from supported sleep on AC power. You do not
 need to sit at the keyboard, unlock Windows, or approve each test or push.**
 Windows cannot execute a test while the CPU remains asleep: the task wakes the
@@ -134,7 +141,8 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
   speed and can reject working but slower nodes. Full verification and health checks
   retain a 30-second deadline (`--timeout 30`). Discovery
   finalists require a new process and successful transfers to two different
-  probe hostnames. Health checks revisit already fully verified nodes.
+  probe hostnames. Every health check also requires successful transfers to two
+  different probe hostnames before marking a node freshly verified.
 - Roughly 16 KiB download and smaller fallback endpoints prove connectivity.
   Transfer estimates include handshake time and **are not sustained-speed
   benchmarks**. Timing variation across different endpoints is reported separately
@@ -199,6 +207,7 @@ After Pages is enabled and a successful local scan is pushed:
 
 - Plain: `https://parsabrg.github.io/free_sub/sub.txt`
 - Base64: `https://parsabrg.github.io/free_sub/sub.b64`
+- Xray outbounds for v2rayN: `https://parsabrg.github.io/free_sub/xray.json`
 - Freshness/health: `https://parsabrg.github.io/free_sub/status.json`
 
 Until then, the repository contains no fabricated tested subscription. The public

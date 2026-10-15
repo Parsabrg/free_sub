@@ -162,7 +162,7 @@ class RealXrayEndToEnd(unittest.TestCase):
                 remote_sha=git('ls-remote','origin','refs/heads/main').stdout.split()[0]
                 self.assertEqual(local_sha,remote_sha)
                 committed=git('diff-tree','--no-commit-id','--name-only','-r','HEAD').stdout.splitlines()
-                self.assertEqual(set(committed),{'docs/sub.txt','docs/sub.b64','docs/status.json','docs/index.html'})
+                self.assertEqual(set(committed),{'docs/sub.txt','docs/sub.b64','docs/xray.json','docs/status.json','docs/index.html'})
                 self.assertFalse(any('.local' in p for p in committed))
             finally:
                 import shutil

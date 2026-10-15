@@ -9,7 +9,7 @@ import subprocess
 import sys
 from collector import links, parse
 
-OUTPUTS = ('sub.txt','sub.b64','status.json','index.html')
+OUTPUTS = ('sub.txt','sub.b64','xray.json','status.json','index.html')
 
 
 def source_fingerprint(root):
@@ -33,6 +33,9 @@ def validate_outputs(docs):
     if len(urls)!=report['published'] or len(report['nodes'])!=len(urls):
         raise ValueError('Subscription count mismatch')
     seen=set()
+    outbounds=json.loads((docs/'xray.json').read_text(encoding='utf-8'))['outbounds']
+    if len(outbounds)!=len(urls):
+        raise ValueError('Xray subscription count mismatch')
     for url,row in zip(urls,report['nodes']):
         c=parse(url)
         if c is None or c.key in seen or c.key!=row['id']:
@@ -40,6 +43,10 @@ def validate_outputs(docs):
         if row['last_success_epoch']>row['expires_epoch'] or row['expires_epoch']<=report['generated_epoch']:
             raise ValueError('Expired node in publication')
         seen.add(c.key)
+    for url,row,outbound in zip(urls,report['nodes'],outbounds):
+        expected=dict(parse(url).outbound,tag=row['name'])
+        if outbound!=expected:
+            raise ValueError('Xray export differs from tested configuration')
     return report
 
 

@@ -26,6 +26,13 @@ class RenameTests(unittest.TestCase):
         self.assertEqual(unquote(urlsplit(changed).fragment), 'server 🇺🇸 2')
         self.assertEqual(parse(changed).key, parse(src).key)
 
+    def test_trojan_escapes_reserved_userinfo_for_dotnet_clients(self):
+        src='trojan://fixture@tag+pass@example.net:443?security=tls&sni=example.net#old'
+        changed=rename_share_link(src,'server 🌐 2')
+        self.assertIn('fixture%40tag%2Bpass@',changed)
+        self.assertEqual(parse(changed).key,parse(src).key)
+        self.assertEqual(rename_share_link(changed,'server 🌐 2'),changed)
+
     def test_ss_preserves_credentials(self):
         payload = base64.urlsafe_b64encode(b'aes-256-gcm:longpassword').decode().rstrip('=')
         src = f'ss://{payload}@8.8.4.4:443#Unwanted'
