@@ -1,26 +1,6 @@
 {
   "outbounds": [
     {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "kr.tronsg.com",
-            "port": 443,
-            "password": "Trojan@82164024"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "kr.tronsg.com"
-        }
-      },
-      "tag": "server 🇰🇷 1623"
-    },
-    {
       "protocol": "shadowsocks",
       "settings": {
         "servers": [
@@ -33,26 +13,6 @@
         ]
       },
       "tag": "server 🇩🇪 478"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "ca.tronsg.com",
-            "port": 443,
-            "password": "Trojan@82164024"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ca.tronsg.com"
-        }
-      },
-      "tag": "server 🇨🇦 740"
     },
     {
       "protocol": "vless",
@@ -146,27 +106,6 @@
       "tag": "server 🇸🇬 4757"
     },
     {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "ca.tronsg.com",
-            "port": 443,
-            "password": "Trojan@82164024"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ca.tronsg.com",
-          "fingerprint": "chrome"
-        }
-      },
-      "tag": "server 🇨🇦 5763"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -197,6 +136,36 @@
       "tag": "server 🇰🇿 8364"
     },
     {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "88.216.223.66",
+            "port": 443,
+            "users": [
+              {
+                "id": "244d9eab-3311-40c7-b47f-4968dc3088a6",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "tcpswed1.figurapn.ru",
+          "publicKey": "drl7nndYdfzZY1aQ0eUAWmNV0nsHig2uDnu9siy9biQ",
+          "shortId": "868419504747f6de",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇸🇪 8365"
+    },
+    {
       "protocol": "shadowsocks",
       "settings": {
         "servers": [
@@ -209,6 +178,20 @@
         ]
       },
       "tag": "server 🇨🇦 424"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "102.37.156.224",
+            "port": 443,
+            "method": "chacha20-ietf-poly1305",
+            "password": "aduB9HGxQHjA2SBMRjkHX6"
+          }
+        ]
+      },
+      "tag": "server 🇿🇦 241"
     }
   ]
 }
