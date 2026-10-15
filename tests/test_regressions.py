@@ -15,6 +15,16 @@ from xray_test import ProbeResult
 
 
 class RegressionTests(unittest.TestCase):
+    def test_parallel_worker_budget(self):
+        import sys
+        from main import arguments
+        version = subprocess.CompletedProcess([], 0, stdout='Xray fixture')
+        with patch('main.subprocess.run', return_value=version):
+            self.assertEqual(arguments(['--xray', sys.executable]).workers, 32)
+            self.assertEqual(arguments(['--xray', sys.executable, '--workers', '64']).workers, 64)
+            with self.assertRaises(SystemExit):
+                arguments(['--xray', sys.executable, '--workers', '65'])
+
     def test_strict_url_settings_and_grpc_mode(self):
         base='vless://id@example.com:443?security=tls'
         self.assertIsNone(parse(base+'&type=xhttp&extra=%7B%7D'))

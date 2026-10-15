@@ -47,3 +47,8 @@ Windows PC/GitHub account. They have not been represented as tested remotely.
   certificate and hostname verification enabled. Production TLS is unchanged.
 - All three PowerShell installation/runtime/check scripts parsed without errors.
 - Physical sleep/wake is not yet verified.
+
+Follow-up Windows checks: 31 tests passed after adding a 32-worker default
+and a tested 64-worker upper bound. The unattended PowerShell runner now preserves
+native stderr, exit codes, and durable START/END timestamps. An actual Windows
+PowerShell 5 lock-collision check confirmed exit code 2 and a readable error log.

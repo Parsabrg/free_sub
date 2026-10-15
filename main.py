@@ -224,7 +224,7 @@ def arguments(argv=None):
     ap.add_argument('--mode',choices=('auto','full','health'),default='auto')
     ap.add_argument('--limit',type=int,default=300)
     ap.add_argument('--max-tests',type=int,default=1600,help='0 means all supported source entries; no per-source truncation')
-    ap.add_argument('--workers',type=int,default=6)
+    ap.add_argument('--workers',type=int,default=32)
     ap.add_argument('--timeout',type=float,default=30,help='Total wall-clock deadline per candidate including DNS and all probes')
     ap.add_argument('--recheck',type=int,default=400)
     ap.add_argument('--geo-workers',type=int,default=3)
@@ -233,7 +233,7 @@ def arguments(argv=None):
     ap.add_argument('--ttl-hours',type=float,default=6)
     ap.add_argument('--publish',action='store_true')
     args=ap.parse_args(argv)
-    if not (1<=args.limit<=300 and 1<=args.workers<=16 and 1<=args.geo_workers<=8 and
+    if not (1<=args.limit<=300 and 1<=args.workers<=64 and 1<=args.geo_workers<=8 and
             args.max_tests>=0 and 5<=args.timeout<=120 and args.recheck>=args.limit and
             1<=args.discovery_hours<=24 and 1<=args.ttl_hours<=24):
         ap.error('Invalid budget, worker count, deadline, TTL or discovery interval')

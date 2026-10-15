@@ -232,7 +232,9 @@ Do not upload these directories or add private subscription sources.
   owner; do not use `SYSTEM`, S4U, or an SSH key requiring unavailable prompts.
 - Task runs but does not wake: check `powercfg /a`, `powercfg /waketimers`, the
   task's WakeToRun property, AC power, firmware wake support, and Modern Standby.
-- Long full scans: reduce `--max-tests`/timeout or modestly increase workers;
+- Full scans use 32 parallel workers by default (`--workers 1` through `64`).
+  This operator PC has 20 logical CPUs and 32 GiB RAM; reduce workers on smaller PCs.
+- Long full scans: reduce `--max-tests`/timeout or adjust workers;
   scheduled trigger overlap is suppressed. Do not assume a 30-minute trigger
   guarantees a completed update every 30 minutes during a long scan.
 - Source/proxy/GeoIP access may be filtered; existing nodes are still rechecked
