@@ -5,20 +5,6 @@
       "settings": {
         "servers": [
           {
-            "address": "194.87.196.107",
-            "port": 18443,
-            "method": "aes-256-gcm",
-            "password": "Lpq5UPVHtQYiuB9jEUNc2WkeIYCUH9DE"
-          }
-        ]
-      },
-      "tag": "server 🇷🇺 9165"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
             "address": "54.255.178.40",
             "port": 8443,
             "method": "chacha20-ietf-poly1305",
@@ -43,16 +29,51 @@
       "tag": "server 🇰🇷 9649"
     },
     {
-      "protocol": "vless",
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "ca.tronsg.com",
+            "port": 443,
+            "password": "Trojan@82164024"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ca.tronsg.com"
+        }
+      },
+      "tag": "server 🇨🇦 740"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "102.37.156.224",
+            "port": 443,
+            "method": "chacha20-ietf-poly1305",
+            "password": "aduB9HGxQHjA2SBMRjkHX6"
+          }
+        ]
+      },
+      "tag": "server 🇿🇦 241"
+    },
+    {
+      "protocol": "vmess",
       "settings": {
         "vnext": [
           {
-            "address": "188.114.98.0",
+            "address": "us16-4.998998.best",
             "port": 443,
             "users": [
               {
-                "id": "20ff936a-8eb5-4d27-9cce-93f2016d467b",
-                "encryption": "none"
+                "id": "5504eaa8-1395-402f-8e0e-75ecd762e627",
+                "alterId": 0,
+                "security": "auto"
               }
             ]
           }
@@ -62,16 +83,13 @@
         "network": "ws",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "free.nadun.store"
+          "serverName": "server1.9966338.xyz"
         },
         "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "free.nadun.store"
-          }
+          "path": "/efrsdioy98wert"
         }
       },
-      "tag": "server 🇺🇸 8619"
+      "tag": "server 🇺🇸 4375"
     },
     {
       "protocol": "shadowsocks",
