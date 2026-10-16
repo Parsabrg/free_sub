@@ -1,35 +1,6 @@
 {
   "outbounds": [
     {
-      "protocol": "vmess",
-      "settings": {
-        "vnext": [
-          {
-            "address": "yg1.ygkkk.dpdns.org",
-            "port": 443,
-            "users": [
-              {
-                "id": "b2ba4a73-3123-479e-aa96-5973a9ecd0c0",
-                "alterId": 0,
-                "security": "auto"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "jmp1.907737.xyz"
-        },
-        "wsSettings": {
-          "path": "/b2ba4a73-3123-479e-aa96-5973a9ecd0c0-vm"
-        }
-      },
-      "tag": "server 🇺🇸 7783"
-    },
-    {
       "protocol": "shadowsocks",
       "settings": {
         "servers": [
@@ -72,25 +43,35 @@
       "tag": "server 🇰🇷 9649"
     },
     {
-      "protocol": "trojan",
+      "protocol": "vless",
       "settings": {
-        "servers": [
+        "vnext": [
           {
-            "address": "ca.tronsg.com",
+            "address": "188.114.98.0",
             "port": 443,
-            "password": "Trojan@82164024"
+            "users": [
+              {
+                "id": "20ff936a-8eb5-4d27-9cce-93f2016d467b",
+                "encryption": "none"
+              }
+            ]
           }
         ]
       },
       "streamSettings": {
-        "network": "tcp",
+        "network": "ws",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "ca.tronsg.com",
-          "fingerprint": "chrome"
+          "serverName": "free.nadun.store"
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "free.nadun.store"
+          }
         }
       },
-      "tag": "server 🇨🇦 5763"
+      "tag": "server 🇺🇸 8619"
     },
     {
       "protocol": "shadowsocks",
