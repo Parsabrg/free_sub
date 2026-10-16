@@ -1,30 +1,47 @@
 {
   "outbounds": [
     {
-      "protocol": "vless",
+      "protocol": "vmess",
       "settings": {
         "vnext": [
           {
-            "address": "fi.quic.best",
+            "address": "yg1.ygkkk.dpdns.org",
             "port": 443,
             "users": [
               {
-                "id": "c2331311-c9fd-4af9-8f34-7a9edcee3b92",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
+                "id": "b2ba4a73-3123-479e-aa96-5973a9ecd0c0",
+                "alterId": 0,
+                "security": "auto"
               }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "tcp",
+        "network": "ws",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "fi.quic.best"
+          "serverName": "jmp1.907737.xyz"
+        },
+        "wsSettings": {
+          "path": "/b2ba4a73-3123-479e-aa96-5973a9ecd0c0-vm"
         }
       },
-      "tag": "server 🇫🇮 6593"
+      "tag": "server 🇺🇸 7783"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "194.87.196.107",
+            "port": 18443,
+            "method": "aes-256-gcm",
+            "password": "Lpq5UPVHtQYiuB9jEUNc2WkeIYCUH9DE"
+          }
+        ]
+      },
+      "tag": "server 🇷🇺 9165"
     },
     {
       "protocol": "shadowsocks",
@@ -55,66 +72,25 @@
       "tag": "server 🇰🇷 9649"
     },
     {
-      "protocol": "vless",
+      "protocol": "trojan",
       "settings": {
-        "vnext": [
+        "servers": [
           {
-            "address": "31.76.227.60",
+            "address": "ca.tronsg.com",
             "port": 443,
-            "users": [
-              {
-                "id": "05c8eabe-96af-4db2-bb2f-a24fa84344ba",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
+            "password": "Trojan@82164024"
           }
         ]
       },
       "streamSettings": {
         "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "assets-mi-29.spbstudentlife.com",
-          "publicKey": "CcMEJ-JOS4clB3gXbc6wXgzkiJQbyNpKY90I8B6AqyU",
-          "shortId": "4c188683e2c14a3c",
-          "fingerprint": "randomized",
-          "spiderX": "/"
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ca.tronsg.com",
+          "fingerprint": "chrome"
         }
       },
-      "tag": "server 🇷🇺 8644"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "88.216.191.10",
-            "port": 443,
-            "users": [
-              {
-                "id": "244d9eab-3311-40c7-b47f-4968dc3088a6",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "si1.lazeroe.com",
-          "publicKey": "drl7nndYdfzZY1aQ0eUAWmNV0nsHig2uDnu9siy9biQ",
-          "shortId": "868419504747f6de",
-          "fingerprint": "firefox",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇸🇬 4757"
+      "tag": "server 🇨🇦 5763"
     },
     {
       "protocol": "shadowsocks",
