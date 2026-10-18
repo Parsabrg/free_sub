@@ -1,15 +1,17 @@
 {
   "mode": "health",
-  "health": "ok",
+  "health": "retained_previous",
   "tested_on": "operator network; local Xray",
   "xray_version": "Xray 26.3.27 (Xray, Penetrates Everything.) d2758a0 (go1.26.1 windows/amd64)",
   "source_status": {},
-  "unique_selected_for_test": 697,
+  "unique_selected_for_test": 665,
   "first_pass": {
-    "pass": 563,
-    "TimeoutError": 104,
-    "SSLEOFError": 27,
-    "ConnectionResetError": 3
+    "TimeoutExpired": 8,
+    "ConnectionResetError": 52,
+    "TimeoutError": 593,
+    "ValueError": 7,
+    "SSLEOFError": 4,
+    "CalledProcessError": 1
   },
   "second_pass": {},
   "max_tests": 0,
@@ -18,10 +20,10 @@
   "first_pass_timeout_seconds": 30,
   "screen_network_timeout_seconds": null,
   "verification_timeout_seconds": 30,
-  "failure_reason": null,
+  "failure_reason": "No current verified transfer; previous nodes age normally",
   "schema": 2,
-  "generated_epoch": 1792342468.208742,
-  "generated_utc": "2026-10-18T16:54:28+00:00",
+  "generated_epoch": 1792344717.5878885,
+  "generated_utc": "2026-10-18T17:31:57+00:00",
   "published": 300,
   "nodes": [
     {
@@ -33,13 +35,13 @@
       "endpoint_ip": "67.159.18.34",
       "last_success_epoch": 1792342181.063425,
       "expires_epoch": 1792363781.063425,
-      "success_rate": 0.9485,
+      "success_rate": 0.9226,
       "latency_ms": 555.5,
       "jitter_ms": 33.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 165.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "4eb58fda02f10e3ab511e975a28dda07b357a39686f8fc64364c24a8b2247927",
@@ -50,13 +52,13 @@
       "endpoint_ip": "85.155.242.39",
       "last_success_epoch": 1792342181.4650457,
       "expires_epoch": 1792363781.4650457,
-      "success_rate": 0.9231,
+      "success_rate": 0.91,
       "latency_ms": 792.6,
       "jitter_ms": 466.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 116.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "69606dca0270558926a9b3fcdbdf7ae0810734ac55e1b569ba35d700700e2e64",
@@ -67,13 +69,13 @@
       "endpoint_ip": "79.139.59.46",
       "last_success_epoch": 1792342180.8298407,
       "expires_epoch": 1792363780.8298407,
-      "success_rate": 0.9231,
+      "success_rate": 0.91,
       "latency_ms": 539.0,
       "jitter_ms": 53.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 170.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "9c586c244d812556a6183101295e68ab68529610e9a5cf1f88abe44b9a6168b0",
@@ -84,13 +86,13 @@
       "endpoint_ip": "193.233.82.201",
       "last_success_epoch": 1792342189.8211532,
       "expires_epoch": 1792363789.8211532,
-      "success_rate": 0.9227,
+      "success_rate": 0.8971,
       "latency_ms": 4910.1,
       "jitter_ms": 2759.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 18.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "66424f6c653ce70df0380a75a44d6cbf7883242ea26aec8f81ef935623958967",
@@ -101,13 +103,13 @@
       "endpoint_ip": "45.9.156.24",
       "last_success_epoch": 1792342181.6413095,
       "expires_epoch": 1792363781.6413095,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 752.0,
       "jitter_ms": 82.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 122.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f77f363a96b1659fc1fe24e2615db7eeacd8dfccf19097bf8f2aa86d33f447d5",
@@ -118,13 +120,13 @@
       "endpoint_ip": "76.164.203.141",
       "last_success_epoch": 1792342183.6407406,
       "expires_epoch": 1792363783.6407406,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 1870.0,
       "jitter_ms": 2459.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 49.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "5a66fe400599051aeb1913606c41c1b6725dc1c7e3f90e86051500bb129abb8e",
@@ -135,13 +137,13 @@
       "endpoint_ip": "188.114.96.4",
       "last_success_epoch": 1792342183.5467489,
       "expires_epoch": 1792363783.5467489,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 754.5,
       "jitter_ms": 62.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 122.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "0296c97669e9cde5ff008dbda2bc7f9b3a7064bd1dfec9313cfa5f6663763841",
@@ -152,13 +154,13 @@
       "endpoint_ip": "104.21.7.133",
       "last_success_epoch": 1792342183.6235526,
       "expires_epoch": 1792363783.6235526,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 805.9,
       "jitter_ms": 72.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 114.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "dfd7eb4ea1755a4888214f848bb29c20c6f428c4a80862ed7d618f27b7a46f93",
@@ -169,13 +171,13 @@
       "endpoint_ip": "94.183.238.15",
       "last_success_epoch": 1792342180.8377771,
       "expires_epoch": 1792363780.8377771,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 554.2,
       "jitter_ms": 11.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 166.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "97bf5f881118b32939d760e0a7b07c4473a36b2b1ae647e2db09d9d18f171da3",
@@ -186,13 +188,13 @@
       "endpoint_ip": "179.254.167.58",
       "last_success_epoch": 1792342181.3277998,
       "expires_epoch": 1792363781.3277998,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 546.9,
       "jitter_ms": 230.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 168.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "fe0444a274ec207acb04ac91f0794ccfda4eaa2c3a57bfc54e4f9a0ab4ea5d2c",
@@ -203,13 +205,13 @@
       "endpoint_ip": "177.1.186.43",
       "last_success_epoch": 1792342182.5442984,
       "expires_epoch": 1792363782.5442984,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 424.5,
       "jitter_ms": 3.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 216.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "3f92a89cfe00eacd6f41434511e1b736c7c42392b7730211f8eb5fc3d8bcc092",
@@ -220,13 +222,13 @@
       "endpoint_ip": "31.59.180.155",
       "last_success_epoch": 1792342180.8595154,
       "expires_epoch": 1792363780.8595154,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 499.3,
       "jitter_ms": 95.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 184.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b798d1b31cc55b26814d2032c43df4604826c74166df1404b6583a8b4f4e5789",
@@ -237,13 +239,13 @@
       "endpoint_ip": "50.7.176.123",
       "last_success_epoch": 1792342184.153508,
       "expires_epoch": 1792363784.153508,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 1068.2,
       "jitter_ms": 319.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 86.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "ee413ba97b6bf9f73b51148d00d773e7d762fffd8cd98e312c749bbb6b7a638b",
@@ -254,13 +256,13 @@
       "endpoint_ip": "212.104.141.233",
       "last_success_epoch": 1792342183.3640275,
       "expires_epoch": 1792363783.3640275,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 917.3,
       "jitter_ms": 173.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 100.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b1def5a378652f2f173e751a1e51614b566d21aec4da5fcf8504582c58554302",
@@ -271,13 +273,13 @@
       "endpoint_ip": "212.104.141.233",
       "last_success_epoch": 1792342183.3726127,
       "expires_epoch": 1792363783.3726127,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 915.9,
       "jitter_ms": 167.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 100.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "1abe473b9eae7c7e114fc36ecd2109ba994b467d142608a4d8914476b33586bb",
@@ -288,13 +290,13 @@
       "endpoint_ip": "212.104.141.233",
       "last_success_epoch": 1792342183.603801,
       "expires_epoch": 1792363783.603801,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 929.0,
       "jitter_ms": 207.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 99.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "5cea2785c687677bbe5e1fead0160ddb080c92331a9cbe95c86f4b0b2d23a552",
@@ -305,13 +307,13 @@
       "endpoint_ip": "91.107.247.173",
       "last_success_epoch": 1792342183.610494,
       "expires_epoch": 1792363783.610494,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 714.1,
       "jitter_ms": 385.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 128.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "057b34144b04fa85a077fef4734dd1daa251a6fcf8dd0eaa79610efacb63df79",
@@ -322,13 +324,13 @@
       "endpoint_ip": "162.159.133.36",
       "last_success_epoch": 1792342183.3789315,
       "expires_epoch": 1792363783.3789315,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 630.5,
       "jitter_ms": 24.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 146.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f0054129e464f30427a2d9e036ee2d67db4ebc778c9a3b1ae9a9541726e7b1a2",
@@ -339,13 +341,13 @@
       "endpoint_ip": "104.17.74.206",
       "last_success_epoch": 1792342187.71023,
       "expires_epoch": 1792363787.71023,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 2683.4,
       "jitter_ms": 2769.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 34.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "bd00037cf02d53e959769df38405aae897b0c99052acb7235870010c3bbaed0c",
@@ -356,13 +358,13 @@
       "endpoint_ip": "162.159.130.234",
       "last_success_epoch": 1792342184.4872139,
       "expires_epoch": 1792363784.4872139,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 638.7,
       "jitter_ms": 144.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 144.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "c8b806731093658bc11745667980dc5519b91ec156abcab2a612304246a72e85",
@@ -373,13 +375,13 @@
       "endpoint_ip": "104.17.148.22",
       "last_success_epoch": 1792342184.4621708,
       "expires_epoch": 1792363784.4621708,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 627.6,
       "jitter_ms": 224.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 146.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a8db9cd6a57e6a600ec8467d4d6d15d8e0466846ac6a5cb5ba530c0e6a43c8a1",
@@ -390,13 +392,13 @@
       "endpoint_ip": "104.18.4.82",
       "last_success_epoch": 1792342186.4612978,
       "expires_epoch": 1792363786.4612978,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 1586.3,
       "jitter_ms": 190.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 58.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "95c3691eccd65466395fcc207d8428edb7568c7de2de2f57d870337b0aaab1a5",
@@ -407,13 +409,13 @@
       "endpoint_ip": "104.18.4.82",
       "last_success_epoch": 1792342187.7289672,
       "expires_epoch": 1792363787.7289672,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 1880.9,
       "jitter_ms": 565.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 48.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "35bb12550bf4e87ecbbb885f1aa2c229cace36ecbcfe9691a6af1e929eef4879",
@@ -424,13 +426,13 @@
       "endpoint_ip": "50.7.176.123",
       "last_success_epoch": 1792342186.719844,
       "expires_epoch": 1792363786.719844,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 1432.4,
       "jitter_ms": 95.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 64.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "734818811ea284fcee6079d15d24bfe64d186b2d13f006d2aab8ac0bbd098622",
@@ -441,13 +443,13 @@
       "endpoint_ip": "172.67.190.164",
       "last_success_epoch": 1792342188.8022778,
       "expires_epoch": 1792363788.8022778,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 1695.5,
       "jitter_ms": 179.5,
       "body_bytes": 16612,
       "transfer_kbps_estimate": 39.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "0aac8ec0df4fe86db957afe6b5c25ee5236a8a1cd4f34c04d8f66e222b341e52",
@@ -458,13 +460,13 @@
       "endpoint_ip": "172.67.190.164",
       "last_success_epoch": 1792342189.2177863,
       "expires_epoch": 1792363789.2177863,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 1799.2,
       "jitter_ms": 79.9,
       "body_bytes": 16616,
       "transfer_kbps_estimate": 36.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f0e885d261f1a8c5278e9b46eca79cb9c5dd2b2276fac5ebd7ee64b8da3f9d63",
@@ -475,13 +477,13 @@
       "endpoint_ip": "172.67.190.164",
       "last_success_epoch": 1792342189.345512,
       "expires_epoch": 1792363789.345512,
-      "success_rate": 0.9222,
+      "success_rate": 0.9095,
       "latency_ms": 1790.7,
       "jitter_ms": 267.4,
       "body_bytes": 16616,
       "transfer_kbps_estimate": 37.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f4e8b252eabf4a0d9eb28fe69069bc605803bb1547efca95376956080e4e3202",
@@ -492,13 +494,13 @@
       "endpoint_ip": "104.18.1.22",
       "last_success_epoch": 1792342191.777553,
       "expires_epoch": 1792363791.777553,
-      "success_rate": 0.9222,
+      "success_rate": 0.9095,
       "latency_ms": 3708.3,
       "jitter_ms": 3937.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 24.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b2a85f6b7e61c7f1d9c977e903f7fca46c05a08f27d452c408255a111464edb9",
@@ -509,13 +511,13 @@
       "endpoint_ip": "78.159.246.179",
       "last_success_epoch": 1792342186.2575135,
       "expires_epoch": 1792363786.2575135,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 933.0,
       "jitter_ms": 224.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 98.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "9010ca283a5e5f0acd3856f709a9e48431baab81ac30bb8182851947df0f7a07",
@@ -526,13 +528,13 @@
       "endpoint_ip": "45.9.156.24",
       "last_success_epoch": 1792342185.927323,
       "expires_epoch": 1792363785.927323,
-      "success_rate": 0.9222,
+      "success_rate": 0.9095,
       "latency_ms": 650.7,
       "jitter_ms": 333.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 141.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e647489942e46a808df03f1f3e9418d38db8a02a3d2da24aee5188546ee11fe6",
@@ -543,13 +545,13 @@
       "endpoint_ip": "15.204.233.41",
       "last_success_epoch": 1792342197.6208167,
       "expires_epoch": 1792363797.6208167,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 6083.6,
       "jitter_ms": 1569.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 15.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e4cc3a213516da3d2019541152c5bffc380550081941021ba34badd373cc1343",
@@ -560,13 +562,13 @@
       "endpoint_ip": "91.107.247.173",
       "last_success_epoch": 1792342185.5397735,
       "expires_epoch": 1792363785.5397735,
-      "success_rate": 0.9222,
+      "success_rate": 0.9095,
       "latency_ms": 649.7,
       "jitter_ms": 161.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 141.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "78598c47a02b1a5251fe380feba88d6e675698a7c566a6302146bb6f91772fb9",
@@ -577,13 +579,13 @@
       "endpoint_ip": "82.38.31.201",
       "last_success_epoch": 1792342185.6241229,
       "expires_epoch": 1792363785.6241229,
-      "success_rate": 0.9222,
+      "success_rate": 0.9095,
       "latency_ms": 330.3,
       "jitter_ms": 14.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 278.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "72aa5e84e5b3cc143e7f2ae44d2c865565509452e1c21c773a832e424d877e90",
@@ -594,13 +596,13 @@
       "endpoint_ip": "104.18.4.82",
       "last_success_epoch": 1792342189.3651736,
       "expires_epoch": 1792363789.3651736,
-      "success_rate": 0.9222,
+      "success_rate": 0.9095,
       "latency_ms": 2155.0,
       "jitter_ms": 690.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 42.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b73be1a9db10da11715322530079fa2b6f018e024d32b39949c3fa2ebfa476ba",
@@ -611,13 +613,13 @@
       "endpoint_ip": "185.220.223.25",
       "last_success_epoch": 1792342187.3614624,
       "expires_epoch": 1792363787.3614624,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 630.9,
       "jitter_ms": 121.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 145.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "507b9734a30d4c9eff54e249abfe7053bf6a261d5767b07ceca591ba02e16a73",
@@ -628,13 +630,13 @@
       "endpoint_ip": "162.159.135.234",
       "last_success_epoch": 1792342190.571575,
       "expires_epoch": 1792363790.571575,
-      "success_rate": 0.9222,
+      "success_rate": 0.9095,
       "latency_ms": 2043.9,
       "jitter_ms": 110.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 45.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2a40bab3302bb1dcaea6052837b7e024d5156f3c304435eda057bf93dfd90135",
@@ -645,13 +647,13 @@
       "endpoint_ip": "78.159.250.84",
       "last_success_epoch": 1792342189.8483238,
       "expires_epoch": 1792363789.8483238,
-      "success_rate": 0.9222,
+      "success_rate": 0.9096,
       "latency_ms": 1441.6,
       "jitter_ms": 212.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 63.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "adf5211e0dba1e4b964edacf0e1d3dab609d93cbc2d38fe431ecb93ef67d35a1",
@@ -662,13 +664,13 @@
       "endpoint_ip": "168.113.135.90",
       "last_success_epoch": 1792342188.1810737,
       "expires_epoch": 1792363788.1810737,
-      "success_rate": 0.9221,
+      "success_rate": 0.9095,
       "latency_ms": 786.0,
       "jitter_ms": 69.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 117.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "1b5be01fc90713bdfad5884b3a7e5a26578c9fa06990ee5ed3f3ded61dc51d18",
@@ -679,13 +681,13 @@
       "endpoint_ip": "104.18.4.82",
       "last_success_epoch": 1792342191.4773962,
       "expires_epoch": 1792363791.4773962,
-      "success_rate": 0.9221,
+      "success_rate": 0.9095,
       "latency_ms": 2209.3,
       "jitter_ms": 452.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 41.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "32ca219ce4dc2d52a95cb2fb249c223c6966165b7d9c169afa71c030d0f0be35",
@@ -696,13 +698,13 @@
       "endpoint_ip": "104.21.91.244",
       "last_success_epoch": 1792342181.4088073,
       "expires_epoch": 1792363781.4088073,
-      "success_rate": 0.922,
+      "success_rate": 0.8959,
       "latency_ms": 558.9,
       "jitter_ms": 49.8,
       "body_bytes": 6855,
       "transfer_kbps_estimate": 49.1,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "c6912abbc5c582ed86ff5e667ad1fad1b1cdbb31f790a05e59ae0b9a1fa032ed",
@@ -713,13 +715,13 @@
       "endpoint_ip": "45.12.63.219",
       "last_success_epoch": 1792342184.9595628,
       "expires_epoch": 1792363784.9595628,
-      "success_rate": 0.9206,
+      "success_rate": 0.8946,
       "latency_ms": 2386.4,
       "jitter_ms": 2910.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 38.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "62a6ea520c321528a06c9d8b72968b40e61b24251f9400b3d789b5a963b5cc12",
@@ -730,13 +732,13 @@
       "endpoint_ip": "201.58.176.157",
       "last_success_epoch": 1792342190.343042,
       "expires_epoch": 1792363790.343042,
-      "success_rate": 0.9196,
+      "success_rate": 0.8942,
       "latency_ms": 5065.0,
       "jitter_ms": 1092.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 18.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "7091280b38fc97e40be9f0db701d7a7665499f115e49b8b5d59f5f2485cf461f",
@@ -747,13 +749,13 @@
       "endpoint_ip": "39.109.110.80",
       "last_success_epoch": 1792342182.4646575,
       "expires_epoch": 1792363782.4646575,
-      "success_rate": 0.9145,
+      "success_rate": 0.8924,
       "latency_ms": 1233.1,
       "jitter_ms": 101.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 74.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2676caf680ac7750e64793d324f1bac0403bdc3143156a78fd73d180c0e69a80",
@@ -764,13 +766,13 @@
       "endpoint_ip": "172.64.229.21",
       "last_success_epoch": 1792342181.9240105,
       "expires_epoch": 1792363781.9240105,
-      "success_rate": 0.9107,
+      "success_rate": 0.8976,
       "latency_ms": 1030.0,
       "jitter_ms": 182.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 89.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "8215743de13a921dbcc8f53e6bef9d891b20582e3e7bd312d51e8a3e4bda665a",
@@ -781,13 +783,13 @@
       "endpoint_ip": "5.253.59.156",
       "last_success_epoch": 1792342181.2177672,
       "expires_epoch": 1792363781.2177672,
-      "success_rate": 0.9107,
+      "success_rate": 0.8976,
       "latency_ms": 510.3,
       "jitter_ms": 43.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 180.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "71ed04e78817ef9403f277cb906ffd3e76c3fddd043cf5ffc2f087b8456fb5be",
@@ -798,13 +800,13 @@
       "endpoint_ip": "45.9.156.42",
       "last_success_epoch": 1792342181.2652469,
       "expires_epoch": 1792363781.2652469,
-      "success_rate": 0.9107,
+      "success_rate": 0.8976,
       "latency_ms": 647.7,
       "jitter_ms": 349.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 142.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "9365d0c463139e29399db3908664030cf0b2338c1095875eedfdc9a774308e04",
@@ -815,13 +817,13 @@
       "endpoint_ip": "91.107.247.173",
       "last_success_epoch": 1792342189.8539119,
       "expires_epoch": 1792363789.8539119,
-      "success_rate": 0.91,
+      "success_rate": 0.8971,
       "latency_ms": 824.2,
       "jitter_ms": 385.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 111.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "51d3fcf268c415a011fd7a6c5462ca11a5fc11894157ef8a407e33d82add937c",
@@ -832,13 +834,13 @@
       "endpoint_ip": "45.91.248.127",
       "last_success_epoch": 1792342190.62476,
       "expires_epoch": 1792363790.62476,
-      "success_rate": 0.9098,
+      "success_rate": 0.8969,
       "latency_ms": 988.0,
       "jitter_ms": 207.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 93.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "41c99eb4b858ef5a957b009dd4854587f027b39491f9ebc645f20c8829db1209",
@@ -849,13 +851,13 @@
       "endpoint_ip": "91.107.247.173",
       "last_success_epoch": 1792342190.514297,
       "expires_epoch": 1792363790.514297,
-      "success_rate": 0.9098,
+      "success_rate": 0.8969,
       "latency_ms": 616.3,
       "jitter_ms": 185.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 149.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b103d683341887534afd6e20df3946ae81ce4643cfe851dbcd90382e80bea8b1",
@@ -866,13 +868,13 @@
       "endpoint_ip": "45.38.60.153",
       "last_success_epoch": 1792342194.1311283,
       "expires_epoch": 1792363794.1311283,
-      "success_rate": 0.9097,
+      "success_rate": 0.8968,
       "latency_ms": 1617.1,
       "jitter_ms": 231.8,
       "body_bytes": 6854,
       "transfer_kbps_estimate": 17.0,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "d71a91c1a22b595ceb7a3335aec3b2077fcff84c9094606e0263acdf19161f33",
@@ -883,13 +885,13 @@
       "endpoint_ip": "212.24.105.101",
       "last_success_epoch": 1792342191.529394,
       "expires_epoch": 1792363791.529394,
-      "success_rate": 0.9095,
+      "success_rate": 0.8968,
       "latency_ms": 700.4,
       "jitter_ms": 97.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 131.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "50b5ecd402338c458db9ccee97dea43bb1ef49f6a35761119c3040867a7b1e4b",
@@ -900,13 +902,13 @@
       "endpoint_ip": "213.165.56.102",
       "last_success_epoch": 1792342198.0700686,
       "expires_epoch": 1792363798.0700686,
-      "success_rate": 0.9092,
+      "success_rate": 0.8966,
       "latency_ms": 1035.4,
       "jitter_ms": 1137.6,
       "body_bytes": 6856,
       "transfer_kbps_estimate": 26.5,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "efddc93f5d5d961136806ff897f19e6bd8c65e2702529a4926337bf308e48983",
@@ -917,13 +919,13 @@
       "endpoint_ip": "89.35.14.32",
       "last_success_epoch": 1792342192.9845605,
       "expires_epoch": 1792363792.9845605,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1204.5,
       "jitter_ms": 22.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 76.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "7ff99335df4def83a07f21d28f044794e47bc7ba725c601058448822ba120e09",
@@ -934,13 +936,13 @@
       "endpoint_ip": "89.35.14.32",
       "last_success_epoch": 1792342192.7399292,
       "expires_epoch": 1792363792.7399292,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 925.7,
       "jitter_ms": 25.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 99.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "7cba18c99720f2db99cb222cc506fae719f3e28fb3d97edfb0e83175e17e90dd",
@@ -951,13 +953,13 @@
       "endpoint_ip": "150.40.126.24",
       "last_success_epoch": 1792342192.3632658,
       "expires_epoch": 1792363792.3632658,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 548.1,
       "jitter_ms": 257.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 167.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "ebc78fbb1bdb602bb906273adf2f74a8d9037aacfbe765f9bf78c97d1fe20d43",
@@ -968,13 +970,13 @@
       "endpoint_ip": "150.40.126.19",
       "last_success_epoch": 1792342192.5772548,
       "expires_epoch": 1792363792.5772548,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 624.7,
       "jitter_ms": 227.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 147.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "d43ab2be8d2fd184401428c7b23d504cdfb9e0e3492f4b48b6274bf85625ae88",
@@ -985,13 +987,13 @@
       "endpoint_ip": "195.178.106.23",
       "last_success_epoch": 1792342193.9980006,
       "expires_epoch": 1792363793.9980006,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 773.8,
       "jitter_ms": 173.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 118.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2694c4def1df4e6c29ac247b43a3ac0bf1f534d87aa6fb1386f3947bffb70b30",
@@ -1002,13 +1004,13 @@
       "endpoint_ip": "150.40.126.22",
       "last_success_epoch": 1792342192.928181,
       "expires_epoch": 1792363792.928181,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 699.0,
       "jitter_ms": 458.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 131.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "239f5742e776e15c48d2162b6065f823462f35b80966f327a0500eb40868b5ec",
@@ -1019,13 +1021,13 @@
       "endpoint_ip": "45.9.156.42",
       "last_success_epoch": 1792342193.914668,
       "expires_epoch": 1792363793.914668,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 692.5,
       "jitter_ms": 225.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 132.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "323b6ef821e19002fa2bee107a86412186eeac21eb8960100ce7f7bcce00fea2",
@@ -1036,13 +1038,13 @@
       "endpoint_ip": "45.9.156.28",
       "last_success_epoch": 1792342192.2216377,
       "expires_epoch": 1792363792.2216377,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 828.6,
       "jitter_ms": 29.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 111.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a4462ace5ec0dbb1241cb37c51e6ca66f5c05ca434e3d3781c5f1a9b59910139",
@@ -1053,13 +1055,13 @@
       "endpoint_ip": "89.35.14.32",
       "last_success_epoch": 1792342193.7390826,
       "expires_epoch": 1792363793.7390826,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1365.2,
       "jitter_ms": 310.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 67.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "ebcac9291e727afcb1ab92f664ed0a06e671c6da4415054b1c6e2870da1e2e53",
@@ -1070,13 +1072,13 @@
       "endpoint_ip": "150.40.126.22",
       "last_success_epoch": 1792342193.2955477,
       "expires_epoch": 1792363793.2955477,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 622.6,
       "jitter_ms": 290.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 147.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "391099d97ec510b6c9c63267410ed2e1d2e395d1e0fb471fb09fdee22426efe4",
@@ -1087,13 +1089,13 @@
       "endpoint_ip": "89.35.14.32",
       "last_success_epoch": 1792342195.192899,
       "expires_epoch": 1792363795.192899,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1592.3,
       "jitter_ms": 1268.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 57.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f73a56ce2caf184478229693edb356e875b497e72bec358b3e17fb7c746a92b1",
@@ -1104,13 +1106,13 @@
       "endpoint_ip": "89.35.14.34",
       "last_success_epoch": 1792342196.5526266,
       "expires_epoch": 1792363796.5526266,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1428.6,
       "jitter_ms": 1036.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 64.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b0efecf588c462be9ee14d934244faa2c9faa337e026ffeaf340560a63d81c4a",
@@ -1121,13 +1123,13 @@
       "endpoint_ip": "45.9.156.28",
       "last_success_epoch": 1792342193.73406,
       "expires_epoch": 1792363793.73406,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 748.0,
       "jitter_ms": 66.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 123.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b6e119c2e699dd0f78f2dccf5d20e5405dc26622b225876e89963e7e05432e44",
@@ -1138,13 +1140,13 @@
       "endpoint_ip": "89.35.14.34",
       "last_success_epoch": 1792342196.4715972,
       "expires_epoch": 1792363796.4715972,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1620.3,
       "jitter_ms": 56.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 56.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "777877480260fd3440ba31feec95c6a2d3699ccbcaa15c7772b6840a7cff63d9",
@@ -1155,13 +1157,13 @@
       "endpoint_ip": "78.159.250.84",
       "last_success_epoch": 1792342198.6300688,
       "expires_epoch": 1792363798.6300688,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 2958.9,
       "jitter_ms": 186.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 31.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "cca729e7112e59576819753afb6ef5f57e9bcc986c7d8425ff09a2f1b22b07e9",
@@ -1172,13 +1174,13 @@
       "endpoint_ip": "89.35.14.34",
       "last_success_epoch": 1792342198.155735,
       "expires_epoch": 1792363798.155735,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1930.6,
       "jitter_ms": 492.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 47.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "957fe7d2191b69cd09cfacdd979aa860b9d4b38903125516206f5be5df0454da",
@@ -1189,13 +1191,13 @@
       "endpoint_ip": "168.113.135.90",
       "last_success_epoch": 1792342199.7166755,
       "expires_epoch": 1792363799.7166755,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 3332.3,
       "jitter_ms": 3061.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 27.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "7bb8e50f0ec4f677bf96fc43eec5e6a40cc05d60434e05b68bbf3d8a7b249015",
@@ -1206,13 +1208,13 @@
       "endpoint_ip": "45.91.248.127",
       "last_success_epoch": 1792342199.499609,
       "expires_epoch": 1792363799.499609,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 3213.8,
       "jitter_ms": 4946.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 28.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b81fb52e063d81ce416ee6ed2a626cb543e459d7808f8cc57d83ec5087a9e622",
@@ -1223,13 +1225,13 @@
       "endpoint_ip": "78.159.246.85",
       "last_success_epoch": 1792342195.5312762,
       "expires_epoch": 1792363795.5312762,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 963.7,
       "jitter_ms": 109.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 95.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2a0f7a750ddb04eb8cdf2a23e7e784a91e64382454d62bb9d4ebd52e52637fa2",
@@ -1240,13 +1242,13 @@
       "endpoint_ip": "104.26.4.60",
       "last_success_epoch": 1792342190.8297057,
       "expires_epoch": 1792363790.8297057,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1561.7,
       "jitter_ms": 131.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 58.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b178f164d69cf3089cb8ea3561ace545afee8489972b4b107bf2fb4ae0c58040",
@@ -1257,13 +1259,13 @@
       "endpoint_ip": "82.38.31.11",
       "last_success_epoch": 1792342196.622158,
       "expires_epoch": 1792363796.622158,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1119.4,
       "jitter_ms": 117.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 82.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "4407be16b2314caa8008fafc6985530343c99857c68c80560e045c3a852dbb9b",
@@ -1274,13 +1276,13 @@
       "endpoint_ip": "82.38.31.171",
       "last_success_epoch": 1792342195.1148014,
       "expires_epoch": 1792363795.1148014,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 327.3,
       "jitter_ms": 24.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 281.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2ffbb2741467e6d12ef9deea8aa072b62d17196c4f55ae6ffa3abdecd76e5804",
@@ -1291,13 +1293,13 @@
       "endpoint_ip": "193.29.139.225",
       "last_success_epoch": 1792342195.2106652,
       "expires_epoch": 1792363795.2106652,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 303.7,
       "jitter_ms": 44.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 303.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "31312c6ca8ab2f69fd097762bd7697b2a6ca85f05a0a0b66617424b62f5b7d45",
@@ -1308,13 +1310,13 @@
       "endpoint_ip": "104.18.1.22",
       "last_success_epoch": 1792342196.8926957,
       "expires_epoch": 1792363796.8926957,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1505.3,
       "jitter_ms": 155.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 61.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "8d1d6bc817aa824b15dd5dcc350185d04ccfd7e5105f435cae066f7ef8a32296",
@@ -1325,13 +1327,13 @@
       "endpoint_ip": "193.29.139.235",
       "last_success_epoch": 1792342196.2015042,
       "expires_epoch": 1792363796.2015042,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 306.8,
       "jitter_ms": 66.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 300.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f3bf6e163e2b372a4d555f6618edaeeb46e784a274c27a81656f82ca9b2499e2",
@@ -1342,13 +1344,13 @@
       "endpoint_ip": "64.188.66.181",
       "last_success_epoch": 1792342196.9935837,
       "expires_epoch": 1792363796.9935837,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 548.3,
       "jitter_ms": 185.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 167.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a8fcf0c13c53554aa1077350099f6afe66d3e6c9244e8014e1e556a2a18aecbe",
@@ -1359,13 +1361,13 @@
       "endpoint_ip": "185.226.172.8",
       "last_success_epoch": 1792342196.8176546,
       "expires_epoch": 1792363796.8176546,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 575.9,
       "jitter_ms": 452.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 159.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "56b8670967cd2e2c73e99d92fcbf318b474d81480ffdf022311faf8b951b52a3",
@@ -1376,13 +1378,13 @@
       "endpoint_ip": "31.59.180.155",
       "last_success_epoch": 1792342195.186123,
       "expires_epoch": 1792363795.186123,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 489.8,
       "jitter_ms": 67.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 187.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e0ee4a6f44ea7ef5c511a5d1c47ad5925a4170e7b2eb6d6822f7f853e69ca51a",
@@ -1393,13 +1395,13 @@
       "endpoint_ip": "162.159.135.234",
       "last_success_epoch": 1792342200.1344333,
       "expires_epoch": 1792363800.1344333,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 2010.7,
       "jitter_ms": 48.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 45.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "3a6926f7c29731a1094a78165fae644dc477bbcb732261e8e059d5f90818575c",
@@ -1410,13 +1412,13 @@
       "endpoint_ip": "45.9.156.27",
       "last_success_epoch": 1792342198.5318923,
       "expires_epoch": 1792363798.5318923,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 682.4,
       "jitter_ms": 501.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 134.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b34fb57a483b77bf611e822cb2d16c3316fc51bbb8f43b8ba085b78a423ced10",
@@ -1427,13 +1429,13 @@
       "endpoint_ip": "82.38.31.17",
       "last_success_epoch": 1792342197.2378361,
       "expires_epoch": 1792363797.2378361,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 290.4,
       "jitter_ms": 16.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 317.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e24fa84cc6ade4b4c61396d89227c1f7657ebe2c64398343915441a1ae0fcf65",
@@ -1444,13 +1446,13 @@
       "endpoint_ip": "150.40.126.21",
       "last_success_epoch": 1792342199.034495,
       "expires_epoch": 1792363799.034495,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 610.2,
       "jitter_ms": 265.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 150.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "268a498b5f3e6a38a17af3d2491742f2a3c936075424869f8fafbf48b26b46dd",
@@ -1461,13 +1463,13 @@
       "endpoint_ip": "162.159.133.36",
       "last_success_epoch": 1792342198.2695825,
       "expires_epoch": 1792363798.2695825,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 575.9,
       "jitter_ms": 28.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 159.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "c9b1fc27ed4733e16a2071fc8be112f9ba7a8fa6d4f4a7d1005e14ab1f62bd9d",
@@ -1478,13 +1480,13 @@
       "endpoint_ip": "162.159.135.234",
       "last_success_epoch": 1792342200.6776862,
       "expires_epoch": 1792363800.6776862,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1733.7,
       "jitter_ms": 101.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 53.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "37ea30c01f1c54fe492274254eec76e7f95437af679e933d454a84e33e6b1cdc",
@@ -1495,13 +1497,13 @@
       "endpoint_ip": "104.21.71.249",
       "last_success_epoch": 1792342199.7594724,
       "expires_epoch": 1792363799.7594724,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 868.9,
       "jitter_ms": 201.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 105.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "762dbd4725d0aab7486aa2d76c1def52a4e45e0ed06109c0ee9b0e650f7ad77f",
@@ -1512,13 +1514,13 @@
       "endpoint_ip": "45.9.156.27",
       "last_success_epoch": 1792342198.9456944,
       "expires_epoch": 1792363798.9456944,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 625.3,
       "jitter_ms": 381.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 147.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "6384c30ba5c9605ae5730b519bf19abf9162269ed36f6ac00ee1c80d47bf7a29",
@@ -1529,13 +1531,13 @@
       "endpoint_ip": "45.9.156.42",
       "last_success_epoch": 1792342201.8497856,
       "expires_epoch": 1792363801.8497856,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 760.3,
       "jitter_ms": 586.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 121.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e8c87634fd2e6913083d3d381e4b7cf2500e7ced157e0038b2ee32d2424eb41d",
@@ -1546,13 +1548,13 @@
       "endpoint_ip": "76.164.203.141",
       "last_success_epoch": 1792342200.1014464,
       "expires_epoch": 1792363800.1014464,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1276.3,
       "jitter_ms": 1204.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 72.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "806e1581b4e12c67f74cb1f9f3aef4af279018a7e9c31dd85b9205637f5f04f0",
@@ -1563,13 +1565,13 @@
       "endpoint_ip": "45.9.156.28",
       "last_success_epoch": 1792342200.9227166,
       "expires_epoch": 1792363800.9227166,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 710.4,
       "jitter_ms": 334.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 129.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "30b71429069b41497c3f8c17af819ed6a8b3427f0926970e0604cbf57054410a",
@@ -1580,13 +1582,13 @@
       "endpoint_ip": "104.16.175.2",
       "last_success_epoch": 1792342203.1165879,
       "expires_epoch": 1792363803.1165879,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 2120.9,
       "jitter_ms": 66.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 43.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "1e5caee0abf88ccda8889bbabb071ad25604336e7cee876fba07b650afdf6a5c",
@@ -1597,13 +1599,13 @@
       "endpoint_ip": "82.38.31.39",
       "last_success_epoch": 1792342198.8274248,
       "expires_epoch": 1792363798.8274248,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 366.9,
       "jitter_ms": 118.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 250.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b4be5e4636150c71ec371a6dc15bbdd7edcc9b154e806525c9d94e2bc490e581",
@@ -1614,13 +1616,13 @@
       "endpoint_ip": "150.40.126.19",
       "last_success_epoch": 1792342202.0251422,
       "expires_epoch": 1792363802.0251422,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 593.2,
       "jitter_ms": 284.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 155.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "046c63d9a1ddb72bb84bf2edab5142649b05052cfc3696952afcd7d9b2527649",
@@ -1631,13 +1633,13 @@
       "endpoint_ip": "150.40.126.18",
       "last_success_epoch": 1792342202.417318,
       "expires_epoch": 1792363802.417318,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 619.6,
       "jitter_ms": 267.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 148.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f07f4ab003dc800e8e26a029031fc461fcb780111936f15daa309b67a04bfd64",
@@ -1648,13 +1650,13 @@
       "endpoint_ip": "45.194.66.191",
       "last_success_epoch": 1792342199.825258,
       "expires_epoch": 1792363799.825258,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 513.6,
       "jitter_ms": 12.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 179.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2731879220fba3976f8f44e78420b09bd6ae709c0ccae0b66046a9175cf44db4",
@@ -1665,13 +1667,13 @@
       "endpoint_ip": "85.155.242.37",
       "last_success_epoch": 1792342201.3526459,
       "expires_epoch": 1792363801.3526459,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1303.0,
       "jitter_ms": 734.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 70.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "30506c6c97c6afa20b1e573f92d0cb401c11b5edf8d252854a540d78e09ff6ae",
@@ -1682,13 +1684,13 @@
       "endpoint_ip": "104.17.74.206",
       "last_success_epoch": 1792342208.720981,
       "expires_epoch": 1792363808.720981,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 4798.8,
       "jitter_ms": 2640.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 19.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "4d261c270aa1cab051dde33bc67bdf8757183dec54c134b50792033ad7782a70",
@@ -1699,13 +1701,13 @@
       "endpoint_ip": "45.194.66.17",
       "last_success_epoch": 1792342200.2806695,
       "expires_epoch": 1792363800.2806695,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 588.9,
       "jitter_ms": 127.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 156.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "92e6ec1cf563afde5115aaadbc3065f5e132c14e26aeb6c6c0c7dc5c7f4d2a61",
@@ -1716,13 +1718,13 @@
       "endpoint_ip": "104.17.74.206",
       "last_success_epoch": 1792342212.564995,
       "expires_epoch": 1792363812.564995,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 6476.5,
       "jitter_ms": 8435.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 14.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "60a216417aa649c46b19e9e3c60e468992d2b9a0f6c128d6573acedac3c1044b",
@@ -1733,13 +1735,13 @@
       "endpoint_ip": "78.159.246.85",
       "last_success_epoch": 1792342203.8315089,
       "expires_epoch": 1792363803.8315089,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1867.3,
       "jitter_ms": 797.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 49.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "483466918280241f1766789b79a4a0e9efb58686ea4576e50ea809508e450988",
@@ -1750,13 +1752,13 @@
       "endpoint_ip": "45.194.66.202",
       "last_success_epoch": 1792342200.4629316,
       "expires_epoch": 1792363800.4629316,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 573.3,
       "jitter_ms": 86.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 160.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "09cec143930b1607de1d708ab25853ae6c76bb43b01f3ff120b962c38e2296d5",
@@ -1767,13 +1769,13 @@
       "endpoint_ip": "104.21.7.133",
       "last_success_epoch": 1792342202.422051,
       "expires_epoch": 1792363802.422051,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1068.8,
       "jitter_ms": 67.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 86.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f1eb42345c0c92447daa31e0f92e3e77cff10c5e2807e0b47412fb60f7d65350",
@@ -1784,13 +1786,13 @@
       "endpoint_ip": "78.159.246.85",
       "last_success_epoch": 1792342202.9956381,
       "expires_epoch": 1792363802.9956381,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1154.3,
       "jitter_ms": 292.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 79.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "4bbe8acd452f26b5e007476e59792059486703ae6fc1e051149fb5041e696e89",
@@ -1801,13 +1803,13 @@
       "endpoint_ip": "104.19.216.84",
       "last_success_epoch": 1792342203.1937268,
       "expires_epoch": 1792363803.1937268,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1178.0,
       "jitter_ms": 72.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 78.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "5d7331b91e3741d3bca50683e1664ad865af54fc15f135a79efdacb7bb1fff5a",
@@ -1818,13 +1820,13 @@
       "endpoint_ip": "31.76.11.83",
       "last_success_epoch": 1792342201.2871497,
       "expires_epoch": 1792363801.2871497,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 500.4,
       "jitter_ms": 215.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 183.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f8f2d71777a2a42c7f653121cdc672483f2c832aa07e46e02d2df2168f2c69b0",
@@ -1835,13 +1837,13 @@
       "endpoint_ip": "78.159.250.84",
       "last_success_epoch": 1792342212.0251446,
       "expires_epoch": 1792363812.0251446,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 5074.4,
       "jitter_ms": 1237.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 18.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b8ccd7fcfc3d016b499bd6436dcfcf465d81fa98dac24f46f357946a157f625b",
@@ -1852,13 +1854,13 @@
       "endpoint_ip": "195.178.106.23",
       "last_success_epoch": 1792342202.6459749,
       "expires_epoch": 1792363802.6459749,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 702.9,
       "jitter_ms": 30.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 130.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "1c6753b2e7e2cd65491066f6b8f30b8dd3b9a3209da854033b0a1a68eb2ae6a9",
@@ -1869,13 +1871,13 @@
       "endpoint_ip": "195.178.106.23",
       "last_success_epoch": 1792342202.8168855,
       "expires_epoch": 1792363802.8168855,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 673.3,
       "jitter_ms": 12.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 136.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "0d3e8b6c3e4eef7cb30f465f5ed1354db1b6acfca5696adae66e2e4be7d3ab29",
@@ -1886,13 +1888,13 @@
       "endpoint_ip": "45.9.156.27",
       "last_success_epoch": 1792342204.1451008,
       "expires_epoch": 1792363804.1451008,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 581.8,
       "jitter_ms": 350.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 158.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2aa4f2f28036564b94a4a872afc10f418e4794b2ae1d93d33d869c857aaf4982",
@@ -1903,13 +1905,13 @@
       "endpoint_ip": "45.9.156.24",
       "last_success_epoch": 1792342204.3536808,
       "expires_epoch": 1792363804.3536808,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 685.5,
       "jitter_ms": 119.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 134.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "71aaa155db0333802ad5b75dc517b261ec1e615a99a37950d089dab1f53751c2",
@@ -1920,13 +1922,13 @@
       "endpoint_ip": "150.40.126.24",
       "last_success_epoch": 1792342204.4367003,
       "expires_epoch": 1792363804.4367003,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 566.6,
       "jitter_ms": 276.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 162.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "8cfa5eed3d0037645d8d94efc382476611d80ec980d98674c0ef4fa2062a5132",
@@ -1937,13 +1939,13 @@
       "endpoint_ip": "177.3.222.100",
       "last_success_epoch": 1792342202.737229,
       "expires_epoch": 1792363802.737229,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 462.9,
       "jitter_ms": 28.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 198.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "28faec3a3e6309afba0140c9a6ac33f42922c9d095d24504bc08d2e7086a6b04",
@@ -1954,13 +1956,13 @@
       "endpoint_ip": "76.164.203.141",
       "last_success_epoch": 1792342210.4050467,
       "expires_epoch": 1792363810.4050467,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 3895.4,
       "jitter_ms": 687.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 23.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "fd7fdbbb02e364aac228268605aef547cebcdd8a92f643487771dc15fc1aa080",
@@ -1971,13 +1973,13 @@
       "endpoint_ip": "45.141.118.232",
       "last_success_epoch": 1792342203.4661064,
       "expires_epoch": 1792363803.4661064,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 564.0,
       "jitter_ms": 72.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 163.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "cd6e5c66e9008d08b33ca398add072091156dca132a5ab346f26ada336d5c924",
@@ -1988,13 +1990,13 @@
       "endpoint_ip": "78.159.246.179",
       "last_success_epoch": 1792342205.3909183,
       "expires_epoch": 1792363805.3909183,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1127.4,
       "jitter_ms": 768.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 81.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "d3353101835bac60d0180f0d73a48583db1aab68109cac755eb4876b018333c1",
@@ -2005,13 +2007,13 @@
       "endpoint_ip": "150.40.126.22",
       "last_success_epoch": 1792342204.6385734,
       "expires_epoch": 1792363804.6385734,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 582.5,
       "jitter_ms": 286.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 158.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "7e93d338261e105539ad70c4e4cab3d5c3112a439d107342ecc0484ac1ed66eb",
@@ -2022,13 +2024,13 @@
       "endpoint_ip": "150.40.126.21",
       "last_success_epoch": 1792342204.755734,
       "expires_epoch": 1792363804.755734,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 570.9,
       "jitter_ms": 258.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 161.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "aa00274312d90ed30a8009751b247d64d9bb33c33d7b4ebd5adafd840425136e",
@@ -2039,13 +2041,13 @@
       "endpoint_ip": "104.18.1.22",
       "last_success_epoch": 1792342209.982094,
       "expires_epoch": 1792363809.982094,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 3098.3,
       "jitter_ms": 3312.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 29.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "5059e05b5d0c5dc1fa3a7ced7bdc75f6b00ecd02d5c1c3b1a12ebecae2edc027",
@@ -2056,13 +2058,13 @@
       "endpoint_ip": "54.36.174.140",
       "last_success_epoch": 1792342205.541632,
       "expires_epoch": 1792363805.541632,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 516.8,
       "jitter_ms": 338.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 178.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "88ef977364149d55a0b53c3509004cfa37eaf416737de952228ead9951d4fb80",
@@ -2073,13 +2075,13 @@
       "endpoint_ip": "149.22.87.241",
       "last_success_epoch": 1792342207.0727196,
       "expires_epoch": 1792363807.0727196,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1226.9,
       "jitter_ms": 374.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 75.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2caf0fe5d1c914daf4974ba96ab4a6494bbbdbf5534457144b92eddcfc717ed6",
@@ -2090,13 +2092,13 @@
       "endpoint_ip": "104.21.71.249",
       "last_success_epoch": 1792342206.4822054,
       "expires_epoch": 1792363806.4822054,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 776.9,
       "jitter_ms": 15.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 118.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "afabc1c0b06fe4f937effe486df07adbf6ba5c41b80c63552df07aedac795c6f",
@@ -2107,13 +2109,13 @@
       "endpoint_ip": "104.26.4.60",
       "last_success_epoch": 1792342207.1292715,
       "expires_epoch": 1792363807.1292715,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1542.9,
       "jitter_ms": 55.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 59.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "48eedbd59bc1565bbd4c43cda959f3e7ede31f1103f698124ba4df8a5bf3b2e9",
@@ -2124,13 +2126,13 @@
       "endpoint_ip": "149.22.87.240",
       "last_success_epoch": 1792342207.4407442,
       "expires_epoch": 1792363807.4407442,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 1170.7,
       "jitter_ms": 308.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 78.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "0d71e2ba646f81085cc75259af5350355a99da007f6a03f3e929b26716fd0d93",
@@ -2141,13 +2143,13 @@
       "endpoint_ip": "195.178.106.23",
       "last_success_epoch": 1792342206.4697118,
       "expires_epoch": 1792363806.4697118,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 731.0,
       "jitter_ms": 74.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 125.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "d527a33eabd3e100e217f598e3618dfa8a129e84fee3059a6bce9a5a20e2ff17",
@@ -2158,13 +2160,13 @@
       "endpoint_ip": "45.141.118.232",
       "last_success_epoch": 1792342207.7125726,
       "expires_epoch": 1792363807.7125726,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 568.4,
       "jitter_ms": 61.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 161.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "602b23fe5a4f6feebbbfdfafd67987c3ebbf30f43084d9f130ed006ce270f6f6",
@@ -2175,13 +2177,13 @@
       "endpoint_ip": "54.36.174.134",
       "last_success_epoch": 1792342206.8680112,
       "expires_epoch": 1792363806.8680112,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 377.7,
       "jitter_ms": 52.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 243.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "365ad79f13774c9b4591912be25c38b9f9290d32b27f1bfd322691b07319da94",
@@ -2192,13 +2194,13 @@
       "endpoint_ip": "82.38.31.171",
       "last_success_epoch": 1792342208.2962162,
       "expires_epoch": 1792363808.2962162,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 667.4,
       "jitter_ms": 78.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 137.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2e8fc803a894338c68fa8bf0964ba282df83bf5f16ec116bf4fc9073e2ee378b",
@@ -2209,13 +2211,13 @@
       "endpoint_ip": "104.17.148.22",
       "last_success_epoch": 1792342209.1501036,
       "expires_epoch": 1792363809.1501036,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 677.8,
       "jitter_ms": 285.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 135.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "379a9d054ab5938bcc6d6ced560291cabe4ec042beaf79d470c0389da19f6095",
@@ -2226,13 +2228,13 @@
       "endpoint_ip": "82.38.31.42",
       "last_success_epoch": 1792342207.635449,
       "expires_epoch": 1792363807.635449,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 335.7,
       "jitter_ms": 17.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 274.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "5bb2bf8940a69197b482e38da2929b7dda7cf4bfc5b9afaa789881028a8d761e",
@@ -2243,13 +2245,13 @@
       "endpoint_ip": "82.38.31.10",
       "last_success_epoch": 1792342208.0161128,
       "expires_epoch": 1792363808.0161128,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 326.5,
       "jitter_ms": 17.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 281.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "275efaecadb8f8109050d569d48ee2a46ffeb0febea15a5d8779d3833aa667a7",
@@ -2260,13 +2262,13 @@
       "endpoint_ip": "82.38.31.202",
       "last_success_epoch": 1792342207.7050781,
       "expires_epoch": 1792363807.7050781,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 354.9,
       "jitter_ms": 52.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 259.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "303f56b8b5576c451cc96fe4af83510af564fca53f58fe3e910027340da26655",
@@ -2277,13 +2279,13 @@
       "endpoint_ip": "162.159.130.234",
       "last_success_epoch": 1792342206.4732542,
       "expires_epoch": 1792363806.4732542,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 580.3,
       "jitter_ms": 91.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 158.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "5241407fe31d06a3b5767868b722428a86c01f59bd11d12195d608954a12a9c0",
@@ -2294,13 +2296,13 @@
       "endpoint_ip": "162.159.130.234",
       "last_success_epoch": 1792342207.2546372,
       "expires_epoch": 1792363807.2546372,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 573.4,
       "jitter_ms": 30.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 160.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "29ff285c76238a1f08038e82ae5c51756af3d23fe1c49a6d6e42adea7beae322",
@@ -2311,13 +2313,13 @@
       "endpoint_ip": "150.40.126.18",
       "last_success_epoch": 1792342209.0668852,
       "expires_epoch": 1792363809.0668852,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 621.9,
       "jitter_ms": 312.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 148.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "83a945f71c0e125ab8c851695aa748319a2e91259b92eef989c882d6bf9b7cd0",
@@ -2328,13 +2330,13 @@
       "endpoint_ip": "162.159.135.234",
       "last_success_epoch": 1792342244.4406674,
       "expires_epoch": 1792363844.4406674,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 543.5,
       "jitter_ms": 1.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 169.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "09e31477315a2fe97cacc080295e98247db429142ba3d6f5660d1d4bfc1c1e0b",
@@ -2345,13 +2347,13 @@
       "endpoint_ip": "162.159.130.234",
       "last_success_epoch": 1792342208.7854657,
       "expires_epoch": 1792363808.7854657,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 570.8,
       "jitter_ms": 30.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 161.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "666180e64d40bf165663daa2177e66cdcfc850cd84ad0110a14cbcebd146dbf2",
@@ -2362,13 +2364,13 @@
       "endpoint_ip": "82.38.31.220",
       "last_success_epoch": 1792342208.564692,
       "expires_epoch": 1792363808.564692,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 315.5,
       "jitter_ms": 19.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 291.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "0d888e6fffff077ba17e20b9e2a2857e0d4b43e330453f3ae591705608beb5d1",
@@ -2379,13 +2381,13 @@
       "endpoint_ip": "82.38.31.200",
       "last_success_epoch": 1792342208.7614195,
       "expires_epoch": 1792363808.7614195,
-      "success_rate": 0.9088,
+      "success_rate": 0.8963,
       "latency_ms": 318.8,
       "jitter_ms": 29.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 288.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "0f6e278a22c778d87b8bf09e7e620b2e0936c3792db808debb3ad2de6bc862dc",
@@ -2396,13 +2398,13 @@
       "endpoint_ip": "84.32.109.20",
       "last_success_epoch": 1792342210.3225498,
       "expires_epoch": 1792363810.3225498,
-      "success_rate": 0.9087,
+      "success_rate": 0.8963,
       "latency_ms": 1063.2,
       "jitter_ms": 100.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 86.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "068e8fd77e37e08fd57b8080f0987fa79af35148f1be423c3a25d4fdfd124825",
@@ -2413,13 +2415,13 @@
       "endpoint_ip": "172.67.155.65",
       "last_success_epoch": 1792342191.5298474,
       "expires_epoch": 1792363791.5298474,
-      "success_rate": 0.905,
+      "success_rate": 0.8798,
       "latency_ms": 1652.4,
       "jitter_ms": 2108.6,
       "body_bytes": 6850,
       "transfer_kbps_estimate": 16.6,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "c29bc3e46af030976ebb41aa34e34d4d39bab20e229e6da133118bf3ba6a06ff",
@@ -2430,13 +2432,13 @@
       "endpoint_ip": "89.35.14.30",
       "last_success_epoch": 1792342210.2776594,
       "expires_epoch": 1792363810.2776594,
-      "success_rate": 0.9026,
+      "success_rate": 0.8903,
       "latency_ms": 894.8,
       "jitter_ms": 589.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 102.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e843a7b9c479be22bd461f03c50652c230cdfbbad5dc77693c1aef1849a76779",
@@ -2447,13 +2449,13 @@
       "endpoint_ip": "213.165.56.102",
       "last_success_epoch": 1792342191.6402993,
       "expires_epoch": 1792363791.6402993,
-      "success_rate": 0.8996,
+      "success_rate": 0.8744,
       "latency_ms": 1596.5,
       "jitter_ms": 2316.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 57.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "6ebaa1ded9634291dabb668bb2fdf77255050e00832166c3bec9a641b188d2ec",
@@ -2464,13 +2466,13 @@
       "endpoint_ip": "177.1.188.96",
       "last_success_epoch": 1792342213.7023377,
       "expires_epoch": 1792363813.7023377,
-      "success_rate": 0.8989,
+      "success_rate": 0.8865,
       "latency_ms": 2066.7,
       "jitter_ms": 2926.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 44.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "c0ce23d873525e15ef6d37f74902478ad9b146a2c3244ee4d2295376229b14ab",
@@ -2481,13 +2483,13 @@
       "endpoint_ip": "177.1.186.43",
       "last_success_epoch": 1792342210.7459095,
       "expires_epoch": 1792363810.7459095,
-      "success_rate": 0.8986,
+      "success_rate": 0.8863,
       "latency_ms": 557.5,
       "jitter_ms": 292.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 165.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e737f9c06ab5916f826baee9d2ff2efbab6878fe652850c26bfa61f62cc1b85e",
@@ -2498,13 +2500,13 @@
       "endpoint_ip": "93.152.215.176",
       "last_success_epoch": 1792342215.7489822,
       "expires_epoch": 1792363815.7489822,
-      "success_rate": 0.8978,
+      "success_rate": 0.8856,
       "latency_ms": 2485.3,
       "jitter_ms": 3745.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 37.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f14694538753953ad1780d9ab451a81403bf42858f05530709bbf3e9549b414b",
@@ -2515,13 +2517,13 @@
       "endpoint_ip": "206.71.158.124",
       "last_success_epoch": 1792342211.8619936,
       "expires_epoch": 1792363811.8619936,
-      "success_rate": 0.8978,
+      "success_rate": 0.8856,
       "latency_ms": 527.4,
       "jitter_ms": 37.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 174.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "83d9995dc4a61cfd62288f1cb527d0c39fc2b4eb26b2de13228c381f2afa5883",
@@ -2532,13 +2534,13 @@
       "endpoint_ip": "82.38.31.195",
       "last_success_epoch": 1792342211.6814337,
       "expires_epoch": 1792363811.6814337,
-      "success_rate": 0.8947,
+      "success_rate": 0.8825,
       "latency_ms": 398.5,
       "jitter_ms": 34.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 230.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "d899d0c9ed7df76d34c16c24e755a1b5c55f84fd800b11e324942b0e4ef5fb04",
@@ -2549,13 +2551,13 @@
       "endpoint_ip": "104.18.42.163",
       "last_success_epoch": 1792342216.2658603,
       "expires_epoch": 1792363816.2658603,
-      "success_rate": 0.8939,
+      "success_rate": 0.8817,
       "latency_ms": 1705.5,
       "jitter_ms": 339.3,
       "body_bytes": 16615,
       "transfer_kbps_estimate": 39.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a4373a4801eb7550a2e784a356a439943e6701bd611050d76d96ff9bbbe0a7df",
@@ -2566,13 +2568,13 @@
       "endpoint_ip": "101.142.129.72",
       "last_success_epoch": 1792342215.1185575,
       "expires_epoch": 1792363815.1185575,
-      "success_rate": 0.8929,
+      "success_rate": 0.8457,
       "latency_ms": 3027.2,
       "jitter_ms": 642.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 30.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "bf5379ad12992f0b54bd56f89ee76bc5a1c4b3487369e5b938a79916c8bfda92",
@@ -2583,13 +2585,13 @@
       "endpoint_ip": "31.56.187.208",
       "last_success_epoch": 1792342212.3534882,
       "expires_epoch": 1792363812.3534882,
-      "success_rate": 0.8929,
+      "success_rate": 0.8456,
       "latency_ms": 1376.9,
       "jitter_ms": 1514.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 66.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "55d5fde23277edf899b4ab82d08b461a013148d039879223c795d8762a805e07",
@@ -2600,13 +2602,13 @@
       "endpoint_ip": "195.58.140.146",
       "last_success_epoch": 1792342211.8105493,
       "expires_epoch": 1792363811.8105493,
-      "success_rate": 0.8927,
+      "success_rate": 0.8674,
       "latency_ms": 463.3,
       "jitter_ms": 40.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 198.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "80c9943898c68a5bc7145cb6314a5fa5208b5fb091c48886b921c6095a6a04fe",
@@ -2617,13 +2619,13 @@
       "endpoint_ip": "82.38.31.193",
       "last_success_epoch": 1792342212.8529902,
       "expires_epoch": 1792363812.8529902,
-      "success_rate": 0.8898,
+      "success_rate": 0.8776,
       "latency_ms": 348.9,
       "jitter_ms": 59.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 263.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "339c2283bfc1c46ab9174c8f727fe85e28982f5b3e4139406a18038dea61c7dc",
@@ -2634,13 +2636,13 @@
       "endpoint_ip": "185.220.223.25",
       "last_success_epoch": 1792342210.1616645,
       "expires_epoch": 1792363810.1616645,
-      "success_rate": 0.8895,
+      "success_rate": 0.8645,
       "latency_ms": 581.1,
       "jitter_ms": 48.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 158.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "78ef1b347aaca868260b5a77f73af24920a8d6cefe826a9acde4ff716218a85d",
@@ -2651,13 +2653,13 @@
       "endpoint_ip": "76.164.203.135",
       "last_success_epoch": 1792342216.230486,
       "expires_epoch": 1792363816.230486,
-      "success_rate": 0.8862,
+      "success_rate": 0.8741,
       "latency_ms": 1941.9,
       "jitter_ms": 2815.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 47.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "4d01b262d6f7218711142b3da37098ac5697b63e0b1f89bb947e2b3484cfe23e",
@@ -2668,13 +2670,13 @@
       "endpoint_ip": "93.152.215.176",
       "last_success_epoch": 1792342219.794695,
       "expires_epoch": 1792363819.794695,
-      "success_rate": 0.8848,
+      "success_rate": 0.8727,
       "latency_ms": 3362.5,
       "jitter_ms": 4502.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 27.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "33ba013c9a1fb97d2134b9d49cf61f1b455d2854ca60a978ec15f2455c492854",
@@ -2685,13 +2687,13 @@
       "endpoint_ip": "51.75.67.209",
       "last_success_epoch": 1792342216.5258982,
       "expires_epoch": 1792363816.5258982,
-      "success_rate": 0.8848,
+      "success_rate": 0.8727,
       "latency_ms": 1621.2,
       "jitter_ms": 507.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 56.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "5aebb066a484195ca44c2919cf3fbfbe2163a1137bacec5e7bb34b9784ddf26d",
@@ -2702,13 +2704,13 @@
       "endpoint_ip": "104.18.40.179",
       "last_success_epoch": 1792342215.7736442,
       "expires_epoch": 1792363815.7736442,
-      "success_rate": 0.8845,
+      "success_rate": 0.8724,
       "latency_ms": 997.9,
       "jitter_ms": 68.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 92.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "c1635bd818f51b802bd5459b7946bbd0c1617f8750bac05acf48906d0bbfbd39",
@@ -2719,13 +2721,13 @@
       "endpoint_ip": "78.159.246.179",
       "last_success_epoch": 1792342247.328826,
       "expires_epoch": 1792363847.328826,
-      "success_rate": 0.8845,
+      "success_rate": 0.8719,
       "latency_ms": 1389.1,
       "jitter_ms": 827.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 66.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e875ad42bc1e863f4778a600ac0e8bee3dab72107344868f512c7577fd5883c9",
@@ -2736,13 +2738,13 @@
       "endpoint_ip": "78.159.246.179",
       "last_success_epoch": 1792342248.5621793,
       "expires_epoch": 1792363848.5621793,
-      "success_rate": 0.8834,
+      "success_rate": 0.8714,
       "latency_ms": 1902.9,
       "jitter_ms": 1004.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 48.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "cda40dca616a1c9d6ee54c436a97d200093552235fb39d18ad2b1a3d5eed5202",
@@ -2753,13 +2755,13 @@
       "endpoint_ip": "94.103.168.125",
       "last_success_epoch": 1792342213.999743,
       "expires_epoch": 1792363813.999743,
-      "success_rate": 0.8772,
+      "success_rate": 0.8344,
       "latency_ms": 648.8,
       "jitter_ms": 221.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 141.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "4ef80f98674bc704cb8237848fa22c4694de715ff235ed8047419679051411cb",
@@ -2770,13 +2772,13 @@
       "endpoint_ip": "2.27.109.179",
       "last_success_epoch": 1792342221.8398523,
       "expires_epoch": 1792363821.8398523,
-      "success_rate": 0.8742,
+      "success_rate": 0.8623,
       "latency_ms": 2852.0,
       "jitter_ms": 25.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 32.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "1f15c77e6e57ec5d58e7925e1c3885be6e393e49785d58de5b2b2dbafec8b584",
@@ -2787,13 +2789,13 @@
       "endpoint_ip": "188.114.98.0",
       "last_success_epoch": 1792342234.2299695,
       "expires_epoch": 1792363834.2299695,
-      "success_rate": 0.8705,
+      "success_rate": 0.8584,
       "latency_ms": 887.8,
       "jitter_ms": 672.0,
       "body_bytes": 6856,
       "transfer_kbps_estimate": 30.9,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "7b0ddb23d75e36110cec32e457b975721aa0793d8ac8806d1e4e69a1989d9001",
@@ -2804,13 +2806,13 @@
       "endpoint_ip": "142.91.108.25",
       "last_success_epoch": 1792342237.3255773,
       "expires_epoch": 1792363837.3255773,
-      "success_rate": 0.8689,
+      "success_rate": 0.8569,
       "latency_ms": 2278.2,
       "jitter_ms": 1420.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 40.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "aaad5dd89ff34365d055c2ce675ae56f5f85dacebb3b6799a43cf93798989adb",
@@ -2821,13 +2823,13 @@
       "endpoint_ip": "144.31.4.234",
       "last_success_epoch": 1792342215.6499898,
       "expires_epoch": 1792363815.6499898,
-      "success_rate": 0.8676,
+      "success_rate": 0.8551,
       "latency_ms": 714.0,
       "jitter_ms": 68.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 128.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a0af14f8c569bd0a06590fd74eddbc94f062f8ad1b9a5a547cac83fe4f66385c",
@@ -2838,13 +2840,13 @@
       "endpoint_ip": "185.220.223.24",
       "last_success_epoch": 1792342237.2913475,
       "expires_epoch": 1792363837.2913475,
-      "success_rate": 0.8675,
+      "success_rate": 0.8557,
       "latency_ms": 2152.1,
       "jitter_ms": 3033.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 42.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e394c3b9535fd15827f8f55b990ed25c30bcc4564ee39264aa7e8b3f1c641801",
@@ -2855,13 +2857,13 @@
       "endpoint_ip": "213.165.56.102",
       "last_success_epoch": 1792342246.3962095,
       "expires_epoch": 1792363846.3962095,
-      "success_rate": 0.8673,
+      "success_rate": 0.8553,
       "latency_ms": 3568.0,
       "jitter_ms": 3886.2,
       "body_bytes": 6855,
       "transfer_kbps_estimate": 7.7,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "3524ccfd30a9309a595a4d15619046529baf4638eb5e62f84b24447df9aa4a71",
@@ -2872,13 +2874,13 @@
       "endpoint_ip": "213.165.56.102",
       "last_success_epoch": 1792342241.1009512,
       "expires_epoch": 1792363841.1009512,
-      "success_rate": 0.8671,
+      "success_rate": 0.8552,
       "latency_ms": 3838.9,
       "jitter_ms": 1123.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 24.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f05738aef8b7d0c4abe3bb2651b531df231ce8d4e6641c044785de006fdaeb63",
@@ -2889,13 +2891,13 @@
       "endpoint_ip": "51.38.71.147",
       "last_success_epoch": 1792342242.8730524,
       "expires_epoch": 1792363842.8730524,
-      "success_rate": 0.8667,
+      "success_rate": 0.8549,
       "latency_ms": 4588.4,
       "jitter_ms": 619.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 20.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "d5eef083de0ed91e3dd9c231fad622f4787714f75cef495328b10f0cb3eeace8",
@@ -2906,13 +2908,13 @@
       "endpoint_ip": "143.246.41.31",
       "last_success_epoch": 1792342216.7389307,
       "expires_epoch": 1792363816.7389307,
-      "success_rate": 0.8667,
+      "success_rate": 0.8273,
       "latency_ms": 570.7,
       "jitter_ms": 33.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 161.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "afc17ca2e17c4b82dbae5eb846c8ea4aa39adfb0a3a30922dd977ed0fe07fbf1",
@@ -2923,13 +2925,13 @@
       "endpoint_ip": "144.31.4.234",
       "last_success_epoch": 1792342236.3994277,
       "expires_epoch": 1792363836.3994277,
-      "success_rate": 0.8658,
+      "success_rate": 0.854,
       "latency_ms": 1439.0,
       "jitter_ms": 502.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 64.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "09d50c4c57e41a0ab83253db370fd443efcb50be1f93b611c7876d8296cfb284",
@@ -2940,13 +2942,13 @@
       "endpoint_ip": "144.31.4.234",
       "last_success_epoch": 1792342234.9664567,
       "expires_epoch": 1792363834.9664567,
-      "success_rate": 0.8658,
+      "success_rate": 0.854,
       "latency_ms": 694.1,
       "jitter_ms": 119.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 132.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a3a14f7e74ed76bc174f73b1830b7a21e40d6966c6a0a0c1c19f6342ed0b95be",
@@ -2957,13 +2959,13 @@
       "endpoint_ip": "167.148.183.51",
       "last_success_epoch": 1792342235.8270323,
       "expires_epoch": 1792363835.8270323,
-      "success_rate": 0.8652,
+      "success_rate": 0.8534,
       "latency_ms": 804.5,
       "jitter_ms": 134.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 114.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "0e3bd54dd860473716142d66bab92fe9dff508f6fe76b07e25f880fa3a4e66e5",
@@ -2974,13 +2976,13 @@
       "endpoint_ip": "104.21.91.244",
       "last_success_epoch": 1792342236.064182,
       "expires_epoch": 1792363836.064182,
-      "success_rate": 0.8649,
+      "success_rate": 0.8531,
       "latency_ms": 507.2,
       "jitter_ms": 14.6,
       "body_bytes": 6848,
       "transfer_kbps_estimate": 54.0,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "097661f8e4ac4f33b00c2243522636cab8659ba9c23b8916c2a33fc45dc04a1a",
@@ -2991,13 +2993,13 @@
       "endpoint_ip": "188.114.98.0",
       "last_success_epoch": 1792342237.5357225,
       "expires_epoch": 1792363837.5357225,
-      "success_rate": 0.8645,
+      "success_rate": 0.8522,
       "latency_ms": 976.4,
       "jitter_ms": 412.5,
       "body_bytes": 6856,
       "transfer_kbps_estimate": 28.1,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "7f7013773cd8f0b2531e84da4b58ee8f4106b27d11f9eaea126b17f452ec232d",
@@ -3008,13 +3010,13 @@
       "endpoint_ip": "162.159.250.29",
       "last_success_epoch": 1792342236.8353949,
       "expires_epoch": 1792363836.8353949,
-      "success_rate": 0.864,
+      "success_rate": 0.8519,
       "latency_ms": 540.0,
       "jitter_ms": 9.8,
       "body_bytes": 6854,
       "transfer_kbps_estimate": 50.8,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b2eb16c6dd88ce728dd0262a06d93457464e49584ec6feb0da3eaab34460e4c5",
@@ -3025,13 +3027,13 @@
       "endpoint_ip": "85.155.242.37",
       "last_success_epoch": 1792342217.8385072,
       "expires_epoch": 1792363817.8385072,
-      "success_rate": 0.8636,
+      "success_rate": 0.8248,
       "latency_ms": 681.6,
       "jitter_ms": 165.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 135.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "8fa958dbf13ce9a029cc199e5d8332357950c087f685f720d75170ad56a0e57f",
@@ -3042,13 +3044,13 @@
       "endpoint_ip": "205.237.110.254",
       "last_success_epoch": 1792342227.9545379,
       "expires_epoch": 1792363827.9545379,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 2839.3,
       "jitter_ms": 2538.6,
       "body_bytes": 6851,
       "transfer_kbps_estimate": 9.7,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "66015b39d317ddd9218050d5ce5ec513fa4f01197ff7696c8e94978d9b4dc3a1",
@@ -3059,13 +3061,13 @@
       "endpoint_ip": "45.9.156.42",
       "last_success_epoch": 1792342217.9042118,
       "expires_epoch": 1792363817.9042118,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 601.8,
       "jitter_ms": 402.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 152.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "c2652e4fb0cdef0e9bda2251bac0bfb908451464979bc6d47c12b03161135ab0",
@@ -3076,13 +3078,13 @@
       "endpoint_ip": "2.26.225.89",
       "last_success_epoch": 1792342223.1209016,
       "expires_epoch": 1792363823.1209016,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 3179.7,
       "jitter_ms": 610.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 28.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "d01a75abc9d5afe83baa7b63f97a1e372b2923cc634a6a4bf4e53758abd0b1f7",
@@ -3093,13 +3095,13 @@
       "endpoint_ip": "150.40.126.21",
       "last_success_epoch": 1792342218.2642102,
       "expires_epoch": 1792363818.2642102,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 590.6,
       "jitter_ms": 308.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 155.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e65c8004f80cddb8565da445e4703743c42921dbb2e93266bea2d52ba20c6ead",
@@ -3110,13 +3112,13 @@
       "endpoint_ip": "82.38.31.66",
       "last_success_epoch": 1792342217.826947,
       "expires_epoch": 1792363817.826947,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 301.4,
       "jitter_ms": 26.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 305.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "4a28351e1be5e835669c269e7c7f151fa2973da8ba12e5da1057736e82e12059",
@@ -3127,13 +3129,13 @@
       "endpoint_ip": "149.22.87.204",
       "last_success_epoch": 1792342219.7609088,
       "expires_epoch": 1792363819.7609088,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 1208.5,
       "jitter_ms": 279.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 76.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f071066aa780fbee22642a5378ce3d0999a87393558c702bf0e6452e80829017",
@@ -3144,13 +3146,13 @@
       "endpoint_ip": "82.38.31.194",
       "last_success_epoch": 1792342219.0699136,
       "expires_epoch": 1792363819.0699136,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 376.0,
       "jitter_ms": 58.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 244.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "253c215ff2abbb9ce7873f2ad1110b8207932edb5ab1d39d8206ff8d45b011ed",
@@ -3161,13 +3163,13 @@
       "endpoint_ip": "132.243.175.144",
       "last_success_epoch": 1792342222.4056182,
       "expires_epoch": 1792363822.4056182,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 1444.5,
       "jitter_ms": 113.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 63.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "5e69f1c6f8a5f5696efbc8bd99323238e27ed3ddf12fd8b11fa032cfbe0c59c9",
@@ -3178,13 +3180,13 @@
       "endpoint_ip": "82.38.31.192",
       "last_success_epoch": 1792342219.0276728,
       "expires_epoch": 1792363819.0276728,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 347.0,
       "jitter_ms": 80.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 265.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "7686d07be2d089a72f3f50e841895bab91826654a891f90083b065309cb19a75",
@@ -3195,13 +3197,13 @@
       "endpoint_ip": "82.38.31.62",
       "last_success_epoch": 1792342219.3529432,
       "expires_epoch": 1792363819.3529432,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 310.4,
       "jitter_ms": 41.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 296.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "90d2efa7cbe4fa6da46c85478ab348c54a005082921d8e4b59403d210d673f02",
@@ -3212,13 +3214,13 @@
       "endpoint_ip": "82.38.31.191",
       "last_success_epoch": 1792342220.1555579,
       "expires_epoch": 1792363820.1555579,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 317.6,
       "jitter_ms": 69.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 289.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "afefcef15bee2fbe1a9a962e0ae60d6424681e2ae3ee5d73fad634bfc5315827",
@@ -3229,13 +3231,13 @@
       "endpoint_ip": "82.38.31.186",
       "last_success_epoch": 1792342220.9118316,
       "expires_epoch": 1792363820.9118316,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 344.3,
       "jitter_ms": 15.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 267.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "9538dfc85381c1aa59d91ffbda5acc01b32407af363808e378641f210f01225c",
@@ -3246,13 +3248,13 @@
       "endpoint_ip": "193.29.139.235",
       "last_success_epoch": 1792342221.2470655,
       "expires_epoch": 1792363821.2470655,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 310.1,
       "jitter_ms": 8.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 296.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "50d84ff0ac49d0810fc210210348f8321a3d6c978054bddd42d0debed97abf82",
@@ -3263,13 +3265,13 @@
       "endpoint_ip": "82.38.31.170",
       "last_success_epoch": 1792342220.8736534,
       "expires_epoch": 1792363820.8736534,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 301.4,
       "jitter_ms": 30.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 305.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "7813f23140a57d5b15c1b8ccb8b31c2488b4d12a55e57ba4da2efed2f04fa8eb",
@@ -3280,13 +3282,13 @@
       "endpoint_ip": "82.38.31.16",
       "last_success_epoch": 1792342222.1566963,
       "expires_epoch": 1792363822.1566963,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 384.5,
       "jitter_ms": 100.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 239.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "c78dfa2525998c473fbd2e14d950a718ec1d3480b52ec6a3e51e4bdd996ca954",
@@ -3297,13 +3299,13 @@
       "endpoint_ip": "82.38.31.159",
       "last_success_epoch": 1792342223.2400074,
       "expires_epoch": 1792363823.2400074,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 311.7,
       "jitter_ms": 64.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 295.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f61ecd193b2dd0ca57a3a687bf0749ea7a7118f1a2cf5d8580a9eb4541bc8076",
@@ -3314,13 +3316,13 @@
       "endpoint_ip": "149.22.95.183",
       "last_success_epoch": 1792342222.9917378,
       "expires_epoch": 1792363822.9917378,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 824.5,
       "jitter_ms": 85.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 111.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "263d6a59b9f3d6cd97662838a664940bb8d15add4576b17955bb7239f21fbe40",
@@ -3331,13 +3333,13 @@
       "endpoint_ip": "82.38.31.49",
       "last_success_epoch": 1792342222.329215,
       "expires_epoch": 1792363822.329215,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 305.2,
       "jitter_ms": 80.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 301.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "6b636e2891e58f3ac4b94ae791aca22fd0614e3e4929a3f3f03cae81551e2b98",
@@ -3348,13 +3350,13 @@
       "endpoint_ip": "82.38.31.9",
       "last_success_epoch": 1792342222.929552,
       "expires_epoch": 1792363822.929552,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 312.0,
       "jitter_ms": 28.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 295.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "96a040f1871dc8165fb7485e8bb8861409779b76cf381f432ef8ea3464d1410f",
@@ -3365,13 +3367,13 @@
       "endpoint_ip": "82.38.31.61",
       "last_success_epoch": 1792342222.3750854,
       "expires_epoch": 1792363822.3750854,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 305.9,
       "jitter_ms": 30.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 300.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "193987f8d6260daa2803a47c09a6803d8dd581880f7a9df13b58e84e5ab1bfa1",
@@ -3382,13 +3384,13 @@
       "endpoint_ip": "209.46.102.22",
       "last_success_epoch": 1792342223.3968759,
       "expires_epoch": 1792363823.3968759,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 299.9,
       "jitter_ms": 38.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 306.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "abf861576412d493299edd03c9fbeb4bda400d9362344cdb7a2d357da189d40a",
@@ -3399,13 +3401,13 @@
       "endpoint_ip": "193.29.139.179",
       "last_success_epoch": 1792342223.4930763,
       "expires_epoch": 1792363823.4930763,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 308.6,
       "jitter_ms": 84.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 298.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "919f2eccd354910241fe468770662df32f765d1637e6c5b28290ec9239a49f63",
@@ -3416,13 +3418,13 @@
       "endpoint_ip": "82.38.31.174",
       "last_success_epoch": 1792342223.45528,
       "expires_epoch": 1792363823.45528,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 303.8,
       "jitter_ms": 22.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 302.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "cf3734f4598561bca791090f07e2571d8bef9a8cc18b18041a3c3f87757f3164",
@@ -3433,13 +3435,13 @@
       "endpoint_ip": "82.38.31.47",
       "last_success_epoch": 1792342224.1391366,
       "expires_epoch": 1792363824.1391366,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 369.7,
       "jitter_ms": 160.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 248.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e74f5f87bdaee8e390812d75e859d4e6ff3985c664051d6d3c4355b59ee41f16",
@@ -3450,13 +3452,13 @@
       "endpoint_ip": "51.222.136.236",
       "last_success_epoch": 1792342229.2090266,
       "expires_epoch": 1792363829.2090266,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 2656.4,
       "jitter_ms": 897.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 34.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "61818b01ce964cd6b825946715cfc25bde6aeceb58e625cabfe5bc8e14d669f3",
@@ -3467,13 +3469,13 @@
       "endpoint_ip": "156.146.38.169",
       "last_success_epoch": 1792342224.8471992,
       "expires_epoch": 1792363824.8471992,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 694.4,
       "jitter_ms": 169.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 132.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "20308b2105d200dc62679cd55ff52aa50e0c42b1ce7fb24b3dc05e691e3280dc",
@@ -3484,13 +3486,13 @@
       "endpoint_ip": "82.38.31.187",
       "last_success_epoch": 1792342224.437367,
       "expires_epoch": 1792363824.437367,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 427.9,
       "jitter_ms": 164.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 215.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a979c12f69327acaee773abd378098d99348f682d23fd594bd9d2739f8fb7751",
@@ -3501,13 +3503,13 @@
       "endpoint_ip": "82.38.31.162",
       "last_success_epoch": 1792342224.2869382,
       "expires_epoch": 1792363824.2869382,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 295.8,
       "jitter_ms": 66.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 311.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "6d31303f90559453672260b2338f20bad84e3fa9baec8115dcfa49b3e48632b9",
@@ -3518,13 +3520,13 @@
       "endpoint_ip": "82.38.31.35",
       "last_success_epoch": 1792342224.5777035,
       "expires_epoch": 1792363824.5777035,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 318.1,
       "jitter_ms": 48.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 289.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "944cfe1ff2af2f727bcafe61fe6d34dc4e78353c0f2ce1b885e30c3540582d79",
@@ -3535,13 +3537,13 @@
       "endpoint_ip": "82.38.31.185",
       "last_success_epoch": 1792342224.7814713,
       "expires_epoch": 1792363824.7814713,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 403.9,
       "jitter_ms": 69.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 227.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "6e4e8d599f54855dc26b3000d0c6764e63d96be44bc2e2a180f47fdf2247461c",
@@ -3552,13 +3554,13 @@
       "endpoint_ip": "82.38.31.82",
       "last_success_epoch": 1792342225.6159797,
       "expires_epoch": 1792363825.6159797,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 429.5,
       "jitter_ms": 211.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 214.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "6c80a0ec97dfa4093f23fb58b52cb09429d6ab81d1bc60162a5c303600676dbd",
@@ -3569,13 +3571,13 @@
       "endpoint_ip": "8.209.74.72",
       "last_success_epoch": 1792342224.5957856,
       "expires_epoch": 1792363824.5957856,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 311.4,
       "jitter_ms": 7.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 295.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "78d66dd3a9bb87c4406ac42eb75011ab152c922d2ab852314d1cc1a496770510",
@@ -3586,13 +3588,13 @@
       "endpoint_ip": "193.29.139.223",
       "last_success_epoch": 1792342225.2201633,
       "expires_epoch": 1792363825.2201633,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 306.1,
       "jitter_ms": 41.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 300.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "1425b6774b53c88c700abfa49d5e393d7f848cb7ae76d01a2396dee5515bf3f1",
@@ -3603,13 +3605,13 @@
       "endpoint_ip": "193.29.139.204",
       "last_success_epoch": 1792342225.6535916,
       "expires_epoch": 1792363825.6535916,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 302.9,
       "jitter_ms": 58.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 303.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "7527411bb88b7375ac150d2acb3374fc3d66face1cafb2f8d5366a128464cad3",
@@ -3620,13 +3622,13 @@
       "endpoint_ip": "149.102.132.184",
       "last_success_epoch": 1792342225.629791,
       "expires_epoch": 1792363825.629791,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 359.1,
       "jitter_ms": 58.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 256.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "c5ae5fb9985a8f19e6d967fe699aafaa123127b16592d0950c922f7a8228c467",
@@ -3637,13 +3639,13 @@
       "endpoint_ip": "82.38.31.18",
       "last_success_epoch": 1792342225.7019558,
       "expires_epoch": 1792363825.7019558,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 311.7,
       "jitter_ms": 26.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 295.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "35465f370975c56b5904913abfb24d3fe3bd5fb65fd9559f7cf14760cca42f49",
@@ -3654,13 +3656,13 @@
       "endpoint_ip": "103.11.76.248",
       "last_success_epoch": 1792342227.8095448,
       "expires_epoch": 1792363827.8095448,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 1265.9,
       "jitter_ms": 986.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 72.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "30f834f4e5837a7d1596aa38361f99de26ad89e64ff333d82ecb7f62cd645407",
@@ -3671,13 +3673,13 @@
       "endpoint_ip": "82.38.31.215",
       "last_success_epoch": 1792342225.8720925,
       "expires_epoch": 1792363825.8720925,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 310.8,
       "jitter_ms": 65.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 296.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "d1371c424c3552ddb5430dbda3c360693947049f612916e1af5b55013f889aae",
@@ -3688,13 +3690,13 @@
       "endpoint_ip": "82.38.31.13",
       "last_success_epoch": 1792342228.3322387,
       "expires_epoch": 1792363828.3322387,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 1119.9,
       "jitter_ms": 73.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 82.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a1766b803562a7ebe69d41f934f6b894b1d6473c83493e71d558e650f4470a40",
@@ -3705,13 +3707,13 @@
       "endpoint_ip": "82.38.31.3",
       "last_success_epoch": 1792342226.2912054,
       "expires_epoch": 1792363826.2912054,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 299.4,
       "jitter_ms": 19.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 307.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "9e661ef5c99e8a91714acd65889cd1a0de1b3fcda8c5e88d5397eb763c976f4d",
@@ -3722,13 +3724,13 @@
       "endpoint_ip": "82.38.31.174",
       "last_success_epoch": 1792342225.9345634,
       "expires_epoch": 1792363825.9345634,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 305.5,
       "jitter_ms": 84.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 301.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "947017d9cbfdaa5874386c44717e10fe69ebd22269ae1b5d02deb7809bb6fcb4",
@@ -3739,13 +3741,13 @@
       "endpoint_ip": "193.29.139.197",
       "last_success_epoch": 1792342226.718773,
       "expires_epoch": 1792363826.718773,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 306.0,
       "jitter_ms": 62.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 300.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "6613d9f4c4e10e2df469d1b12d29b598fccc664409e703a8de36dea799a66e80",
@@ -3756,13 +3758,13 @@
       "endpoint_ip": "102.133.165.160",
       "last_success_epoch": 1792342228.1621792,
       "expires_epoch": 1792363828.1621792,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 1017.8,
       "jitter_ms": 158.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 90.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "27cc902f437268fe4237d01ab4117c3e8d4cbfcca6bc9a7eb51c894e10e651e0",
@@ -3773,13 +3775,13 @@
       "endpoint_ip": "82.38.31.46",
       "last_success_epoch": 1792342226.9337916,
       "expires_epoch": 1792363826.9337916,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 296.7,
       "jitter_ms": 36.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 310.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e8cf0397108cdfcbf9276112624a5318d508579d13bafab2319de8177e32de14",
@@ -3790,13 +3792,13 @@
       "endpoint_ip": "149.102.132.184",
       "last_success_epoch": 1792342228.8934972,
       "expires_epoch": 1792363828.8934972,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 519.8,
       "jitter_ms": 163.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 177.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "184b09ca007135374932cf2db54e7be7b3bd30ad1f78a7e61417f05f22ef4c7b",
@@ -3807,13 +3809,13 @@
       "endpoint_ip": "78.159.250.214",
       "last_success_epoch": 1792342227.7620354,
       "expires_epoch": 1792363827.7620354,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 795.1,
       "jitter_ms": 21.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 115.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2ea48cc06d1619ccdad48e87752360dcd90c77d3c7974a20edd05a8679b0fc3c",
@@ -3824,13 +3826,13 @@
       "endpoint_ip": "82.38.31.34",
       "last_success_epoch": 1792342228.1125143,
       "expires_epoch": 1792363828.1125143,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 355.6,
       "jitter_ms": 76.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 258.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "731c97c9ec7f958e74b5f957b422e23ce6ad7d9ff5bf792f4c2619aef6530ac6",
@@ -3841,13 +3843,13 @@
       "endpoint_ip": "82.38.31.2",
       "last_success_epoch": 1792342227.009754,
       "expires_epoch": 1792363827.009754,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 305.2,
       "jitter_ms": 39.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 301.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "57550909f498f2a1f281bb49e12be3d5fbc01ffb6235799dcf5e53b991b350e8",
@@ -3858,13 +3860,13 @@
       "endpoint_ip": "193.29.139.168",
       "last_success_epoch": 1792342229.0251825,
       "expires_epoch": 1792363829.0251825,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 388.5,
       "jitter_ms": 92.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 236.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "87b9c379710a77a6e32e8530f1306200f07113ebab0fc78f3c224fdd1010c5e6",
@@ -3875,13 +3877,13 @@
       "endpoint_ip": "82.38.31.217",
       "last_success_epoch": 1792342227.8595707,
       "expires_epoch": 1792363827.8595707,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 322.9,
       "jitter_ms": 90.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 285.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "852000aac8530b4f655f1f4e19119fee2f63343df7111097232246173d58e88e",
@@ -3892,13 +3894,13 @@
       "endpoint_ip": "185.164.175.81",
       "last_success_epoch": 1792342227.392361,
       "expires_epoch": 1792363827.392361,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 313.1,
       "jitter_ms": 8.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 293.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "fc7fda1682bb095888fe26d739357d6ed980162afc40ac6181258b9b784139a2",
@@ -3909,13 +3911,13 @@
       "endpoint_ip": "37.19.198.243",
       "last_success_epoch": 1792342227.9510381,
       "expires_epoch": 1792363827.9510381,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 606.4,
       "jitter_ms": 41.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 151.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "d7373a718919871f453db00e258a30729a31172a42b8201a316aa98ff11871f8",
@@ -3926,13 +3928,13 @@
       "endpoint_ip": "173.244.56.9",
       "last_success_epoch": 1792342229.031809,
       "expires_epoch": 1792363829.031809,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 782.1,
       "jitter_ms": 152.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 117.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "9c52459a24431e1d0477948390cd6340c25f1ed8384a981f05650a70536f6b22",
@@ -3943,13 +3945,13 @@
       "endpoint_ip": "82.110.60.9",
       "last_success_epoch": 1792342229.0850701,
       "expires_epoch": 1792363829.0850701,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 400.9,
       "jitter_ms": 164.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 229.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "dac1521cbceb6720043cc04ad8751a9ab42bfb24297c16141a503efe99db1474",
@@ -3960,13 +3962,13 @@
       "endpoint_ip": "193.29.139.188",
       "last_success_epoch": 1792342229.669166,
       "expires_epoch": 1792363829.669166,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 662.9,
       "jitter_ms": 10.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 138.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "1fc856dc8de557586185c993eae2bf41344c2a36fef8bdef9bab7ad16876d9dc",
@@ -3977,13 +3979,13 @@
       "endpoint_ip": "82.38.31.48",
       "last_success_epoch": 1792342229.1514215,
       "expires_epoch": 1792363829.1514215,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 371.7,
       "jitter_ms": 204.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 247.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "32fffd206ebe66cd3d6680d5b1ee10fbe7016af903cc01d0e412aa332525d9da",
@@ -3994,13 +3996,13 @@
       "endpoint_ip": "156.146.38.167",
       "last_success_epoch": 1792342229.8293836,
       "expires_epoch": 1792363829.8293836,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 697.2,
       "jitter_ms": 165.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 132.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "27b0e836c8ccdc48824d88ca4d6c50e3db2326d425bdf1affc5d0bb946c4b88e",
@@ -4011,13 +4013,13 @@
       "endpoint_ip": "37.148.203.124",
       "last_success_epoch": 1792342229.2909381,
       "expires_epoch": 1792363829.2909381,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 326.0,
       "jitter_ms": 71.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 282.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "422bb42ed82fac5cf72c8db9a3095f2117c6619960c0d6273886196ba6f240c8",
@@ -4028,13 +4030,13 @@
       "endpoint_ip": "82.38.31.149",
       "last_success_epoch": 1792342232.8688161,
       "expires_epoch": 1792363832.8688161,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 1804.6,
       "jitter_ms": 2956.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 51.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "570811afdae15a9c57f5540947f54ce2cd6b7087927a7830c4f2ca022a27b65c",
@@ -4045,13 +4047,13 @@
       "endpoint_ip": "82.38.31.175",
       "last_success_epoch": 1792342229.5302708,
       "expires_epoch": 1792363829.5302708,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 363.1,
       "jitter_ms": 103.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 253.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "1365184ca66d4710ae28a99fb77291583f1a9b8132229d2a96d7264dfbdfca48",
@@ -4062,13 +4064,13 @@
       "endpoint_ip": "108.61.186.37",
       "last_success_epoch": 1792342232.842895,
       "expires_epoch": 1792363832.842895,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 1546.3,
       "jitter_ms": 21.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 59.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "3a6570b8aa68d730a92c1b9846d85ea66bc6a1d241a0e06c7fbc0e0c68d794c5",
@@ -4079,13 +4081,13 @@
       "endpoint_ip": "156.146.38.168",
       "last_success_epoch": 1792342230.6974962,
       "expires_epoch": 1792363830.6974962,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 669.2,
       "jitter_ms": 116.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 137.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "8e4fc7232d960963ed7071ac8d72a61a01b02f2cdde1a4084289b37880832fd9",
@@ -4096,13 +4098,13 @@
       "endpoint_ip": "158.173.20.208",
       "last_success_epoch": 1792342230.0982518,
       "expires_epoch": 1792363830.0982518,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 299.1,
       "jitter_ms": 41.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 307.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "6691a875dfefa15ee0175efeb297aca9c13ab26f95c02c9699a25564f542b186",
@@ -4113,13 +4115,13 @@
       "endpoint_ip": "82.38.31.7",
       "last_success_epoch": 1792342230.155333,
       "expires_epoch": 1792363830.155333,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 296.5,
       "jitter_ms": 59.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 310.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "778cc3ec61df0f7dff5fa598dc8f80a3fd5bc20136a94768363171b9d8a139ed",
@@ -4130,13 +4132,13 @@
       "endpoint_ip": "172.66.203.67",
       "last_success_epoch": 1792342230.5315206,
       "expires_epoch": 1792363830.5315206,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 955.3,
       "jitter_ms": 48.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 96.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "84acb85e3dd6ed6c3cc8451792ef5fb8a0f4c8f580123c6924d7497084c76936",
@@ -4147,13 +4149,13 @@
       "endpoint_ip": "173.244.56.6",
       "last_success_epoch": 1792342231.2304358,
       "expires_epoch": 1792363831.2304358,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 797.4,
       "jitter_ms": 220.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 115.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a07675a39ceb4d4ef1eba94682d0e75b871f57e514c1f452dc4d73d8531c57c7",
@@ -4164,13 +4166,13 @@
       "endpoint_ip": "82.38.31.28",
       "last_success_epoch": 1792342230.277968,
       "expires_epoch": 1792363830.277968,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 290.1,
       "jitter_ms": 16.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 317.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "d47618b00e074d947cc2e0b745aa82f361c921f5a97bda36106a9c96eac7c0d2",
@@ -4181,13 +4183,13 @@
       "endpoint_ip": "37.19.198.244",
       "last_success_epoch": 1792342230.951612,
       "expires_epoch": 1792363830.951612,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 594.5,
       "jitter_ms": 102.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 154.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "6e3bcb6be9f8294764aac39c32b6c814f497775fc7541c285724bec2794490d8",
@@ -4198,13 +4200,13 @@
       "endpoint_ip": "156.146.38.170",
       "last_success_epoch": 1792342231.363801,
       "expires_epoch": 1792363831.363801,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 675.4,
       "jitter_ms": 133.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 136.3,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "5d372ba3aa4562ba10274ad32b6506bfe61ea4546addfbb51113153837366cbe",
@@ -4215,13 +4217,13 @@
       "endpoint_ip": "37.19.198.236",
       "last_success_epoch": 1792342231.3331194,
       "expires_epoch": 1792363831.3331194,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 604.7,
       "jitter_ms": 79.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 152.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "76d1940ae42a9a95d586c9c93e7314295bec172ed6f38385c459e67abf9243c3",
@@ -4232,13 +4234,13 @@
       "endpoint_ip": "82.38.31.26",
       "last_success_epoch": 1792342230.9327402,
       "expires_epoch": 1792363830.9327402,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 315.0,
       "jitter_ms": 36.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 292.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "5cd4e4b4ac043272b655716b7f995612191654eb0cfcdda869c0ebfa7fc75ec5",
@@ -4249,13 +4251,13 @@
       "endpoint_ip": "54.36.174.140",
       "last_success_epoch": 1792342231.738934,
       "expires_epoch": 1792363831.738934,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 587.5,
       "jitter_ms": 256.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 156.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "5f97474749d421fad3e54680cf4344a77abd81308474c731b052bcee208d9855",
@@ -4266,13 +4268,13 @@
       "endpoint_ip": "82.38.31.69",
       "last_success_epoch": 1792342231.2809792,
       "expires_epoch": 1792363831.2809792,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 333.6,
       "jitter_ms": 81.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 275.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "926c6120e06c098f9e0dde6f73d0841abef8d3a06e927ce5bf4ceae74e7e6ec5",
@@ -4283,13 +4285,13 @@
       "endpoint_ip": "82.38.31.149",
       "last_success_epoch": 1792342232.75113,
       "expires_epoch": 1792363832.75113,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 1001.9,
       "jitter_ms": 1369.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 91.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "04e32c1c9a270846457f113848f14c77baab09a22a09da6653a9f32c35170c82",
@@ -4300,13 +4302,13 @@
       "endpoint_ip": "82.38.31.36",
       "last_success_epoch": 1792342231.6018424,
       "expires_epoch": 1792363831.6018424,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 309.6,
       "jitter_ms": 90.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 297.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f69459372f9831c79e93f1aa894c5064f71b7618ab46287dc8ef9a5feb383deb",
@@ -4317,13 +4319,13 @@
       "endpoint_ip": "193.29.139.202",
       "last_success_epoch": 1792342231.685525,
       "expires_epoch": 1792363831.685525,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 282.6,
       "jitter_ms": 13.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 325.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "76de1fdd39bec057626272de7f5b30d862c51f70282567ab00a6376aa3fcb71b",
@@ -4334,13 +4336,13 @@
       "endpoint_ip": "193.29.139.198",
       "last_success_epoch": 1792342231.7852983,
       "expires_epoch": 1792363831.7852983,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 317.0,
       "jitter_ms": 59.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 290.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "993455f7e1a2f3a443bcc88b168990829688104818f87f68ab4922ad1a0d96a6",
@@ -4351,13 +4353,13 @@
       "endpoint_ip": "2.26.225.89",
       "last_success_epoch": 1792342241.0189147,
       "expires_epoch": 1792363841.0189147,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 4695.6,
       "jitter_ms": 1212.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 19.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2d767a4387adc52a8dbacb489bdda76e6952d0253a04087520ae79c17e6332a5",
@@ -4368,13 +4370,13 @@
       "endpoint_ip": "104.17.136.198",
       "last_success_epoch": 1792342233.0521874,
       "expires_epoch": 1792363833.0521874,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 820.2,
       "jitter_ms": 72.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 112.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "49566cc545c16805ba3453b47217c0719fb305a30dd02018af9220f5051daef3",
@@ -4385,13 +4387,13 @@
       "endpoint_ip": "82.38.31.54",
       "last_success_epoch": 1792342232.2938206,
       "expires_epoch": 1792363832.2938206,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 295.3,
       "jitter_ms": 39.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 311.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "cf01b7743c75ececc0c216831fff68fcb9db047474d926d97932febb1b489bfe",
@@ -4402,13 +4404,13 @@
       "endpoint_ip": "54.36.174.134",
       "last_success_epoch": 1792342233.1069503,
       "expires_epoch": 1792363833.1069503,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 673.6,
       "jitter_ms": 623.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 136.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "8163ad44ef68700d614de19b2ac07d80967f60f83174c73284ae15401f543d30",
@@ -4419,13 +4421,13 @@
       "endpoint_ip": "82.38.31.175",
       "last_success_epoch": 1792342232.4884841,
       "expires_epoch": 1792363832.4884841,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 346.3,
       "jitter_ms": 3.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 265.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b535b3aead0c30bdd0715aef125da2c77a014a4ae41dc8a880e487604e098f2e",
@@ -4436,13 +4438,13 @@
       "endpoint_ip": "82.38.31.198",
       "last_success_epoch": 1792342232.462725,
       "expires_epoch": 1792363832.462725,
-      "success_rate": 0.8635,
+      "success_rate": 0.8247,
       "latency_ms": 312.4,
       "jitter_ms": 1.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 294.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a044e764e677533317ced04571ac50c8415d3101409c13c6e5a2145b7995a37b",
@@ -4453,13 +4455,13 @@
       "endpoint_ip": "103.106.229.37",
       "last_success_epoch": 1792342237.313579,
       "expires_epoch": 1792363837.313579,
-      "success_rate": 0.8625,
+      "success_rate": 0.8442,
       "latency_ms": 1378.9,
       "jitter_ms": 129.3,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 66.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2f6082111515aad7887bfe84b948daacef721d13f17cb709f92a0abcf5526665",
@@ -4470,13 +4472,13 @@
       "endpoint_ip": "85.155.242.38",
       "last_success_epoch": 1792342246.0870774,
       "expires_epoch": 1792363846.0870774,
-      "success_rate": 0.8624,
+      "success_rate": 0.8506,
       "latency_ms": 568.3,
       "jitter_ms": 17.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 161.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "3da50e383a798ce9b895844807ae642a6a02e7431274cde5265395dc0497d929",
@@ -4487,13 +4489,13 @@
       "endpoint_ip": "85.120.144.116",
       "last_success_epoch": 1792342233.730755,
       "expires_epoch": 1792363833.730755,
-      "success_rate": 0.8617,
+      "success_rate": 0.8228,
       "latency_ms": 643.7,
       "jitter_ms": 29.2,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 143.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "491166ff34231b67570ec5a79b1501042b42e429b74a1186ae6886dba32d3a37",
@@ -4504,13 +4506,13 @@
       "endpoint_ip": "188.114.96.4",
       "last_success_epoch": 1792342234.0825372,
       "expires_epoch": 1792363834.0825372,
-      "success_rate": 0.8617,
+      "success_rate": 0.8227,
       "latency_ms": 867.3,
       "jitter_ms": 230.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 106.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "77dc58ba6c55bdbfaf01e7bc57fbf6f02440ebd57e29caa16542a1cff325f259",
@@ -4521,13 +4523,13 @@
       "endpoint_ip": "188.114.97.6",
       "last_success_epoch": 1792342239.6774364,
       "expires_epoch": 1792363839.6774364,
-      "success_rate": 0.8612,
+      "success_rate": 0.8494,
       "latency_ms": 1213.0,
       "jitter_ms": 1349.3,
       "body_bytes": 6879,
       "transfer_kbps_estimate": 22.7,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f244a3f141a831a063b48702a7fa25299634a65adb5c1fc4f32b0598d5ae168a",
@@ -4538,13 +4540,13 @@
       "endpoint_ip": "93.152.215.176",
       "last_success_epoch": 1792342244.1461995,
       "expires_epoch": 1792363844.1461995,
-      "success_rate": 0.8609,
+      "success_rate": 0.8491,
       "latency_ms": 3403.3,
       "jitter_ms": 5293.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 27.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "386fac853feb7670e6f6fb318a542ace05f8776c60b0d909d092d6b977e7b4af",
@@ -4555,13 +4557,13 @@
       "endpoint_ip": "104.18.42.163",
       "last_success_epoch": 1792342242.432511,
       "expires_epoch": 1792363842.432511,
-      "success_rate": 0.8605,
+      "success_rate": 0.8485,
       "latency_ms": 1577.2,
       "jitter_ms": 174.4,
       "body_bytes": 16611,
       "transfer_kbps_estimate": 42.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "4dae286586afbae42848a3aed74baa57bafd25e7e93df392ba9bcad8e7848a29",
@@ -4572,13 +4574,13 @@
       "endpoint_ip": "2.27.109.179",
       "last_success_epoch": 1792342245.557429,
       "expires_epoch": 1792363845.557429,
-      "success_rate": 0.8605,
+      "success_rate": 0.8485,
       "latency_ms": 3873.2,
       "jitter_ms": 390.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 23.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b613e728d4fc4d6461615668b068d024e8f7c9daaad3eec6f30d7cf8ec2145bc",
@@ -4589,13 +4591,13 @@
       "endpoint_ip": "162.159.250.29",
       "last_success_epoch": 1792342239.6572013,
       "expires_epoch": 1792363839.6572013,
-      "success_rate": 0.8581,
+      "success_rate": 0.8464,
       "latency_ms": 632.6,
       "jitter_ms": 217.3,
       "body_bytes": 6855,
       "transfer_kbps_estimate": 43.3,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "fea7df0ab3b44e06c666fa883d0de1cf5b2755682a6fe3eed5c53b1444fc97d1",
@@ -4606,13 +4608,13 @@
       "endpoint_ip": "104.16.10.251",
       "last_success_epoch": 1792342247.37589,
       "expires_epoch": 1792363847.37589,
-      "success_rate": 0.8579,
+      "success_rate": 0.8453,
       "latency_ms": 4600.7,
       "jitter_ms": 413.8,
       "body_bytes": 6855,
       "transfer_kbps_estimate": 6.0,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "cf909a5457d6bb132e562e58804b4dc4f5a6254071eb83069701eb359e170610",
@@ -4623,13 +4625,13 @@
       "endpoint_ip": "172.67.155.65",
       "last_success_epoch": 1792342239.4002063,
       "expires_epoch": 1792363839.4002063,
-      "success_rate": 0.8575,
+      "success_rate": 0.8458,
       "latency_ms": 508.8,
       "jitter_ms": 2.5,
       "body_bytes": 6856,
       "transfer_kbps_estimate": 53.9,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a48f38112cea308b14ff7e34eeb3d113d41a1f97be802c1c4cfa83298b63c292",
@@ -4640,13 +4642,13 @@
       "endpoint_ip": "103.106.229.37",
       "last_success_epoch": 1792342239.1933012,
       "expires_epoch": 1792363839.1933012,
-      "success_rate": 0.8573,
+      "success_rate": 0.839,
       "latency_ms": 1390.3,
       "jitter_ms": 178.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 66.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "9a3b833439e2cfe42570ef9700bc10a633e798861b5a5288944136d80a8eb450",
@@ -4657,13 +4659,13 @@
       "endpoint_ip": "103.106.229.37",
       "last_success_epoch": 1792342239.4255104,
       "expires_epoch": 1792363839.4255104,
-      "success_rate": 0.8573,
+      "success_rate": 0.839,
       "latency_ms": 1391.8,
       "jitter_ms": 231.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 66.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "a952be28feef886a7a27093b16c2fccc8428dd46a850b8d4af81b0b320da18a6",
@@ -4674,13 +4676,13 @@
       "endpoint_ip": "91.107.191.188",
       "last_success_epoch": 1792342246.87331,
       "expires_epoch": 1792363846.87331,
-      "success_rate": 0.856,
+      "success_rate": 0.8443,
       "latency_ms": 463.5,
       "jitter_ms": 40.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 198.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "0622c32f689936e136978ff9c669891600eb67c278da624461d94d30dd754ea5",
@@ -4691,13 +4693,13 @@
       "endpoint_ip": "104.21.71.249",
       "last_success_epoch": 1792342241.2311928,
       "expires_epoch": 1792363841.2311928,
-      "success_rate": 0.8558,
+      "success_rate": 0.8441,
       "latency_ms": 1187.7,
       "jitter_ms": 54.5,
       "body_bytes": 6855,
       "transfer_kbps_estimate": 23.1,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "8fff1ea318910530abef936437b2f1e2aab6cd598dcee922fa18a46f4a85eb51",
@@ -4708,13 +4710,13 @@
       "endpoint_ip": "85.155.242.37",
       "last_success_epoch": 1792342240.9303396,
       "expires_epoch": 1792363840.9303396,
-      "success_rate": 0.8555,
+      "success_rate": 0.8435,
       "latency_ms": 583.9,
       "jitter_ms": 146.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 157.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f984f9969559099faedebd80256883a308518483781ebf996ce32af4b6a76c88",
@@ -4725,13 +4727,13 @@
       "endpoint_ip": "103.244.145.144",
       "last_success_epoch": 1792342247.0038922,
       "expires_epoch": 1792363847.0038922,
-      "success_rate": 0.8536,
+      "success_rate": 0.842,
       "latency_ms": 3429.5,
       "jitter_ms": 3796.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 26.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "16228090bd7556fa1f6e6728f8b1079362cc700861a86378cd42f08df89fb5d0",
@@ -4742,13 +4744,13 @@
       "endpoint_ip": "217.60.35.144",
       "last_success_epoch": 1792342241.4518669,
       "expires_epoch": 1792363841.4518669,
-      "success_rate": 0.853,
+      "success_rate": 0.8414,
       "latency_ms": 769.2,
       "jitter_ms": 501.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 119.6,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "3e313ce591c3b4693efa27ddc52c5ed2ace0cf23d626b28491d189c7bb085e6a",
@@ -4759,13 +4761,13 @@
       "endpoint_ip": "188.114.98.0",
       "last_success_epoch": 1792342241.7786582,
       "expires_epoch": 1792363841.7786582,
-      "success_rate": 0.8518,
+      "success_rate": 0.8402,
       "latency_ms": 634.0,
       "jitter_ms": 170.7,
       "body_bytes": 6856,
       "transfer_kbps_estimate": 43.3,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "9cde87b8602061d0c3e8e8106cbee0c4c095742dc26c38a0a3fa1cc310dfee94",
@@ -4776,13 +4778,13 @@
       "endpoint_ip": "188.114.97.6",
       "last_success_epoch": 1792342242.8821328,
       "expires_epoch": 1792363842.8821328,
-      "success_rate": 0.8496,
+      "success_rate": 0.8377,
       "latency_ms": 560.3,
       "jitter_ms": 59.1,
       "body_bytes": 6850,
       "transfer_kbps_estimate": 48.9,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "1a3e3a6bc62969432f7d882b94ead7bcf15a2b5c6d897388f6410f8b236182ca",
@@ -4793,13 +4795,13 @@
       "endpoint_ip": "140.225.199.241",
       "last_success_epoch": 1792342245.6374745,
       "expires_epoch": 1792363845.6374745,
-      "success_rate": 0.8496,
+      "success_rate": 0.8364,
       "latency_ms": 2636.8,
       "jitter_ms": 1852.0,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 34.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "88511d9997d2334e1ab76a7b81bdd7a03ea1aa3965c571bbb0b576e29dc863da",
@@ -4810,13 +4812,13 @@
       "endpoint_ip": "104.21.91.244",
       "last_success_epoch": 1792342243.8254435,
       "expires_epoch": 1792363843.8254435,
-      "success_rate": 0.8496,
+      "success_rate": 0.838,
       "latency_ms": 636.3,
       "jitter_ms": 239.5,
       "body_bytes": 6854,
       "transfer_kbps_estimate": 43.1,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "0c15cb5da983a5d7f142b172be48108daa01c9427c1a117bb69ddc516631fd32",
@@ -4827,13 +4829,13 @@
       "endpoint_ip": "104.21.71.249",
       "last_success_epoch": 1792342244.0377421,
       "expires_epoch": 1792363844.0377421,
-      "success_rate": 0.8491,
+      "success_rate": 0.8371,
       "latency_ms": 1027.0,
       "jitter_ms": 541.2,
       "body_bytes": 6851,
       "transfer_kbps_estimate": 26.7,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "307bcbafc3a67ab9cab9efa182497d6ee8401f9ef87461d70404ec3a6873df5f",
@@ -4844,13 +4846,13 @@
       "endpoint_ip": "152.69.200.216",
       "last_success_epoch": 1792342247.40474,
       "expires_epoch": 1792363847.40474,
-      "success_rate": 0.8482,
+      "success_rate": 0.8361,
       "latency_ms": 2212.9,
       "jitter_ms": 195.5,
       "body_bytes": 6853,
       "transfer_kbps_estimate": 12.4,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "df7afc4a9a26ad289dc1ad0c8c8c36cddd305b02459c4443ffec0edddc4548e4",
@@ -4861,13 +4863,13 @@
       "endpoint_ip": "104.21.91.244",
       "last_success_epoch": 1792342239.4415019,
       "expires_epoch": 1792363839.4415019,
-      "success_rate": 0.8478,
+      "success_rate": 0.8356,
       "latency_ms": 550.5,
       "jitter_ms": 5.0,
       "body_bytes": 6849,
       "transfer_kbps_estimate": 49.8,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "1b3474f3d09b12210d65bddb77034d631c244700e5d07d49f519a5c992f11093",
@@ -4878,13 +4880,13 @@
       "endpoint_ip": "167.148.183.51",
       "last_success_epoch": 1792342243.5764644,
       "expires_epoch": 1792363843.5764644,
-      "success_rate": 0.8444,
+      "success_rate": 0.8329,
       "latency_ms": 829.1,
       "jitter_ms": 40.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 111.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "83329da6301d72b2b5f9088f7232a4a106e59db1379c6147a51101b2e6341003",
@@ -4895,13 +4897,13 @@
       "endpoint_ip": "94.143.231.146",
       "last_success_epoch": 1792342246.2315204,
       "expires_epoch": 1792363846.2315204,
-      "success_rate": 0.8404,
+      "success_rate": 0.8286,
       "latency_ms": 1646.1,
       "jitter_ms": 452.1,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 55.9,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "328debf6a470d2adadf9595d775470149a7da9b1e21a3ada2c53f6bdf0865087",
@@ -4912,13 +4914,13 @@
       "endpoint_ip": "217.60.35.146",
       "last_success_epoch": 1792342247.7907023,
       "expires_epoch": 1792363847.7907023,
-      "success_rate": 0.8396,
+      "success_rate": 0.8282,
       "latency_ms": 504.4,
       "jitter_ms": 11.7,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 182.5,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "cb31e2845b1b9c947a55014ec811fdc568bdf310ef000699b8d66b52dad829d9",
@@ -4929,13 +4931,13 @@
       "endpoint_ip": "185.141.227.180",
       "last_success_epoch": 1792342254.0342653,
       "expires_epoch": 1792363854.0342653,
-      "success_rate": 0.8392,
+      "success_rate": 0.8275,
       "latency_ms": 3482.6,
       "jitter_ms": 4913.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 26.4,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e5479aab965ae4cb4c57d6fa7f3e05aa49841a66fe9811efd08ec433f6958dc4",
@@ -4946,13 +4948,13 @@
       "endpoint_ip": "167.148.183.51",
       "last_success_epoch": 1792342248.6829853,
       "expires_epoch": 1792363848.6829853,
-      "success_rate": 0.8392,
+      "success_rate": 0.8277,
       "latency_ms": 846.2,
       "jitter_ms": 322.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 108.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "e5a1027224b2655a3ebe1cc94aef39f672babd194a1cf673b392a2d9f29cc7e7",
@@ -4963,13 +4965,13 @@
       "endpoint_ip": "205.237.110.254",
       "last_success_epoch": 1792342264.2309206,
       "expires_epoch": 1792363864.2309206,
-      "success_rate": 0.8378,
+      "success_rate": 0.8263,
       "latency_ms": 5360.4,
       "jitter_ms": 2586.1,
       "body_bytes": 6851,
       "transfer_kbps_estimate": 5.1,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2f6625ead1de5ed3bf2b404fc4b06f4d4c98f1d0a640fc3ff7a2807ced8caf74",
@@ -4980,13 +4982,13 @@
       "endpoint_ip": "89.35.14.31",
       "last_success_epoch": 1792342253.2598686,
       "expires_epoch": 1792363853.2598686,
-      "success_rate": 0.8372,
+      "success_rate": 0.8255,
       "latency_ms": 2612.8,
       "jitter_ms": 2094.5,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 35.2,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "611351cdb6720b403ae7ab0705cc65d5607d6c617f850b93e45f9de7640e3c41",
@@ -4997,13 +4999,13 @@
       "endpoint_ip": "168.113.135.90",
       "last_success_epoch": 1792342247.7687664,
       "expires_epoch": 1792363847.7687664,
-      "success_rate": 0.8341,
+      "success_rate": 0.7934,
       "latency_ms": 2423.6,
       "jitter_ms": 3058.8,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 38.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "29b1bdd9e5571e8961d4a872e82d176a60a8ed7c79231fa4e1dcdf78e4d06be1",
@@ -5014,13 +5016,13 @@
       "endpoint_ip": "82.38.31.207",
       "last_success_epoch": 1792342250.1558604,
       "expires_epoch": 1792363850.1558604,
-      "success_rate": 0.8338,
+      "success_rate": 0.8224,
       "latency_ms": 948.8,
       "jitter_ms": 1281.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 97.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "180f2416a770d9fc9c31ad500308acbfa88808223e82d053511ae50a8a1d9838",
@@ -5031,13 +5033,13 @@
       "endpoint_ip": "82.38.31.208",
       "last_success_epoch": 1792342250.2227364,
       "expires_epoch": 1792363850.2227364,
-      "success_rate": 0.8338,
+      "success_rate": 0.8224,
       "latency_ms": 971.4,
       "jitter_ms": 1089.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 94.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "b7e859f7eae81f3df49ebdb79d2f3ec3afd7f05258e687e8db511339372fa372",
@@ -5048,13 +5050,13 @@
       "endpoint_ip": "94.143.231.146",
       "last_success_epoch": 1792342246.341367,
       "expires_epoch": 1792363846.341367,
-      "success_rate": 0.8327,
+      "success_rate": 0.8086,
       "latency_ms": 2203.7,
       "jitter_ms": 1341.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 41.8,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "0e41c9a0c5188cae49fe5ad29278b9f93b5f5917060c6b7af08a0d344f17463a",
@@ -5065,13 +5067,13 @@
       "endpoint_ip": "188.114.97.6",
       "last_success_epoch": 1792342250.974847,
       "expires_epoch": 1792363850.974847,
-      "success_rate": 0.8323,
+      "success_rate": 0.821,
       "latency_ms": 693.0,
       "jitter_ms": 379.8,
       "body_bytes": 6856,
       "transfer_kbps_estimate": 39.6,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "1236e20a538ec2ab9ad4d7a2333b28d77f2ea5a50b619bf8a7570285d73683ef",
@@ -5082,13 +5084,13 @@
       "endpoint_ip": "185.220.223.25",
       "last_success_epoch": 1792342250.4099758,
       "expires_epoch": 1792363850.4099758,
-      "success_rate": 0.832,
+      "success_rate": 0.8204,
       "latency_ms": 571.4,
       "jitter_ms": 49.6,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 161.1,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "bb9ca0defec4761763aadd91bc65d58f0c3bb2ff3c3f62702a118337a184fbc0",
@@ -5099,13 +5101,13 @@
       "endpoint_ip": "46.225.46.136",
       "last_success_epoch": 1792342250.5632071,
       "expires_epoch": 1792363850.5632071,
-      "success_rate": 0.8315,
+      "success_rate": 0.7909,
       "latency_ms": 1360.2,
       "jitter_ms": 1371.4,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 67.7,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "15d1514990f66d0a1f44b329ede0785743326d41b08d2271d18c0f671aa3a41b",
@@ -5116,13 +5118,13 @@
       "endpoint_ip": "172.67.155.65",
       "last_success_epoch": 1792342244.2926116,
       "expires_epoch": 1792363844.2926116,
-      "success_rate": 0.8306,
+      "success_rate": 0.8187,
       "latency_ms": 847.7,
       "jitter_ms": 674.3,
       "body_bytes": 6856,
       "transfer_kbps_estimate": 32.4,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     }
   ],
   "flag_definition": "IP pinned for the successful proxy connection; may be CDN ingress, not exit",
