@@ -1,17 +1,16 @@
 {
   "mode": "health",
-  "health": "ok",
+  "health": "retained_previous",
   "tested_on": "operator network; local Xray",
   "xray_version": "Xray 26.3.27 (Xray, Penetrates Everything.) d2758a0 (go1.26.1 windows/amd64)",
   "source_status": {},
-  "unique_selected_for_test": 402,
+  "unique_selected_for_test": 403,
   "first_pass": {
-    "ValueError": 30,
-    "TimeoutExpired": 13,
-    "pass": 3,
-    "TimeoutError": 328,
-    "ConnectionResetError": 26,
-    "SSLEOFError": 2
+    "TimeoutExpired": 38,
+    "CalledProcessError": 87,
+    "TimeoutError": 120,
+    "ConnectionResetError": 156,
+    "ConnectionAbortedError": 2
   },
   "second_pass": {},
   "max_tests": 0,
@@ -20,10 +19,10 @@
   "first_pass_timeout_seconds": 30,
   "screen_network_timeout_seconds": null,
   "verification_timeout_seconds": 30,
-  "failure_reason": null,
+  "failure_reason": "No current verified transfer; previous nodes age normally",
   "schema": 2,
-  "generated_epoch": 1792353402.835031,
-  "generated_utc": "2026-10-18T19:56:42+00:00",
+  "generated_epoch": 1792354994.125159,
+  "generated_utc": "2026-10-18T20:23:14+00:00",
   "published": 3,
   "nodes": [
     {
@@ -35,13 +34,13 @@
       "endpoint_ip": "172.64.229.21",
       "last_success_epoch": 1792352991.3493826,
       "expires_epoch": 1792374591.3493826,
-      "success_rate": 0.8499,
+      "success_rate": 0.8256,
       "latency_ms": 1902.3,
       "jitter_ms": 367.4,
       "body_bytes": 6880,
       "transfer_kbps_estimate": 14.5,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "f5c4b1f916cde6933594aebcc4903bd8f8d7a080148a1f3e9d3fc5804fd428a6",
@@ -52,13 +51,13 @@
       "endpoint_ip": "3.36.52.183",
       "last_success_epoch": 1792352986.6731274,
       "expires_epoch": 1792374586.6731274,
-      "success_rate": 0.6656,
+      "success_rate": 0.5689,
       "latency_ms": 3405.2,
       "jitter_ms": 147.9,
       "body_bytes": 23008,
       "transfer_kbps_estimate": 27.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "088ca50d4226f5e6885e3b89b8889c9babcbe82f3537c6a2bb6f4572b0eae8d2",
@@ -69,13 +68,13 @@
       "endpoint_ip": "20.223.172.81",
       "last_success_epoch": 1792352983.5905552,
       "expires_epoch": 1792374583.5905552,
-      "success_rate": 0.6656,
+      "success_rate": 0.5689,
       "latency_ms": 886.5,
       "jitter_ms": 34.1,
       "body_bytes": 6855,
       "transfer_kbps_estimate": 30.9,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     }
   ],
   "flag_definition": "IP pinned for the successful proxy connection; may be CDN ingress, not exit",
