@@ -1,38 +1,6 @@
 {
   "outbounds": [
     {
-      "protocol": "vmess",
-      "settings": {
-        "vnext": [
-          {
-            "address": "us16-4.998998.best",
-            "port": 443,
-            "users": [
-              {
-                "id": "5504eaa8-1395-402f-8e0e-75ecd762e627",
-                "alterId": 0,
-                "security": "auto"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "server1.9966338.xyz"
-        },
-        "wsSettings": {
-          "path": "/efrsdioy98wert",
-          "headers": {
-            "Host": "server1.9966338.xyz"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 6777"
-    },
-    {
       "protocol": "shadowsocks",
       "settings": {
         "servers": [
@@ -61,6 +29,38 @@
       "tag": "server 🇿🇦 241"
     },
     {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "free.sahanwickramasinghe.me",
+            "port": 8443,
+            "users": [
+              {
+                "id": "c136a12c-4260-48a7-a1e6-fbda83a11045",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "free.sahanwickramasinghe.me",
+          "fingerprint": "chrome"
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "free.sahanwickramasinghe.me"
+          }
+        }
+      },
+      "tag": "server 🇩🇪 7066"
+    },
+    {
       "protocol": "trojan",
       "settings": {
         "servers": [
@@ -75,10 +75,11 @@
         "network": "tcp",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "ca.tronsg.com"
+          "serverName": "ca.tronsg.com",
+          "fingerprint": "chrome"
         }
       },
-      "tag": "server 🇨🇦 740"
+      "tag": "server 🇨🇦 5763"
     }
   ]
 }
