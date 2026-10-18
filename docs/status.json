@@ -1,64 +1,121 @@
 {
-  "mode": "health",
-  "health": "retained_previous",
+  "mode": "full",
+  "health": "ok",
   "tested_on": "operator network; local Xray",
   "xray_version": "Xray 26.3.27 (Xray, Penetrates Everything.) d2758a0 (go1.26.1 windows/amd64)",
-  "source_status": {},
-  "unique_selected_for_test": 402,
-  "first_pass": {
-    "ValueError": 10,
-    "TimeoutExpired": 8,
-    "TimeoutError": 345,
-    "ConnectionResetError": 36,
-    "CalledProcessError": 1,
-    "SSLEOFError": 2
+  "source_status": {
+    "Barry": {
+      "raw": 7475,
+      "supported": 2466,
+      "error": null
+    },
+    "EbraSha": {
+      "raw": 0,
+      "supported": 0,
+      "error": "HTTPError"
+    },
+    "Epodonios": {
+      "raw": 7533,
+      "supported": 2481,
+      "error": null
+    },
+    "Shadowmere": {
+      "raw": 163,
+      "supported": 163,
+      "error": null
+    },
+    "Radikal": {
+      "raw": 1090,
+      "supported": 699,
+      "error": null
+    },
+    "Pawdroid": {
+      "raw": 12,
+      "supported": 12,
+      "error": null
+    },
+    "MahdiblandPublic": {
+      "raw": 200,
+      "supported": 152,
+      "error": null
+    },
+    "Patterniha": {
+      "raw": 405,
+      "supported": 73,
+      "error": null
+    },
+    "Whitedns": {
+      "raw": 173,
+      "supported": 81,
+      "error": null
+    },
+    "Kahrobas": {
+      "raw": 261,
+      "supported": 214,
+      "error": null
+    }
   },
-  "second_pass": {},
+  "unique_selected_for_test": 3241,
+  "first_pass": {
+    "ValueError": 124,
+    "CalledProcessError": 94,
+    "pass": 10,
+    "TimeoutExpired": 27,
+    "CandidateDeadline": 2717,
+    "SSLEOFError": 195,
+    "ConnectionResetError": 72,
+    "SSLError": 2
+  },
+  "second_pass": {
+    "pass": 2,
+    "SSLEOFError": 1,
+    "TimeoutError": 7
+  },
   "max_tests": 0,
-  "workers": 16,
+  "workers": 64,
   "verification_workers": 16,
   "first_pass_timeout_seconds": 30,
-  "screen_network_timeout_seconds": null,
+  "screen_network_timeout_seconds": 5,
   "verification_timeout_seconds": 30,
-  "failure_reason": "No current verified transfer; previous nodes age normally",
+  "failure_reason": null,
   "schema": 2,
-  "generated_epoch": 1792349815.9686563,
-  "generated_utc": "2026-10-18T18:56:55+00:00",
+  "generated_epoch": 1792351491.2145267,
+  "generated_utc": "2026-10-18T19:24:51+00:00",
   "published": 2,
   "nodes": [
     {
-      "id": "92e6ec1cf563afde5115aaadbc3065f5e132c14e26aeb6c6c0c7dc5c7f4d2a61",
-      "name": "server 🇺🇸 5920",
+      "id": "f5c4b1f916cde6933594aebcc4903bd8f8d7a080148a1f3e9d3fc5804fd428a6",
+      "name": "server 🇰🇷 18984",
       "rank": 1,
       "protocol": "vless",
-      "country_code": "US",
-      "endpoint_ip": "104.17.72.206",
-      "last_success_epoch": 1792347678.208888,
-      "expires_epoch": 1792369278.208888,
-      "success_rate": 0.8731,
-      "latency_ms": 1979.2,
-      "jitter_ms": 1215.0,
-      "body_bytes": 6855,
-      "transfer_kbps_estimate": 13.9,
-      "full_size": false,
-      "verified_this_run": false
+      "country_code": "KR",
+      "endpoint_ip": "3.36.52.183",
+      "last_success_epoch": 1792351475.4474247,
+      "expires_epoch": 1792373075.4474247,
+      "success_rate": 0.6,
+      "latency_ms": 4145.0,
+      "jitter_ms": 601.8,
+      "body_bytes": 16613,
+      "transfer_kbps_estimate": 16.0,
+      "full_size": true,
+      "verified_this_run": true
     },
     {
-      "id": "2676caf680ac7750e64793d324f1bac0403bdc3143156a78fd73d180c0e69a80",
-      "name": "server 🇺🇸 10279",
+      "id": "088ca50d4226f5e6885e3b89b8889c9babcbe82f3537c6a2bb6f4572b0eae8d2",
+      "name": "server 🇮🇪 18976",
       "rank": 2,
-      "protocol": "vmess",
-      "country_code": "US",
-      "endpoint_ip": "172.64.229.21",
-      "last_success_epoch": 1792347620.2924085,
-      "expires_epoch": 1792369220.2924085,
-      "success_rate": 0.8731,
-      "latency_ms": 979.1,
-      "jitter_ms": 209.0,
-      "body_bytes": 16634,
-      "transfer_kbps_estimate": 68.0,
+      "protocol": "ss",
+      "country_code": "IE",
+      "endpoint_ip": "20.223.172.81",
+      "last_success_epoch": 1792351468.8681972,
+      "expires_epoch": 1792373068.8681972,
+      "success_rate": 0.6,
+      "latency_ms": 841.8,
+      "jitter_ms": 1023.5,
+      "body_bytes": 15336,
+      "transfer_kbps_estimate": 72.9,
       "full_size": true,
-      "verified_this_run": false
+      "verified_this_run": true
     }
   ],
   "flag_definition": "IP pinned for the successful proxy connection; may be CDN ingress, not exit",

@@ -5,60 +5,45 @@
       "settings": {
         "vnext": [
           {
-            "address": "centurylink.es",
-            "port": 8443,
-            "users": [
-              {
-                "id": "c136a12c-4260-48a7-a1e6-fbda83a11045",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "free.sahanwickramasinghe.me"
-        },
-        "wsSettings": {
-          "path": "/"
-        }
-      },
-      "tag": "server 🇺🇸 5920"
-    },
-    {
-      "protocol": "vmess",
-      "settings": {
-        "vnext": [
-          {
-            "address": "172.64.229.21",
+            "address": "3.36.52.183",
             "port": 443,
             "users": [
               {
-                "id": "0cf6d970-3f1d-4aae-a989-92a8f76ae3db",
-                "alterId": 0,
-                "security": "auto"
+                "id": "7e68e32f-8015-4f37-9082-70e8b0b58043",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
               }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "vmess.lbw666.dpdns.org"
-        },
-        "wsSettings": {
-          "path": "/ws",
-          "headers": {
-            "Host": "vmess.lbw666.dpdns.org"
-          }
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "aicall-dev.batonserver.com",
+          "publicKey": "DHOrfoin7TeRpnIoU3d6qT5Yrq3QPVFp49kApATA4iE",
+          "shortId": "e04a526b0b09c765",
+          "fingerprint": "chrome",
+          "spiderX": "/"
         }
       },
-      "tag": "server 🇺🇸 10279"
+      "tag": "server 🇰🇷 18984"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "20.223.172.81",
+            "port": 443,
+            "method": "chacha20-ietf-poly1305",
+            "password": "UUjphkQAh5BkOdbf"
+          }
+        ]
+      },
+      "tag": "server 🇮🇪 18976"
     }
   ]
 }
