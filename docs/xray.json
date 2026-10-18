@@ -1,6 +1,38 @@
 {
   "outbounds": [
     {
+      "protocol": "vmess",
+      "settings": {
+        "vnext": [
+          {
+            "address": "172.64.229.21",
+            "port": 443,
+            "users": [
+              {
+                "id": "0cf6d970-3f1d-4aae-a989-92a8f76ae3db",
+                "alterId": 0,
+                "security": "auto"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "vmess.lbw666.dpdns.org"
+        },
+        "wsSettings": {
+          "path": "/ws",
+          "headers": {
+            "Host": "vmess.lbw666.dpdns.org"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 10279"
+    },
+    {
       "protocol": "vless",
       "settings": {
         "vnext": [
