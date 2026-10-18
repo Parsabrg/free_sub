@@ -1,28 +1,87 @@
 {
-  "mode": "health",
+  "mode": "full",
   "health": "ok",
   "tested_on": "operator network; local Xray",
   "xray_version": "Xray 26.3.27 (Xray, Penetrates Everything.) d2758a0 (go1.26.1 windows/amd64)",
-  "source_status": {},
-  "unique_selected_for_test": 12,
-  "first_pass": {
-    "ValueError": 2,
-    "pass": 2,
-    "TimeoutError": 7,
-    "SSLEOFError": 1
+  "source_status": {
+    "Barry": {
+      "raw": 7461,
+      "supported": 2428,
+      "error": null
+    },
+    "EbraSha": {
+      "raw": 0,
+      "supported": 0,
+      "error": "HTTPError"
+    },
+    "Epodonios": {
+      "raw": 7473,
+      "supported": 2466,
+      "error": null
+    },
+    "Shadowmere": {
+      "raw": 191,
+      "supported": 191,
+      "error": null
+    },
+    "Radikal": {
+      "raw": 1473,
+      "supported": 880,
+      "error": null
+    },
+    "Pawdroid": {
+      "raw": 12,
+      "supported": 8,
+      "error": null
+    },
+    "MahdiblandPublic": {
+      "raw": 200,
+      "supported": 152,
+      "error": null
+    },
+    "Patterniha": {
+      "raw": 405,
+      "supported": 73,
+      "error": null
+    },
+    "Whitedns": {
+      "raw": 237,
+      "supported": 110,
+      "error": null
+    },
+    "Kahrobas": {
+      "raw": 261,
+      "supported": 214,
+      "error": null
+    }
   },
-  "second_pass": {},
+  "unique_selected_for_test": 3316,
+  "first_pass": {
+    "pass": 13,
+    "ValueError": 143,
+    "CalledProcessError": 95,
+    "SSLEOFError": 206,
+    "CandidateDeadline": 2757,
+    "TimeoutExpired": 26,
+    "ConnectionResetError": 75,
+    "SSLError": 1
+  },
+  "second_pass": {
+    "pass": 5,
+    "SSLEOFError": 1,
+    "TimeoutError": 7
+  },
   "max_tests": 0,
-  "workers": 16,
+  "workers": 64,
   "verification_workers": 16,
   "first_pass_timeout_seconds": 30,
-  "screen_network_timeout_seconds": null,
+  "screen_network_timeout_seconds": 5,
   "verification_timeout_seconds": 30,
   "failure_reason": null,
   "schema": 2,
-  "generated_epoch": 1792365601.1291387,
-  "generated_utc": "2026-10-18T23:20:01+00:00",
-  "published": 2,
+  "generated_epoch": 1792367667.658618,
+  "generated_utc": "2026-10-18T23:54:27+00:00",
+  "published": 5,
   "nodes": [
     {
       "id": "088ca50d4226f5e6885e3b89b8889c9babcbe82f3537c6a2bb6f4572b0eae8d2",
@@ -31,13 +90,13 @@
       "protocol": "ss",
       "country_code": "IE",
       "endpoint_ip": "20.223.172.81",
-      "last_success_epoch": 1792365581.6615102,
-      "expires_epoch": 1792387181.6615102,
-      "success_rate": 0.7667,
-      "latency_ms": 333.2,
-      "jitter_ms": 13.7,
+      "last_success_epoch": 1792367648.7832599,
+      "expires_epoch": 1792389248.7832599,
+      "success_rate": 0.7828,
+      "latency_ms": 336.0,
+      "jitter_ms": 22.7,
       "body_bytes": 6850,
-      "transfer_kbps_estimate": 82.2,
+      "transfer_kbps_estimate": 81.5,
       "full_size": false,
       "verified_this_run": true
     },
@@ -48,13 +107,64 @@
       "protocol": "ss",
       "country_code": "ZA",
       "endpoint_ip": "102.37.156.224",
-      "last_success_epoch": 1792365581.459089,
-      "expires_epoch": 1792387181.459089,
-      "success_rate": 0.714,
-      "latency_ms": 913.3,
-      "jitter_ms": 284.9,
-      "body_bytes": 16615,
-      "transfer_kbps_estimate": 72.8,
+      "last_success_epoch": 1792367648.9096694,
+      "expires_epoch": 1792389248.9096694,
+      "success_rate": 0.7173,
+      "latency_ms": 1067.4,
+      "jitter_ms": 70.1,
+      "body_bytes": 23008,
+      "transfer_kbps_estimate": 86.2,
+      "full_size": true,
+      "verified_this_run": true
+    },
+    {
+      "id": "52774d336a8add9e9c80d9d69f2468565fe1c985f77d2764b682ad323ce60775",
+      "name": "server 🇺🇸 18469",
+      "rank": 3,
+      "protocol": "ss",
+      "country_code": "US",
+      "endpoint_ip": "96.45.186.114",
+      "last_success_epoch": 1792367648.8260572,
+      "expires_epoch": 1792389248.8260572,
+      "success_rate": 0.6364,
+      "latency_ms": 1022.6,
+      "jitter_ms": 339.9,
+      "body_bytes": 23008,
+      "transfer_kbps_estimate": 90.0,
+      "full_size": true,
+      "verified_this_run": true
+    },
+    {
+      "id": "ace73932ae8ed70cfb3d59cef6456dc1c1f250d65b35c30a36b53c0f78362807",
+      "name": "server 🇺🇸 19202",
+      "rank": 4,
+      "protocol": "vless",
+      "country_code": "US",
+      "endpoint_ip": "188.114.96.3",
+      "last_success_epoch": 1792367648.256647,
+      "expires_epoch": 1792389248.256647,
+      "success_rate": 0.6,
+      "latency_ms": 598.9,
+      "jitter_ms": 16.3,
+      "body_bytes": 23008,
+      "transfer_kbps_estimate": 153.7,
+      "full_size": true,
+      "verified_this_run": true
+    },
+    {
+      "id": "98706404efb92b31a143b16f66e62b161179b42839b89144b958071f6533e7b5",
+      "name": "server 🇳🇱 3924",
+      "rank": 5,
+      "protocol": "vless",
+      "country_code": "NL",
+      "endpoint_ip": "140.225.199.241",
+      "last_success_epoch": 1792367648.574627,
+      "expires_epoch": 1792389248.574627,
+      "success_rate": 0.4878,
+      "latency_ms": 783.3,
+      "jitter_ms": 384.3,
+      "body_bytes": 23008,
+      "transfer_kbps_estimate": 117.5,
       "full_size": true,
       "verified_this_run": true
     }
