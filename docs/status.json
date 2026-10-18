@@ -1,18 +1,17 @@
 {
   "mode": "health",
-  "health": "ok",
+  "health": "retained_previous",
   "tested_on": "operator network; local Xray",
   "xray_version": "Xray 26.3.27 (Xray, Penetrates Everything.) d2758a0 (go1.26.1 windows/amd64)",
   "source_status": {},
-  "unique_selected_for_test": 660,
+  "unique_selected_for_test": 402,
   "first_pass": {
-    "ValueError": 7,
-    "TimeoutExpired": 9,
-    "TimeoutError": 581,
-    "ConnectionResetError": 54,
-    "SSLEOFError": 6,
-    "pass": 2,
-    "CalledProcessError": 1
+    "ValueError": 10,
+    "TimeoutExpired": 8,
+    "TimeoutError": 345,
+    "ConnectionResetError": 36,
+    "CalledProcessError": 1,
+    "SSLEOFError": 2
   },
   "second_pass": {},
   "max_tests": 0,
@@ -21,10 +20,10 @@
   "first_pass_timeout_seconds": 30,
   "screen_network_timeout_seconds": null,
   "verification_timeout_seconds": 30,
-  "failure_reason": null,
+  "failure_reason": "No current verified transfer; previous nodes age normally",
   "schema": 2,
-  "generated_epoch": 1792348309.0648174,
-  "generated_utc": "2026-10-18T18:31:49+00:00",
+  "generated_epoch": 1792349815.9686563,
+  "generated_utc": "2026-10-18T18:56:55+00:00",
   "published": 2,
   "nodes": [
     {
@@ -36,13 +35,13 @@
       "endpoint_ip": "104.17.72.206",
       "last_success_epoch": 1792347678.208888,
       "expires_epoch": 1792369278.208888,
-      "success_rate": 0.898,
+      "success_rate": 0.8731,
       "latency_ms": 1979.2,
       "jitter_ms": 1215.0,
       "body_bytes": 6855,
       "transfer_kbps_estimate": 13.9,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     },
     {
       "id": "2676caf680ac7750e64793d324f1bac0403bdc3143156a78fd73d180c0e69a80",
@@ -53,13 +52,13 @@
       "endpoint_ip": "172.64.229.21",
       "last_success_epoch": 1792347620.2924085,
       "expires_epoch": 1792369220.2924085,
-      "success_rate": 0.898,
+      "success_rate": 0.8731,
       "latency_ms": 979.1,
       "jitter_ms": 209.0,
       "body_bytes": 16634,
       "transfer_kbps_estimate": 68.0,
       "full_size": true,
-      "verified_this_run": true
+      "verified_this_run": false
     }
   ],
   "flag_definition": "IP pinned for the successful proxy connection; may be CDN ingress, not exit",
