@@ -1,27 +1,87 @@
 {
-  "mode": "health",
+  "mode": "full",
   "health": "ok",
   "tested_on": "operator network; local Xray",
   "xray_version": "Xray 26.3.27 (Xray, Penetrates Everything.) d2758a0 (go1.26.1 windows/amd64)",
-  "source_status": {},
-  "unique_selected_for_test": 10,
-  "first_pass": {
-    "pass": 2,
-    "SSLEOFError": 1,
-    "TimeoutError": 7
+  "source_status": {
+    "Barry": {
+      "raw": 7444,
+      "supported": 2437,
+      "error": null
+    },
+    "EbraSha": {
+      "raw": 0,
+      "supported": 0,
+      "error": "HTTPError"
+    },
+    "Epodonios": {
+      "raw": 7310,
+      "supported": 2421,
+      "error": null
+    },
+    "Shadowmere": {
+      "raw": 171,
+      "supported": 171,
+      "error": null
+    },
+    "Radikal": {
+      "raw": 1482,
+      "supported": 887,
+      "error": null
+    },
+    "Pawdroid": {
+      "raw": 15,
+      "supported": 8,
+      "error": null
+    },
+    "MahdiblandPublic": {
+      "raw": 200,
+      "supported": 135,
+      "error": null
+    },
+    "Patterniha": {
+      "raw": 405,
+      "supported": 73,
+      "error": null
+    },
+    "Whitedns": {
+      "raw": 204,
+      "supported": 96,
+      "error": null
+    },
+    "Kahrobas": {
+      "raw": 261,
+      "supported": 214,
+      "error": null
+    }
   },
-  "second_pass": {},
+  "unique_selected_for_test": 3283,
+  "first_pass": {
+    "pass": 12,
+    "SSLEOFError": 180,
+    "ValueError": 120,
+    "CandidateDeadline": 2768,
+    "TimeoutExpired": 25,
+    "ConnectionResetError": 81,
+    "CalledProcessError": 95,
+    "SSLError": 1,
+    "RuntimeError": 1
+  },
+  "second_pass": {
+    "pass": 4,
+    "TimeoutError": 8
+  },
   "max_tests": 0,
-  "workers": 16,
+  "workers": 64,
   "verification_workers": 16,
   "first_pass_timeout_seconds": 30,
-  "screen_network_timeout_seconds": null,
+  "screen_network_timeout_seconds": 5,
   "verification_timeout_seconds": 30,
   "failure_reason": null,
   "schema": 2,
-  "generated_epoch": 1792398003.579923,
-  "generated_utc": "2026-10-19T08:20:03+00:00",
-  "published": 2,
+  "generated_epoch": 1792400078.5169227,
+  "generated_utc": "2026-10-19T08:54:38+00:00",
+  "published": 4,
   "nodes": [
     {
       "id": "d66b15af1c1321704b4bf75c0486f1f295dab877104366382ff02345468726bc",
@@ -30,13 +90,13 @@
       "protocol": "ss",
       "country_code": "RU",
       "endpoint_ip": "176.32.33.143",
-      "last_success_epoch": 1792397979.734661,
-      "expires_epoch": 1792419579.734661,
-      "success_rate": 0.84,
-      "latency_ms": 541.5,
-      "jitter_ms": 88.6,
-      "body_bytes": 16614,
-      "transfer_kbps_estimate": 122.7,
+      "last_success_epoch": 1792400057.0547981,
+      "expires_epoch": 1792421657.0547981,
+      "success_rate": 0.8503,
+      "latency_ms": 655.5,
+      "jitter_ms": 414.3,
+      "body_bytes": 23008,
+      "transfer_kbps_estimate": 140.4,
       "full_size": true,
       "verified_this_run": true
     },
@@ -47,13 +107,47 @@
       "protocol": "ss",
       "country_code": "TR",
       "endpoint_ip": "78.135.77.110",
-      "last_success_epoch": 1792397985.443314,
-      "expires_epoch": 1792419585.443314,
-      "success_rate": 0.6482,
-      "latency_ms": 279.6,
-      "jitter_ms": 63.1,
+      "last_success_epoch": 1792400065.1072922,
+      "expires_epoch": 1792421665.1072922,
+      "success_rate": 0.6724,
+      "latency_ms": 1470.0,
+      "jitter_ms": 1757.7,
+      "body_bytes": 16615,
+      "transfer_kbps_estimate": 45.2,
+      "full_size": true,
+      "verified_this_run": true
+    },
+    {
+      "id": "684d77286117f53834289f1df04eedebfd7c86877f4cec8d73eb2f350a15b19e",
+      "name": "server 🇩🇪 19277",
+      "rank": 3,
+      "protocol": "ss",
+      "country_code": "DE",
+      "endpoint_ip": "2.26.90.120",
+      "last_success_epoch": 1792400057.0427768,
+      "expires_epoch": 1792421657.0427768,
+      "success_rate": 0.6,
+      "latency_ms": 618.1,
+      "jitter_ms": 528.8,
       "body_bytes": 23008,
-      "transfer_kbps_estimate": 329.2,
+      "transfer_kbps_estimate": 148.9,
+      "full_size": true,
+      "verified_this_run": true
+    },
+    {
+      "id": "7fd0ed0819b7947c6a85054034537eb6e77c47436677c07cee381e692f7ced1b",
+      "name": "server 🇫🇮 19274",
+      "rank": 4,
+      "protocol": "ss",
+      "country_code": "FI",
+      "endpoint_ip": "2.26.9.245",
+      "last_success_epoch": 1792400056.972235,
+      "expires_epoch": 1792421656.972235,
+      "success_rate": 0.6,
+      "latency_ms": 491.0,
+      "jitter_ms": 330.8,
+      "body_bytes": 23008,
+      "transfer_kbps_estimate": 187.4,
       "full_size": true,
       "verified_this_run": true
     }
