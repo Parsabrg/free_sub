@@ -29,20 +29,6 @@
       "tag": "server 🇿🇦 241"
     },
     {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "96.45.186.114",
-            "port": 8443,
-            "method": "chacha20-ietf-poly1305",
-            "password": "SScN2QK7mR9pV4xH"
-          }
-        ]
-      },
-      "tag": "server 🇺🇸 18469"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -76,6 +62,41 @@
         }
       },
       "tag": "server 🇺🇸 19202"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "96.45.186.114",
+            "port": 8443,
+            "method": "chacha20-ietf-poly1305",
+            "password": "SScN2QK7mR9pV4xH"
+          }
+        ]
+      },
+      "tag": "server 🇺🇸 18469"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "ca.tronsg.com",
+            "port": 443,
+            "password": "Trojan@82164024"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ca.tronsg.com",
+          "fingerprint": "chrome"
+        }
+      },
+      "tag": "server 🇨🇦 5763"
     },
     {
       "protocol": "vless",
