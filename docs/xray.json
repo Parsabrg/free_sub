@@ -36,20 +36,6 @@
       "tag": "server 🇺🇸 19202"
     },
     {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "102.37.156.224",
-            "port": 443,
-            "method": "chacha20-ietf-poly1305",
-            "password": "aduB9HGxQHjA2SBMRjkHX6"
-          }
-        ]
-      },
-      "tag": "server 🇿🇦 241"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -81,6 +67,54 @@
       "tag": "server 🇳🇱 3924"
     },
     {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "176.32.33.143",
+            "port": 18443,
+            "method": "aes-256-gcm",
+            "password": "cCMJgJTA3BA489YUYrFq7XHXSiSpWlLa"
+          }
+        ]
+      },
+      "tag": "server 🇷🇺 19210"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "de2.dedushka.top",
+            "port": 443,
+            "password": "4_VfP9fKaM-3LpSVvoZuc_WUzLoCdHaA"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "de2.dedushka.top"
+        }
+      },
+      "tag": "server 🇩🇪 19121"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "78.135.77.110",
+            "port": 11700,
+            "method": "aes-128-gcm",
+            "password": "BI2omXgXduu95xATu5uaU3jn2Lpb9-qK"
+          }
+        ]
+      },
+      "tag": "server 🇹🇷 19201"
+    },
+    {
       "protocol": "trojan",
       "settings": {
         "servers": [
@@ -100,6 +134,37 @@
         }
       },
       "tag": "server 🇨🇦 5763"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "funagfrdfs.alixxplay.com",
+            "port": 46105,
+            "users": [
+              {
+                "id": "57beeeb0-03fc-4fc9-94da-7604488a7134",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "www.lamer.com.sg",
+          "publicKey": "Lk5nwDxC2tr3J7hT8emhUUiMX8cHyKX9TiRj_EnAiik",
+          "shortId": "28f5c1f8f98a",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇸🇬 8746"
     }
   ]
 }
