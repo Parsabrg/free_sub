@@ -1,3 +1,94 @@
 {
-  "outbounds": []
+  "outbounds": [
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "dns2.m3hrzd.ir",
+            "port": 8044,
+            "method": "chacha20-ietf-poly1305",
+            "password": "m4sc5EnK5mKG5iesVtmRiTgjDLJWabey"
+          }
+        ]
+      },
+      "tag": "server 🇩🇪 21186"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "109.248.148.142",
+            "port": 11472,
+            "method": "aes-128-gcm",
+            "password": "ce45b16adec66e4a199d92b9689eae9f"
+          }
+        ]
+      },
+      "tag": "server 🇱🇻 21168"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "176.122.158.11",
+            "port": 443,
+            "users": [
+              {
+                "id": "154c54e0-028d-4c8a-9512-7ad1588cce2a",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "www.cloudflare.com",
+          "publicKey": "dV6-Xn1FCpiYvbJ1o79HjMr0IJg29xacSQcaD4jeKAM",
+          "shortId": "f8d85e1a92219c3c",
+          "fingerprint": "edge",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇺🇸 21075"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "funagfrdfs.alixxplay.com",
+            "port": 30892,
+            "users": [
+              {
+                "id": "57beeeb0-03fc-4fc9-94da-7604488a7134",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "us1p1.xn--ghq880n3na965a.com",
+          "publicKey": "YinI5MijeZpRatg6QNDvP0qXEif-6VHC6gV5yoji4i4",
+          "shortId": "3d31326f95",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇯🇵 10928"
+    }
+  ]
 }
