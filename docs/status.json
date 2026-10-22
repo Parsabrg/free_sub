@@ -1,89 +1,26 @@
 {
-  "mode": "full",
+  "mode": "health",
   "health": "expired_or_empty",
   "tested_on": "operator network; local Xray",
   "xray_version": "Xray 26.3.27 (Xray, Penetrates Everything.) d2758a0 (go1.26.1 windows/amd64)",
-  "source_status": {
-    "Barry": {
-      "raw": 7428,
-      "supported": 2511,
-      "error": null
-    },
-    "EbraSha": {
-      "raw": 0,
-      "supported": 0,
-      "error": "HTTPError"
-    },
-    "Epodonios": {
-      "raw": 7428,
-      "supported": 2511,
-      "error": null
-    },
-    "Shadowmere": {
-      "raw": 198,
-      "supported": 198,
-      "error": null
-    },
-    "Radikal": {
-      "raw": 1326,
-      "supported": 845,
-      "error": null
-    },
-    "Pawdroid": {
-      "raw": 20,
-      "supported": 18,
-      "error": null
-    },
-    "MahdiblandPublic": {
-      "raw": 200,
-      "supported": 143,
-      "error": null
-    },
-    "Patterniha": {
-      "raw": 855,
-      "supported": 358,
-      "error": null
-    },
-    "Whitedns": {
-      "raw": 233,
-      "supported": 106,
-      "error": null
-    },
-    "Kahrobas": {
-      "raw": 261,
-      "supported": 214,
-      "error": null
-    }
-  },
-  "unique_selected_for_test": 3565,
+  "source_status": {},
+  "unique_selected_for_test": 6,
   "first_pass": {
-    "SSLEOFError": 263,
-    "ValueError": 180,
-    "pass": 683,
-    "CalledProcessError": 60,
-    "CandidateDeadline": 1748,
-    "ConnectionResetError": 176,
-    "SSLError": 1,
-    "TimeoutExpired": 453,
-    "ConnectionAbortedError": 1
+    "SSLEOFError": 1,
+    "ConnectionResetError": 1,
+    "TimeoutError": 4
   },
-  "second_pass": {
-    "SSLEOFError": 102,
-    "TimeoutExpired": 4,
-    "TimeoutError": 232,
-    "ConnectionResetError": 47,
-    "ValueError": 15
-  },
+  "second_pass": {},
   "max_tests": 0,
-  "workers": 64,
+  "workers": 16,
   "verification_workers": 16,
   "first_pass_timeout_seconds": 30,
-  "screen_network_timeout_seconds": 5,
+  "screen_network_timeout_seconds": null,
   "verification_timeout_seconds": 30,
   "failure_reason": "No current verified transfer; previous nodes age normally",
   "schema": 2,
-  "generated_epoch": 1792669984.3662112,
-  "generated_utc": "2026-10-22T11:53:04+00:00",
+  "generated_epoch": 1792671598.0125566,
+  "generated_utc": "2026-10-22T12:19:58+00:00",
   "published": 0,
   "nodes": [],
   "flag_definition": "IP pinned for the successful proxy connection; may be CDN ingress, not exit",
