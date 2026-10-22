@@ -15,7 +15,7 @@ import time
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from urllib.parse import urlsplit
-from network import resolve_public, pin_endpoint
+from network import BIND_ENV, resolve_public, pin_endpoint
 from process_guard import communicate_bounded
 
 # First URL transfers ~13 KiB of real HTTPS response-body data.
@@ -123,6 +123,10 @@ def check_ready(port, proc, timeout=4.0):
 def make_config(outbound, local_port):
     node=copy.deepcopy(outbound)
     node['tag']='candidate'
+    # Leave through the real adapter even while a VPN holds the default route.
+    interface=os.environ.get(BIND_ENV)
+    if interface:
+        node.setdefault('streamSettings',{}).setdefault('sockopt',{})['interface']=interface
     return {
         'log':{'loglevel':'warning'},
         'inbounds':[{'listen':'127.0.0.1','port':local_port,'protocol':'socks',

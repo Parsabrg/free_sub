@@ -21,6 +21,7 @@ from geolocation import geolocate_hosts, country_flag
 from naming import name_for_position, rename_share_link
 from publishing import publish, validate_outputs
 from state import atomic_write, keep_awake, observe, read_state, reliability, run_lock, save_state
+from network import BIND_ENV, physical_interface
 from xray_test import ProbeResult, run_probe
 
 ROOT=Path(__file__).resolve().parent
@@ -271,19 +272,39 @@ def arguments(argv=None):
     return args
 
 
-def egress_country(timeout=8):
-    """The country this machine reaches the internet from, as Cloudflare sees
-    it, or None if that cannot be told (offline, or the trace is filtered)."""
-    import urllib.request
-    try:
-        req=urllib.request.Request('https://www.cloudflare.com/cdn-cgi/trace',
-                                   headers={'User-Agent':'free-sub/1'})
-        with urllib.request.urlopen(req,timeout=timeout) as resp:
-            for line in resp.read(4096).decode('ascii','replace').splitlines():
+def egress_country(xray, interface=None, timeout=10):
+    """The country tests reach the internet from, as Cloudflare sees it, or
+    None if that cannot be told (offline, or the trace is filtered).
+
+    Asked through Xray bound to [interface] when there is one, exactly as the
+    tests dial: a VPN's default route, or a system proxy that urllib would
+    follow, says nothing about the path the tests take."""
+    import tempfile
+    from xray_test import allocate_port, check_ready, https_get_via_socks
+    import ssl
+    port=allocate_port()
+    out={'protocol':'freedom'}
+    if interface:
+        out['streamSettings']={'sockopt':{'interface':interface}}
+    cfg={'log':{'loglevel':'none'},
+         'inbounds':[{'listen':'127.0.0.1','port':port,'protocol':'socks','settings':{'udp':False}}],
+         'outbounds':[out]}
+    with tempfile.TemporaryDirectory() as tmp:
+        path=Path(tmp)/'egress.json'
+        path.write_text(json.dumps(cfg),encoding='utf-8')
+        proc=subprocess.Popen([xray,'run','-c',str(path)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                              creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
+        try:
+            check_ready(port,proc)
+            body,_=https_get_via_socks(port,'https://www.cloudflare.com/cdn-cgi/trace',timeout,
+                                       ssl.create_default_context())
+            for line in body.decode('ascii','replace').splitlines():
                 if line.startswith('loc='):
                     return line[4:].strip() or None
-    except Exception:
-        return None
+        except Exception:
+            return None
+        finally:
+            proc.kill(); proc.wait()
     return None
 
 
@@ -292,10 +313,16 @@ def main(argv=None):
     # Results only mean something from the network the subscription is for.
     # This PC is often on a VPN; tests from there passed or failed configs for
     # the VPN's network, while status.json said "operator network".
-    country=egress_country()
+    # Tests bind to the real adapter, so Nebula, v2rayN's TUN or any other VPN
+    # can stay on: the operator's network is still what is measured.
+    interface=physical_interface()
+    if interface:
+        os.environ[BIND_ENV]=interface
+    country=egress_country(args.xray,interface)
+    print(f'[NETWORK] testing through {interface or "the default route"}; egress country {country or "unknown"}',flush=True)
     if country and country!='IR' and not args.allow_non_iran:
-        print(f'[SKIP] This machine reaches the internet from {country}, not Iran '
-              '(a VPN is probably on); the published list is kept as it is.',flush=True)
+        print(f'[SKIP] Tests would reach the internet from {country}, not Iran, and no real '
+              'adapter bypasses it; the published list is kept as it is.',flush=True)
         return
     with run_lock(ROOT/'.local'/'run.lock'), keep_awake():
         run_cycle(args)
