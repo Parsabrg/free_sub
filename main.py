@@ -255,6 +255,8 @@ def arguments(argv=None):
     ap.add_argument('--discovery-hours',type=float,default=4)
     ap.add_argument('--ttl-hours',type=float,default=6)
     ap.add_argument('--publish',action='store_true')
+    ap.add_argument('--allow-non-iran',action='store_true',
+                    help='Test even when this machine does not reach the internet from Iran (e.g. through a VPN)')
     args=ap.parse_args(argv)
     if not (1<=args.limit<=300 and 1<=args.workers<=64 and 1<=args.geo_workers<=8 and
             args.max_tests>=0 and 5<=args.timeout<=120 and 1<=args.screen_timeout<=args.timeout and args.recheck>=args.limit and
@@ -269,8 +271,32 @@ def arguments(argv=None):
     return args
 
 
+def egress_country(timeout=8):
+    """The country this machine reaches the internet from, as Cloudflare sees
+    it, or None if that cannot be told (offline, or the trace is filtered)."""
+    import urllib.request
+    try:
+        req=urllib.request.Request('https://www.cloudflare.com/cdn-cgi/trace',
+                                   headers={'User-Agent':'free-sub/1'})
+        with urllib.request.urlopen(req,timeout=timeout) as resp:
+            for line in resp.read(4096).decode('ascii','replace').splitlines():
+                if line.startswith('loc='):
+                    return line[4:].strip() or None
+    except Exception:
+        return None
+    return None
+
+
 def main(argv=None):
     args=arguments(argv)
+    # Results only mean something from the network the subscription is for.
+    # This PC is often on a VPN; tests from there passed or failed configs for
+    # the VPN's network, while status.json said "operator network".
+    country=egress_country()
+    if country and country!='IR' and not args.allow_non_iran:
+        print(f'[SKIP] This machine reaches the internet from {country}, not Iran '
+              '(a VPN is probably on); the published list is kept as it is.',flush=True)
+        return
     with run_lock(ROOT/'.local'/'run.lock'), keep_awake():
         run_cycle(args)
         if args.publish:

@@ -18,11 +18,16 @@ from urllib.parse import urlsplit
 from network import resolve_public, pin_endpoint
 from process_guard import communicate_bounded
 
-# First URL transfers ~16 KiB of real HTTPS response-body data.
-# Second is an independent smaller fallback; its throughput is ranked lower.
+# First URL transfers ~13 KiB of real HTTPS response-body data.
+# The others are independent smaller fallbacks; their throughput ranks lower.
+# None is hosted on Cloudflare: a Cloudflare Worker relay (edgetunnel, BPB and
+# their kind, a large share of public Iranian configs) cannot open sockets to
+# Cloudflare's own addresses, so a Cloudflare probe failed every such config
+# however well it carried everything else (2026-10-22: 356 of 3466 passed the
+# Google-only screen, 4 survived two Cloudflare probes of three).
 PROBES = [
-    ('https://speed.cloudflare.com/__down?bytes=16384', 8192),
-    ('https://www.cloudflare.com/cdn-cgi/trace', 128),
+    ('https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png', 8192),
+    ('https://en.wikipedia.org/robots.txt', 128),
     ('https://www.google.com/robots.txt', 128),
 ]
 # Real-delay screening must not spend its short budget on a speed download.
