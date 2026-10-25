@@ -31,6 +31,21 @@ class BindInterfaceTests(unittest.TestCase):
             cfg = make_config(outbound, 1080)
         self.assertNotIn('streamSettings', cfg['outbounds'][0])
 
+    def test_a_node_on_this_pc_is_never_bound_to_the_adapter(self):
+        # The self-test's fixture server is on 127.0.0.1; forced out through
+        # Wi-Fi it reset every connection and stopped publishing.
+        for address in ('127.0.0.1', 'localhost', '::1'):
+            outbound = {'protocol': 'vless', 'settings': {'vnext': [{'address': address, 'port': 1}]}}
+            with mock.patch.dict(os.environ, {BIND_ENV: 'Wi-Fi'}):
+                cfg = make_config(outbound, 1080)
+            self.assertNotIn('streamSettings', cfg['outbounds'][0], address)
+
+    def test_a_remote_node_still_is(self):
+        outbound = {'protocol': 'vless', 'settings': {'vnext': [{'address': '203.0.113.7', 'port': 1}]}}
+        with mock.patch.dict(os.environ, {BIND_ENV: 'Wi-Fi'}):
+            cfg = make_config(outbound, 1080)
+        self.assertEqual(cfg['outbounds'][0]['streamSettings']['sockopt']['interface'], 'Wi-Fi')
+
 
 if __name__ == '__main__':
     unittest.main()

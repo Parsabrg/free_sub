@@ -120,12 +120,27 @@ def check_ready(port, proc, timeout=4.0):
             time.sleep(0.08)
     raise TimeoutError('Xray SOCKS listener did not become ready')
 
+def _is_local_node(node):
+    """A node on this PC (the self-test's fixture server) cannot be reached
+    through the Wi-Fi adapter: binding it there reset every connection, the
+    self-test failed, and publishing stopped (2026-10-23 to 2026-10-26)."""
+    s=node.get('settings') or {}
+    entry=((s.get('vnext') or s.get('servers') or [{}])[0]) or {}
+    host=str(entry.get('address') or '').strip('[]').lower()
+    if host in ('localhost',''):
+        return host=='localhost'
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
 def make_config(outbound, local_port):
     node=copy.deepcopy(outbound)
     node['tag']='candidate'
     # Leave through the real adapter even while a VPN holds the default route.
     interface=os.environ.get(BIND_ENV)
-    if interface:
+    if interface and not _is_local_node(node):
         node.setdefault('streamSettings',{}).setdefault('sockopt',{})['interface']=interface
     return {
         'log':{'loglevel':'warning'},
