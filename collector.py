@@ -32,24 +32,12 @@ SOURCES = {
     'EpodoniosSub25': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub25.txt',
     'EpodoniosSub26': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub26.txt',
     'EpodoniosVless': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/vless.txt',
-    # 2026-10-26: active collectors with configs the feeds above lack (6,625 new together).
-    # Stale repositories, dated archive snapshots and >5,000-line port dumps were left out.
+    # 2026-10-26: 16 active collectors were screened from Iran on the 6,625 configs they add;
+    # only these four had any that worked (7, 6, 1 and 1). The other twelve had none.
     'RadikalAll': 'https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/main/all/configs.txt',
-    'MatinGhanbariAll': 'https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/v2ray/all_sub.txt',
-    'Alirewa': 'https://raw.githubusercontent.com/Alirewa/V2ray-Configs/main/config.txt',
-    'Kasesm': 'https://raw.githubusercontent.com/kasesm/Free-Config/main/all_sub.txt',
     'Bahemmat': 'https://raw.githubusercontent.com/MohammadBahemmat/V2ray-Collector/main/all_servers.txt',
-    'SkillfulElectro': 'https://raw.githubusercontent.com/SkillfulElectro/V2RayCollector/main/Config/all_configs.txt',
-    'DukeMehdi': 'https://raw.githubusercontent.com/DukeMehdi/FreeList-V2ray-Configs/main/Configs/All-DukeMehdi-Configs.txt',
-    'MahanKenway': 'https://raw.githubusercontent.com/MahanKenway/Freedom-V2Ray/main/configs/mix.txt',
     'Hamedcode443': 'https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/port_443.txt',
-    'Thirtysixpw': 'https://raw.githubusercontent.com/thirtysixpw/v2ray-reaper/main/normal/mix',
-    'Iboxz': 'https://raw.githubusercontent.com/iboxz/free-v2ray-collector/main/main/mix.txt',
-    'V2RayRoot': 'https://raw.githubusercontent.com/V2RayRoot/V2RayConfig/main/Config/vless.txt',
-    'DeltaKronecker': 'https://raw.githubusercontent.com/Delta-Kronecker/V2ray-Config/main/config/all_configs.txt',
-    'MorpheusBest': 'https://raw.githubusercontent.com/morpheusadam/v2ray-config/main/subs/bundles/best.txt',
     'MorpheusIran': 'https://raw.githubusercontent.com/morpheusadam/v2ray-config/main/subs/bundles/iran-base64.txt',
-    'FreedomFinder': 'https://raw.githubusercontent.com/Freedom-Guard-Builder/Freedom-Finder/main/out/configs/all.txt',
 }
 SCHEMES = ('vless://', 'vmess://', 'trojan://', 'ss://')
 ACCEPTED_SS = {'aes-128-gcm','aes-256-gcm','chacha20-ietf-poly1305','2022-blake3-aes-128-gcm','2022-blake3-aes-256-gcm'}

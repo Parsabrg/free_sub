@@ -129,9 +129,9 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
   file omits), Shadowmere, 0xRadikal, Pawdroid, Mahdibland
   Public (`Eternity.txt`, not the account/airport list), Patterniha, Whitedns,
   Kahrobas, ALIILAPRO, Ermaozi, MatinGhanbari, and (since 2026-10-26) the
-  collectors Alirewa, kasesm, MohammadBahemmat, SkillfulElectro, DukeMehdi,
-  MahanKenway, hamedcode (port 443), thirtysixpw, iboxz, V2RayRoot,
-  Delta-Kronecker, morpheusadam (`best`, `iran`) and Freedom-Finder. These are untrusted
+  0xRadikal's full list, MohammadBahemmat, hamedcode (port 443) and morpheusadam
+  (`iran`): the four of sixteen screened collectors with any config that worked from
+  Iran. These are untrusted
   candidate sources, not endorsed providers. (EbraSha's repository was deleted
   and is no longer used.)
 - Sources have an 8 MiB fetch limit. No hidden per-source 1,800-node cap.
@@ -256,9 +256,8 @@ maintainers endorse this project or guarantee the proxy operators.
 | [ALIILAPRO](https://github.com/ALIILAPRO/v2rayNG-Config) | GPL-3.0 |
 | [Ermaozi](https://github.com/ermaozi/get_subscribe) | GPL-3.0 |
 | [MatinGhanbari](https://github.com/MatinGhanbari/v2ray-configs) | MIT |
-| [SkillfulElectro](https://github.com/SkillfulElectro/V2RayCollector), [MahanKenway](https://github.com/MahanKenway/Freedom-V2Ray) | MIT |
-| [hamedcode](https://github.com/hamedcode/port-based-v2ray-configs), [thirtysixpw](https://github.com/thirtysixpw/v2ray-reaper) | GPL-3.0 |
-| [Alirewa](https://github.com/Alirewa/V2ray-Configs), [kasesm](https://github.com/kasesm/Free-Config), [MohammadBahemmat](https://github.com/MohammadBahemmat/V2ray-Collector), [DukeMehdi](https://github.com/DukeMehdi/FreeList-V2ray-Configs), [iboxz](https://github.com/iboxz/free-v2ray-collector), [V2RayRoot](https://github.com/V2RayRoot/V2RayConfig), [Delta-Kronecker](https://github.com/Delta-Kronecker/V2ray-Config), [morpheusadam](https://github.com/morpheusadam/v2ray-config), [Freedom-Finder](https://github.com/Freedom-Guard-Builder/Freedom-Finder) | No license detected by GitHub; check upstream terms |
+| [hamedcode](https://github.com/hamedcode/port-based-v2ray-configs) | GPL-3.0 |
+| [MohammadBahemmat](https://github.com/MohammadBahemmat/V2ray-Collector), [morpheusadam](https://github.com/morpheusadam/v2ray-config) | No license detected by GitHub; check upstream terms |
 | [XTLS / Xray-core](https://github.com/XTLS/Xray-core) | MPL-2.0; official binary downloaded locally, not committed |
 
 License metadata was checked on 2026-10-15 (ALIILAPRO, Ermaozi and MatinGhanbari on 2026-10-26) and may change. Consult each upstream
