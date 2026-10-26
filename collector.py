@@ -9,7 +9,6 @@ from dataclasses import dataclass
 
 SOURCES = {
     'Barry': 'https://raw.githubusercontent.com/barry-far/V2ray-Config/main/All_Configs_Sub.txt',
-    'EbraSha': 'https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/V2Ray-Config-By-EbraSha-All-Type.txt',
     'Epodonios': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/All_Configs_Sub.txt',
     'Shadowmere': 'https://shadowmere.xyz/api/b64sub/',
     # Additional public feeds. They are candidate sources, NOT trusted or pre-verified by us.
@@ -19,6 +18,11 @@ SOURCES = {
     'Patterniha': 'https://raw.githubusercontent.com/patterniha/Free-Configs/main/configs.txt',
     'Whitedns': 'https://raw.githubusercontent.com/iampedii/whitedns-sub/refs/heads/main/base64.txt',
     'Kahrobas': 'https://bot.kahrobas.shop/sub.txt',
+    # 2026-10-26: EbraSha's repository was deleted (404). These add 548, 228 and 56 configs
+    # no other feed carries; the tests decide whether any of them works.
+    'ALIILAPRO': 'https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/server.txt',
+    'Ermaozi': 'https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt',
+    'MatinGhanbari': 'https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/v2ray/super-sub.txt',
 }
 SCHEMES = ('vless://', 'vmess://', 'trojan://', 'ss://')
 ACCEPTED_SS = {'aes-128-gcm','aes-256-gcm','chacha20-ietf-poly1305','2022-blake3-aes-128-gcm','2022-blake3-aes-256-gcm'}

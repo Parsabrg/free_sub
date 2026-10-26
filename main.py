@@ -20,7 +20,7 @@ from collector import collect, parse
 from geolocation import geolocate_hosts, country_flag
 from naming import name_for_position, rename_share_link
 from publishing import publish, validate_outputs
-from state import atomic_write, keep_awake, observe, read_state, reliability, run_lock, save_state
+from state import atomic_write, keep_awake, observe, read_state, reliability, run_lock, save_state, sweep_stale_probe_dirs
 from network import BIND_ENV, physical_interface
 from xray_test import ProbeResult, run_probe
 
@@ -325,6 +325,8 @@ def main(argv=None):
               'adapter bypasses it; the published list is kept as it is.',flush=True)
         return
     with run_lock(ROOT/'.local'/'run.lock'), keep_awake():
+        removed=sweep_stale_probe_dirs()
+        if removed: print(f'[CLEANUP] Removed {removed} stale probe folders from the temp directory.',flush=True)
         run_cycle(args)
         if args.publish:
             publish(ROOT,args.xray,ROOT/'docs')

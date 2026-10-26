@@ -26,6 +26,9 @@ Requirements: Windows 10/11 x64, Python 3.11+ (python.org installation recommend
 Git for Windows, and a Windows account password. Task Scheduler's password entry
 requires your **account password, not your Windows Hello PIN**. Avoid moving the
 clone after installation. No pip dependencies or OpenSSL installation are needed.
+Python 3.13+ with OpenSSL 3.5+ (python.org's 3.14 has it) is best: its TLS hello is browser-sized
+(measured 1,521 bytes, with a post-quantum key share), so a config that only passes for small-hello
+clients such as curl is rejected here too. Older OpenSSL sends a smaller hello.
 
 1. Clone your dedicated repository and install the pinned official Xray binary:
 
@@ -122,10 +125,11 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
 
 ## What actually gets tested
 
-- Feeds: Barry, EbraSha, Epodonios, Shadowmere, 0xRadikal, Pawdroid, Mahdibland
+- Feeds: Barry, Epodonios, Shadowmere, 0xRadikal, Pawdroid, Mahdibland
   Public (`Eternity.txt`, not the account/airport list), Patterniha, Whitedns,
-  and Kahrobas. These are untrusted
-  candidate sources, not endorsed providers.
+  Kahrobas, ALIILAPRO, Ermaozi and MatinGhanbari. These are untrusted
+  candidate sources, not endorsed providers. (EbraSha's repository was deleted
+  and is no longer used.)
 - Sources have an 8 MiB fetch limit. No hidden per-source 1,800-node cap.
 - Source candidates are balanced and rotated between discovery runs. Previously
   published nodes are checked first. Full discovery tests every supported unique
@@ -173,9 +177,15 @@ configuration. This deliberately sacrifices some coverage for accurate testing.
 Original accepted share-link connection parameters are preserved on output, and
 renamed links are parsed again to verify the effective configuration fingerprint.
 
-Results describe your current test network. Another VPN or TUN on your PC can
-change the route; this project does not disable adapters or promise direct ISP
-measurement. Different users/ISPs still need local app checks. No TUN/DNS-leak,
+Results describe your current test network. Every test connection is bound to this
+PC's real network adapter (Wi-Fi or Ethernet; VPN, TUN and proxy adapters are never
+chosen), so a VPN such as Nebula or v2rayN's TUN can stay on and the operator's
+network is still what is measured. Before each run the egress country is checked
+through that same path; if it is not Iran the run is skipped and the published
+list is kept as it is (`--allow-non-iran` overrides). Nodes on this PC itself,
+the self-test's fixtures, are not bound. A full-tunnel kill switch can still block
+the bypass: the egress check then reads "unknown", every test fails, and the previous
+list is kept until its 6-hour expiry. Different users/ISPs still need local app checks. No TUN/DNS-leak,
 UDP, gaming packet loss, sustained throughput, privacy, operator trust or
 unlimited-capacity certification is provided by an HTTPS probe.
 
@@ -231,7 +241,6 @@ maintainers endorse this project or guarantee the proxy operators.
 | Resource | Published repository license / terms |
 |---|---|
 | [Barry](https://github.com/barry-far/V2ray-Config) | MIT |
-| [EbraSha](https://github.com/ebrasha/free-v2ray-public-list) | No license detected by GitHub; check upstream terms |
 | [Epodonios](https://github.com/Epodonios/v2ray-configs) | GPL-3.0 |
 | [Shadowmere](https://shadowmere.xyz/) | Check the provider's terms |
 | [0xRadikal](https://github.com/0xRadikal/Free-v2ray-Configs) | MIT |
@@ -240,9 +249,12 @@ maintainers endorse this project or guarantee the proxy operators.
 | [Patterniha](https://github.com/patterniha/Free-Configs) | MIT |
 | [Whitedns](https://github.com/iampedii/whitedns-sub) | No license detected by GitHub; check upstream terms |
 | [Kahrobas](https://bot.kahrobas.shop/sub.txt) | Check the provider's terms |
+| [ALIILAPRO](https://github.com/ALIILAPRO/v2rayNG-Config) | GPL-3.0 |
+| [Ermaozi](https://github.com/ermaozi/get_subscribe) | GPL-3.0 |
+| [MatinGhanbari](https://github.com/MatinGhanbari/v2ray-configs) | MIT |
 | [XTLS / Xray-core](https://github.com/XTLS/Xray-core) | MPL-2.0; official binary downloaded locally, not committed |
 
-License metadata was checked on 2026-10-15 and may change. Consult each upstream
+License metadata was checked on 2026-10-15 (ALIILAPRO, Ermaozi and MatinGhanbari on 2026-10-26) and may change. Consult each upstream
 license and retain required copyright/license notices when redistributing covered
 material. A repository's software license does not by itself establish permission
 from every proxy operator to redistribute credentials. Attribution is not a

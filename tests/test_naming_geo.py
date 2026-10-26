@@ -53,8 +53,12 @@ class RenameTests(unittest.TestCase):
         self.assertEqual(decoded['id'], config['id'])
         self.assertEqual(parse(changed).key, parse(src).key)
 
-    def test_all_ten_sources_configured(self):
-        self.assertEqual(len(SOURCES), 10)
+    def test_all_sources_configured(self):
+        # EbraSha's repository was deleted (404, 2026-10-26); three live feeds replaced it.
+        self.assertEqual(len(SOURCES), 12)
+        self.assertNotIn('EbraSha', SOURCES)
+        for name in ('ALIILAPRO', 'Ermaozi', 'MatinGhanbari'):
+            self.assertTrue(SOURCES[name].startswith('https://raw.githubusercontent.com/'), name)
         self.assertIn('Shadowmere', SOURCES)
         self.assertIn('Pawdroid', SOURCES)
         self.assertIn('Radikal', SOURCES)

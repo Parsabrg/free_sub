@@ -160,7 +160,11 @@ def run_probe(candidate, xray_bin, timeout=30.0, *, quick=False, screen_timeout=
     The production CLI never exposes this hook or accepts a custom trust anchor.
     """
     # Parent ownership cleans probe files even when the whole worker is killed.
-    with tempfile.TemporaryDirectory(prefix='xray-probe-') as work_dir:
+    # ignore_cleanup_errors: closing the probe's job object kills Xray asynchronously, so
+    # Windows can still hold a file for a moment. The PermissionError that raised then
+    # replaced the probe's result (a passing one too) and left 10,800 empty folders in
+    # %TEMP% (2026-10-26); state.sweep_stale_probe_dirs removes any that remain.
+    with tempfile.TemporaryDirectory(prefix='xray-probe-',ignore_cleanup_errors=True) as work_dir:
         payload = {'candidate': asdict(candidate), 'xray_bin':str(xray_bin), 'timeout':timeout,
                    'quick':quick, 'screen_timeout':screen_timeout, 'fixture':local_fixture, 'work_dir':work_dir}
         try:
@@ -203,7 +207,7 @@ def _probe_worker(payload):
     successes = []; attempts = 0; last_error = ''
     target_successes = 1 if payload.get('quick') else 2
     p = allocate_port()
-    with tempfile.TemporaryDirectory(prefix='xray-check-',dir=payload.get('work_dir')) as tmp:
+    with tempfile.TemporaryDirectory(prefix='xray-check-',dir=payload.get('work_dir'),ignore_cleanup_errors=True) as tmp:
         cfg = Path(tmp)/'config.json'
         cfg.write_text(json.dumps(make_config(outbound,p)), encoding='utf-8')
         proc = None

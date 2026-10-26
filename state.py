@@ -106,3 +106,23 @@ def reliability(row, now):
     events = row.get('history',[])
     weights = [(0.5**(max(0,now-e['at'])/86400),e['ok']) for e in events]
     return (2+sum(w for w,ok in weights if ok))/(4+sum(w for w,_ in weights))
+
+
+def sweep_stale_probe_dirs(base=None, max_age_seconds=3600, now=None):
+    """Remove probe folders an earlier run could not (a locked file at the moment
+    it ended). Only this project's own prefixes, and only when older than an hour,
+    so a probe still running is never touched. Returns how many were removed."""
+    import shutil, tempfile
+    from pathlib import Path
+    base = Path(base or tempfile.gettempdir())
+    now = time.time() if now is None else now
+    removed = 0
+    for prefix in ('xray-probe-', 'xray-check-'):
+        for folder in base.glob(prefix + '*'):
+            try:
+                if folder.is_dir() and now - folder.stat().st_mtime > max_age_seconds:
+                    shutil.rmtree(folder, ignore_errors=True)
+                    removed += not folder.exists()
+            except OSError:
+                continue
+    return removed

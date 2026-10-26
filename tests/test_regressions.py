@@ -223,3 +223,35 @@ class RegressionTests(unittest.TestCase):
                 with self.assertRaises(subprocess.CalledProcessError): publish(root,'xray',root/'docs')
             self.assertIn('Git fetch exited 128; category=network',errors.getvalue())
             self.assertNotIn('private-token-fixture',errors.getvalue())
+
+    def test_a_probe_cleanup_race_never_replaces_the_result(self):
+        # Closing the probe's job object kills Xray asynchronously, so Windows can still
+        # hold a file when the temp folder is removed. The PermissionError that raised then
+        # replaced the probe's result and left thousands of folders behind.
+        import xray_test
+        seen=[]
+        real=tempfile.TemporaryDirectory
+        def recording(*args,**kwargs):
+            seen.append(kwargs.get('ignore_cleanup_errors'))
+            return real(*args,**kwargs)
+        good=json.dumps({'passed':True,'latency_ms':12.0})
+        with patch('xray_test.tempfile.TemporaryDirectory',side_effect=recording),             patch('xray_test.communicate_bounded',return_value=good):
+            result=xray_test.run_probe(parse('trojan://secret@203.0.113.7:443?security=tls&sni=example.com#x'),'xray',5)
+        self.assertTrue(result.passed)
+        self.assertEqual(seen,[True])
+
+    def test_stale_probe_folders_are_swept_and_nothing_else(self):
+        from state import sweep_stale_probe_dirs
+        import os
+        with tempfile.TemporaryDirectory() as base:
+            base=Path(base); now=time.time()
+            old=[base/'xray-probe-old1',base/'xray-check-old2']
+            young=base/'xray-probe-running'
+            other=base/'somebody-elses-folder'
+            for folder in (*old,young,other): folder.mkdir()
+            (old[0]/'config.json').write_text('{}')
+            for folder in (*old,other): os.utime(folder,(now-7200,now-7200))
+            self.assertEqual(sweep_stale_probe_dirs(base,3600,now),2)
+            self.assertFalse(any(f.exists() for f in old))
+            self.assertTrue(young.exists())   # a probe still running is never touched
+            self.assertTrue(other.exists())   # nor anything that is not this project's

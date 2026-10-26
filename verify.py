@@ -27,7 +27,10 @@ def main():
     result=subprocess.run([sys.executable,'-m','unittest','discover','-s','tests','-v'],
                           cwd=ROOT,env=env,capture_output=True,text=True,encoding='utf-8',timeout=150)
     output=result.stdout+result.stderr
-    print(output,end='',flush=True)
+    # Test chatter (including a test's own "[PUBLISH] ... pushed" line) read like real run
+    # events in the log; show it only when something failed. verification.json keeps it all.
+    if result.returncode: print(output,end='',flush=True)
+    else: print('[VERIFY] '+(output.strip().splitlines() or [''])[-3:][0].strip()+' / '+(output.strip().splitlines() or [''])[-1].strip(),flush=True)
     evidence={'verified_utc_epoch':time.time(),'passed':result.returncode==0,
               'source_sha256':source_fingerprint(ROOT),'xray_binary_sha256':hashlib.sha256(xray.read_bytes()).hexdigest(),
               'elapsed_seconds':round(time.monotonic()-started,2),'output':output,
