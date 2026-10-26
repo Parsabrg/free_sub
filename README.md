@@ -125,7 +125,8 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
 
 ## What actually gets tested
 
-- Feeds: Barry, Epodonios, Shadowmere, 0xRadikal, Pawdroid, Mahdibland
+- Feeds: Barry, Epodonios (plus its `Sub21`-`Sub26` and VLESS lists, which its combined
+  file omits), Shadowmere, 0xRadikal, Pawdroid, Mahdibland
   Public (`Eternity.txt`, not the account/airport list), Patterniha, Whitedns,
   Kahrobas, ALIILAPRO, Ermaozi and MatinGhanbari. These are untrusted
   candidate sources, not endorsed providers. (EbraSha's repository was deleted

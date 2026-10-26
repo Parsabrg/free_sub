@@ -23,6 +23,15 @@ SOURCES = {
     'ALIILAPRO': 'https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/server.txt',
     'Ermaozi': 'https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt',
     'MatinGhanbari': 'https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/v2ray/super-sub.txt',
+    # Epodonios also publishes Sub21-Sub26 and a VLESS split that its All_Configs_Sub.txt leaves out:
+    # 735 configs no other feed has (measured 2026-10-26). Barry's split files add none.
+    'EpodoniosSub21': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub21.txt',
+    'EpodoniosSub22': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub22.txt',
+    'EpodoniosSub23': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub23.txt',
+    'EpodoniosSub24': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub24.txt',
+    'EpodoniosSub25': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub25.txt',
+    'EpodoniosSub26': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub26.txt',
+    'EpodoniosVless': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/vless.txt',
 }
 SCHEMES = ('vless://', 'vmess://', 'trojan://', 'ss://')
 ACCEPTED_SS = {'aes-128-gcm','aes-256-gcm','chacha20-ietf-poly1305','2022-blake3-aes-128-gcm','2022-blake3-aes-256-gcm'}
