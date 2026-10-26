@@ -55,7 +55,9 @@ class RenameTests(unittest.TestCase):
 
     def test_all_sources_configured(self):
         # EbraSha's repository was deleted (404, 2026-10-26); three live feeds replaced it.
-        self.assertEqual(len(SOURCES), 19)
+        self.assertEqual(len(SOURCES), 35)
+        for name in ['RadikalAll', 'MatinGhanbariAll', 'MorpheusIran', 'DeltaKronecker']:
+            self.assertTrue(SOURCES[name].startswith('https://raw.githubusercontent.com/'), name)
         # Epodonios' extra feeds, missing from its combined file.
         for name in [f'EpodoniosSub{n}' for n in range(21, 27)] + ['EpodoniosVless']:
             self.assertIn('Epodonios/v2ray-configs/main/', SOURCES[name], name)
