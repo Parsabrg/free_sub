@@ -1,6 +1,101 @@
 {
   "outbounds": [
     {
+      "protocol": "vmess",
+      "settings": {
+        "vnext": [
+          {
+            "address": "172.66.203.67",
+            "port": 443,
+            "users": [
+              {
+                "id": "0cf6d970-3f1d-4aae-a989-92a8f76ae3db",
+                "alterId": 0,
+                "security": "auto"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "vmess.lbw666.dpdns.org",
+          "fingerprint": "chrome"
+        },
+        "wsSettings": {
+          "path": "/ws?ed=2048",
+          "headers": {
+            "Host": "vmess.lbw666.dpdns.org"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 1232"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "169.40.42.104",
+            "port": 443,
+            "users": [
+              {
+                "id": "d65cc14c-f53f-4fe2-b262-97856601319c",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "yahoo.com",
+          "publicKey": "e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg",
+          "shortId": "c39cc7310a",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇺🇸 4782"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "169.40.42.35",
+            "port": 443,
+            "users": [
+              {
+                "id": "d65cc14c-f53f-4fe2-b262-97856601319c",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "yahoo.com",
+          "publicKey": "e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg",
+          "shortId": "c39cc7310a",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇺🇸 3402"
+    },
+    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -30,6 +125,26 @@
         }
       },
       "tag": "server 🇺🇸 29946"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "66.163.114.166",
+            "port": 443,
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "blog.findconnectwithemployersandbuildprofessionalnetwork.com"
+        }
+      },
+      "tag": "server 🇺🇸 27214"
     },
     {
       "protocol": "trojan",
@@ -150,6 +265,94 @@
       "settings": {
         "vnext": [
           {
+            "address": "cf.877774.xyz",
+            "port": 443,
+            "users": [
+              {
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz"
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "ccc.010304.xyz"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 461"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "185.95.231.156",
+            "port": 443,
+            "users": [
+              {
+                "id": "1f8cf47a-b66a-4916-979f-26edfcf44eea",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "www.apple.com",
+          "publicKey": "8eXftARun6KH38UZhuqIfPR1VF2DLS9RMBZEnF5k6To",
+          "shortId": "a3a578ab",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇺🇸 8652"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "45.130.125.190",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com"
+        },
+        "wsSettings": {
+          "path": "/assignment",
+          "headers": {
+            "Host": "www.calmlunch.com"
+          }
+        }
+      },
+      "tag": "server 🇸🇨 17019"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
             "address": "172.237.88.103",
             "port": 443,
             "users": [
@@ -175,6 +378,68 @@
         }
       },
       "tag": "server 🇸🇬 21655"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "51.158.206.34",
+            "port": 23576,
+            "users": [
+              {
+                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "fuck.rkn",
+          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
+          "shortId": "01",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇳🇱 1091"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "cf.877774.xyz",
+            "port": 443,
+            "users": [
+              {
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz"
+        },
+        "wsSettings": {
+          "path": "/fp",
+          "headers": {
+            "Host": "ccc.010304.xyz"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 2804"
     },
     {
       "protocol": "vless",
@@ -417,7 +682,7 @@
       "settings": {
         "vnext": [
           {
-            "address": "cf.877774.xyz",
+            "address": "172.67.76.40",
             "port": 443,
             "users": [
               {
@@ -432,7 +697,8 @@
         "network": "ws",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "ccc.010304.xyz"
+          "serverName": "ccc.010304.xyz",
+          "fingerprint": "chrome"
         },
         "wsSettings": {
           "path": "/",
@@ -441,7 +707,7 @@
           }
         }
       },
-      "tag": "server 🇺🇸 461"
+      "tag": "server 🇺🇸 27306"
     },
     {
       "protocol": "vless",
@@ -479,37 +745,6 @@
       "settings": {
         "vnext": [
           {
-            "address": "cf.877774.xyz",
-            "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz"
-        },
-        "wsSettings": {
-          "path": "/fp",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 2804"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
             "address": "snp.bsh-net.ru",
             "port": 443,
             "users": [
@@ -535,6 +770,36 @@
         }
       },
       "tag": "server 🇸🇬 28785"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "chat.openai.com",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com",
+          "fingerprint": "chrome",
+          "alpn": [
+            "h2"
+          ]
+        },
+        "wsSettings": {
+          "path": "/assignment",
+          "headers": {
+            "Host": "www.calmlunch.com"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 2872"
     },
     {
       "protocol": "trojan",
@@ -1125,20 +1390,6 @@
       "tag": "server 🇳🇱 488"
     },
     {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.13",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 563"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -1168,6 +1419,51 @@
         }
       },
       "tag": "server 🇺🇸 19922"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.13",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 563"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "104.18.40.100",
+            "port": 443,
+            "users": [
+              {
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz"
+        },
+        "wsSettings": {
+          "path": "/fp=chromefp=chrome",
+          "headers": {
+            "Host": "ccc.010304.xyz"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 27931"
     },
     {
       "protocol": "vless",
@@ -1206,37 +1502,6 @@
       "settings": {
         "vnext": [
           {
-            "address": "104.18.40.100",
-            "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz"
-        },
-        "wsSettings": {
-          "path": "/fp=chromefp=chrome",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 27931"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
             "address": "185.95.231.156",
             "port": 443,
             "users": [
@@ -1264,24 +1529,18 @@
       "tag": "server 🇺🇸 19635"
     },
     {
-      "protocol": "trojan",
+      "protocol": "shadowsocks",
       "settings": {
         "servers": [
           {
-            "address": "216.106.186.33",
-            "port": 443,
-            "password": "f0eb8c92ce8946aaba856569cff1a16b"
+            "address": "193.29.139.202",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
           }
         ]
       },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "resources.findlocaljobnetworkandbuildcommunityconnections.com"
-        }
-      },
-      "tag": "server 🇺🇸 19788"
+      "tag": "server 🇳🇱 199"
     },
     {
       "protocol": "vless",
@@ -1320,38 +1579,38 @@
       "settings": {
         "vnext": [
           {
-            "address": "172.66.0.162",
-            "port": 443,
+            "address": "51.158.206.26",
+            "port": 23576,
             "users": [
               {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
+                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
               }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz"
-        },
-        "wsSettings": {
-          "path": "/fp=chrome",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "fuck.rkn",
+          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
+          "shortId": "",
+          "fingerprint": "chrome",
+          "spiderX": "/"
         }
       },
-      "tag": "server 🇺🇸 10314"
+      "tag": "server 🇳🇱 19518"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "172.66.154.57",
+            "address": "188.164.248.216",
             "port": 443,
             "users": [
               {
@@ -1370,76 +1629,27 @@
           "fingerprint": "chrome"
         },
         "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 25097"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "172.64.158.170",
-            "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz",
-          "fingerprint": "chrome"
-        },
-        "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 2118"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "104.18.35.15",
-            "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz"
-        },
-        "wsSettings": {
           "path": "/fp=chrome",
           "headers": {
             "Host": "ccc.010304.xyz"
           }
         }
       },
-      "tag": "server 🇺🇸 5866"
+      "tag": "server 🇳🇱 21116"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "173.244.56.6",
+            "port": 443,
+            "method": "aes-128-gcm",
+            "password": "shadowsocks"
+          }
+        ]
+      },
+      "tag": "server 🇺🇸 537"
     },
     {
       "protocol": "vless",
@@ -1477,7 +1687,69 @@
       "settings": {
         "vnext": [
           {
-            "address": "172.64.146.66",
+            "address": "51.158.206.93",
+            "port": 23576,
+            "users": [
+              {
+                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "fuck.rkn",
+          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
+          "shortId": "",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇳🇱 19412"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "104.26.4.2",
+            "port": 443,
+            "users": [
+              {
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz"
+        },
+        "wsSettings": {
+          "path": "/fp=chrome",
+          "headers": {
+            "Host": "ccc.010304.xyz"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 25086"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "104.26.4.2",
             "port": 443,
             "users": [
               {
@@ -1502,38 +1774,7 @@
           }
         }
       },
-      "tag": "server 🇺🇸 24627"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "172.64.158.170",
-            "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz"
-        },
-        "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 25588"
+      "tag": "server 🇺🇸 22601"
     },
     {
       "protocol": "vless",
@@ -1604,6 +1845,133 @@
       "settings": {
         "vnext": [
           {
+            "address": "172.64.146.66",
+            "port": 443,
+            "users": [
+              {
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz",
+          "fingerprint": "chrome"
+        },
+        "wsSettings": {
+          "path": "/fp=chrome",
+          "headers": {
+            "Host": "ccc.010304.xyz"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 27180"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "172.64.158.170",
+            "port": 443,
+            "users": [
+              {
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz",
+          "fingerprint": "chrome"
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "ccc.010304.xyz"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 2118"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "172.66.154.57",
+            "port": 443,
+            "users": [
+              {
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz",
+          "fingerprint": "chrome"
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "ccc.010304.xyz"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 25097"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "172.64.158.170",
+            "port": 443,
+            "users": [
+              {
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz"
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "ccc.010304.xyz"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 25588"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
             "address": "172.64.158.170",
             "port": 443,
             "users": [
@@ -1636,62 +2004,31 @@
       "settings": {
         "vnext": [
           {
-            "address": "51.158.206.93",
-            "port": 23576,
+            "address": "172.66.0.162",
+            "port": 443,
             "users": [
               {
-                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
               }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "fuck.rkn",
-          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
-          "shortId": "",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇳🇱 19412"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "51.158.206.26",
-            "port": 23576,
-            "users": [
-              {
-                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz"
+        },
+        "wsSettings": {
+          "path": "/fp=chrome",
+          "headers": {
+            "Host": "ccc.010304.xyz"
           }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "fuck.rkn",
-          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
-          "shortId": "",
-          "fingerprint": "chrome",
-          "spiderX": "/"
         }
       },
-      "tag": "server 🇳🇱 19518"
+      "tag": "server 🇺🇸 10314"
     },
     {
       "protocol": "vless",
@@ -1726,18 +2063,36 @@
       "tag": "server 🇺🇸 27134"
     },
     {
-      "protocol": "shadowsocks",
+      "protocol": "vless",
       "settings": {
-        "servers": [
+        "vnext": [
           {
-            "address": "173.244.56.6",
+            "address": "104.18.41.190",
             "port": 443,
-            "method": "aes-128-gcm",
-            "password": "shadowsocks"
+            "users": [
+              {
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
+              }
+            ]
           }
         ]
       },
-      "tag": "server 🇺🇸 537"
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz",
+          "fingerprint": "chrome"
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "ccc.010304.xyz"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 26749"
     },
     {
       "protocol": "vless",
@@ -1763,34 +2118,20 @@
           "fingerprint": "chrome"
         },
         "wsSettings": {
-          "path": "/fp=chrome",
+          "path": "/",
           "headers": {
             "Host": "ccc.010304.xyz"
           }
         }
       },
-      "tag": "server 🇺🇸 27180"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.7",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 625"
+      "tag": "server 🇺🇸 24627"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "104.26.4.2",
+            "address": "104.18.35.15",
             "port": 443,
             "users": [
               {
@@ -1814,7 +2155,35 @@
           }
         }
       },
-      "tag": "server 🇺🇸 25086"
+      "tag": "server 🇺🇸 5866"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "156.146.38.167",
+            "port": 443,
+            "method": "aes-128-gcm",
+            "password": "shadowsocks"
+          }
+        ]
+      },
+      "tag": "server 🇺🇸 280"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.7",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 625"
     },
     {
       "protocol": "vless",
@@ -1848,158 +2217,6 @@
       "tag": "server 🇺🇸 26990"
     },
     {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "188.164.248.216",
-            "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz",
-          "fingerprint": "chrome"
-        },
-        "wsSettings": {
-          "path": "/fp=chrome",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
-        }
-      },
-      "tag": "server 🇳🇱 21116"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "156.146.38.167",
-            "port": 443,
-            "method": "aes-128-gcm",
-            "password": "shadowsocks"
-          }
-        ]
-      },
-      "tag": "server 🇺🇸 280"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "104.18.41.190",
-            "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz",
-          "fingerprint": "chrome"
-        },
-        "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 26749"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "193.29.139.197",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 615"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "104.26.4.2",
-            "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz",
-          "fingerprint": "chrome"
-        },
-        "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 22601"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.149",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 388"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "158.173.20.208",
-            "port": 443,
-            "method": "aes-128-gcm",
-            "password": "shadowsocks"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 550"
-    },
-    {
       "protocol": "shadowsocks",
       "settings": {
         "servers": [
@@ -2012,34 +2229,6 @@
         ]
       },
       "tag": "server 🇺🇸 351"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "193.29.139.151",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 311"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "185.176.204.18",
-            "port": 19999,
-            "method": "aes-256-gcm",
-            "password": "ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4="
-          }
-        ]
-      },
-      "tag": "server 🇩🇪 19880"
     },
     {
       "protocol": "shadowsocks",
@@ -2060,20 +2249,6 @@
       "settings": {
         "servers": [
           {
-            "address": "193.29.139.204",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 551"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
             "address": "82.38.31.170",
             "port": 443,
             "method": "chacha20-ietf-poly1305",
@@ -2088,14 +2263,70 @@
       "settings": {
         "servers": [
           {
-            "address": "82.38.31.66",
+            "address": "158.173.20.208",
+            "port": 443,
+            "method": "aes-128-gcm",
+            "password": "shadowsocks"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 550"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "193.29.139.197",
             "port": 8080,
             "method": "chacha20-ietf-poly1305",
             "password": "oZIoA69Q8yhcQV8ka3Pa3A"
           }
         ]
       },
-      "tag": "server 🇳🇱 99"
+      "tag": "server 🇳🇱 615"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "193.29.139.151",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 311"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "193.29.139.204",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 551"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.149",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 388"
     },
     {
       "protocol": "shadowsocks",
@@ -2116,6 +2347,20 @@
       "settings": {
         "servers": [
           {
+            "address": "82.38.31.66",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 99"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
             "address": "82.38.31.35",
             "port": 8080,
             "method": "chacha20-ietf-poly1305",
@@ -2130,14 +2375,14 @@
       "settings": {
         "servers": [
           {
-            "address": "193.29.139.202",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+            "address": "185.176.204.18",
+            "port": 19999,
+            "method": "aes-256-gcm",
+            "password": "ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4="
           }
         ]
       },
-      "tag": "server 🇳🇱 199"
+      "tag": "server 🇩🇪 19880"
     },
     {
       "protocol": "shadowsocks",
@@ -2166,271 +2411,6 @@
         ]
       },
       "tag": "server 🇳🇱 126"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "45.130.125.190",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com"
-        },
-        "wsSettings": {
-          "path": "/assignment",
-          "headers": {
-            "Host": "www.calmlunch.com"
-          }
-        }
-      },
-      "tag": "server 🇸🇨 17019"
-    },
-    {
-      "protocol": "vmess",
-      "settings": {
-        "vnext": [
-          {
-            "address": "172.66.203.67",
-            "port": 443,
-            "users": [
-              {
-                "id": "0cf6d970-3f1d-4aae-a989-92a8f76ae3db",
-                "alterId": 0,
-                "security": "auto"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "vmess.lbw666.dpdns.org",
-          "fingerprint": "chrome"
-        },
-        "wsSettings": {
-          "path": "/ws?ed=2048",
-          "headers": {
-            "Host": "vmess.lbw666.dpdns.org"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 1232"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "169.40.42.104",
-            "port": 443,
-            "users": [
-              {
-                "id": "d65cc14c-f53f-4fe2-b262-97856601319c",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "yahoo.com",
-          "publicKey": "e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg",
-          "shortId": "c39cc7310a",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇺🇸 4782"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "169.40.42.35",
-            "port": 443,
-            "users": [
-              {
-                "id": "d65cc14c-f53f-4fe2-b262-97856601319c",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "yahoo.com",
-          "publicKey": "e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg",
-          "shortId": "c39cc7310a",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇺🇸 3402"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "66.163.114.166",
-            "port": 443,
-            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "blog.findconnectwithemployersandbuildprofessionalnetwork.com"
-        }
-      },
-      "tag": "server 🇺🇸 27214"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "185.95.231.156",
-            "port": 443,
-            "users": [
-              {
-                "id": "1f8cf47a-b66a-4916-979f-26edfcf44eea",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "www.apple.com",
-          "publicKey": "8eXftARun6KH38UZhuqIfPR1VF2DLS9RMBZEnF5k6To",
-          "shortId": "a3a578ab",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇺🇸 8652"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "51.158.206.34",
-            "port": 23576,
-            "users": [
-              {
-                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "fuck.rkn",
-          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
-          "shortId": "01",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇳🇱 1091"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "172.67.76.40",
-            "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz",
-          "fingerprint": "chrome"
-        },
-        "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 27306"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "chat.openai.com",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com",
-          "fingerprint": "chrome",
-          "alpn": [
-            "h2"
-          ]
-        },
-        "wsSettings": {
-          "path": "/assignment",
-          "headers": {
-            "Host": "www.calmlunch.com"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 2872"
     },
     {
       "protocol": "vless",
@@ -2465,6 +2445,32 @@
         }
       },
       "tag": "server 🇫🇮 29393"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "5.44.46.142",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com"
+        },
+        "wsSettings": {
+          "path": "/assignment",
+          "headers": {
+            "Host": "www.calmlunch.com"
+          }
+        }
+      },
+      "tag": "server 🇩🇪 1919"
     },
     {
       "protocol": "vless",
@@ -2516,32 +2522,6 @@
         }
       },
       "tag": "server 🇺🇸 27567"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "5.44.46.142",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com"
-        },
-        "wsSettings": {
-          "path": "/assignment",
-          "headers": {
-            "Host": "www.calmlunch.com"
-          }
-        }
-      },
-      "tag": "server 🇩🇪 1919"
     },
     {
       "protocol": "shadowsocks",
@@ -2743,6 +2723,29 @@
       "settings": {
         "servers": [
           {
+            "address": "45.128.76.242",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.trusteeforward.com"
+        },
+        "wsSettings": {
+          "path": "/assignment"
+        }
+      },
+      "tag": "server 🇩🇪 29634"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
             "address": "195.181.244.216",
             "port": 443,
             "password": "humanity"
@@ -2767,7 +2770,7 @@
       "settings": {
         "servers": [
           {
-            "address": "45.128.76.242",
+            "address": "www.calmlunch.com",
             "port": 443,
             "password": "humanity"
           }
@@ -2777,13 +2780,14 @@
         "network": "ws",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "www.trusteeforward.com"
+          "serverName": "www.calmlunch.com",
+          "fingerprint": "chrome"
         },
         "wsSettings": {
           "path": "/assignment"
         }
       },
-      "tag": "server 🇩🇪 29634"
+      "tag": "server 🇺🇸 19741"
     },
     {
       "protocol": "vless",
@@ -2811,30 +2815,6 @@
         }
       },
       "tag": "server 🇳🇱 164"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "www.calmlunch.com",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com",
-          "fingerprint": "chrome"
-        },
-        "wsSettings": {
-          "path": "/assignment"
-        }
-      },
-      "tag": "server 🇺🇸 19741"
     },
     {
       "protocol": "vless",
@@ -3176,20 +3156,6 @@
       "settings": {
         "servers": [
           {
-            "address": "82.38.31.149",
-            "port": 443,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 744"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
             "address": "82.38.31.171",
             "port": 443,
             "method": "chacha20-ietf-poly1305",
@@ -3198,6 +3164,20 @@
         ]
       },
       "tag": "server 🇳🇱 606"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.149",
+            "port": 443,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 744"
     },
     {
       "protocol": "shadowsocks",
@@ -3242,62 +3222,6 @@
       "tag": "server 🇳🇱 594"
     },
     {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.62",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 254"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.17",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 137"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.28",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 366"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.61",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 116"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -3328,6 +3252,62 @@
         }
       },
       "tag": "server 🇳🇱 1187"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.62",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 254"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.28",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 366"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.61",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 116"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.17",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 137"
     },
     {
       "protocol": "trojan",
@@ -3592,26 +3572,6 @@
       "tag": "server 🇺🇸 1532"
     },
     {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "216.106.186.32",
-            "port": 443,
-            "password": "dba20dcb635e430fa4d3bfc303a149d2"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "blog.findlocaljobnetworkandbuildcommunityconnections.com"
-        }
-      },
-      "tag": "server 🇺🇸 19804"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -3734,6 +3694,37 @@
       "settings": {
         "vnext": [
           {
+            "address": "3.39.4.109",
+            "port": 13672,
+            "users": [
+              {
+                "id": "814bd064-544d-4255-a070-5705c03f6da9",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "www.apple.com",
+          "publicKey": "k2hPp0tTW0Da-HK94wYpSCLbuK44LfGqC2MSJIM1Ti0",
+          "shortId": "48050fab",
+          "fingerprint": "qq",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇰🇷 19520"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
             "address": "51.158.206.29",
             "port": 23576,
             "users": [
@@ -3792,6 +3783,32 @@
       "tag": "server 🇺🇸 2026"
     },
     {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "45.128.76.242",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.trusteeforward.com"
+        },
+        "wsSettings": {
+          "path": "/assignment",
+          "headers": {
+            "Host": "www.trusteeforward.com"
+          }
+        }
+      },
+      "tag": "server 🇩🇪 23787"
+    },
+    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -3827,52 +3844,6 @@
       "settings": {
         "servers": [
           {
-            "address": "45.128.76.242",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.trusteeforward.com"
-        },
-        "wsSettings": {
-          "path": "/assignment",
-          "headers": {
-            "Host": "www.trusteeforward.com"
-          }
-        }
-      },
-      "tag": "server 🇩🇪 23787"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "66.163.112.142",
-            "port": 443,
-            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "cdn.unlockyourfuturefindyourperfectcareer.com"
-        }
-      },
-      "tag": "server 🇺🇸 27280"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
             "address": "212.227.90.142",
             "port": 443,
             "password": "humanity"
@@ -3894,6 +3865,26 @@
         }
       },
       "tag": "server 🇪🇸 27563"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "66.163.112.142",
+            "port": 443,
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "cdn.unlockyourfuturefindyourperfectcareer.com"
+        }
+      },
+      "tag": "server 🇺🇸 27280"
     },
     {
       "protocol": "vless",
@@ -3927,6 +3918,20 @@
       "tag": "server 🇳🇱 583"
     },
     {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.175",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 209"
+    },
+    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -3957,6 +3962,48 @@
         }
       },
       "tag": "server 🇺🇸 25153"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.175",
+            "port": 443,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 697"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.174",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 321"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.174",
+            "port": 443,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 408"
     },
     {
       "protocol": "vless",
@@ -3995,6 +4042,37 @@
       "settings": {
         "vnext": [
           {
+            "address": "169.40.42.163",
+            "port": 443,
+            "users": [
+              {
+                "id": "d65cc14c-f53f-4fe2-b262-97856601319c",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "yahoo.com",
+          "publicKey": "e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg",
+          "shortId": "c39cc7310a",
+          "fingerprint": "ios",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇺🇸 1295"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
             "address": "167.17.69.171",
             "port": 443,
             "users": [
@@ -4020,6 +4098,52 @@
         }
       },
       "tag": "server 🇺🇸 18530"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "104.17.154.123",
+            "port": 443,
+            "users": [
+              {
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz",
+          "fingerprint": "chrome"
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "ccc.010304.xyz"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 6784"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.10",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 97"
     },
     {
       "protocol": "shadowsocks",
@@ -4070,6 +4194,26 @@
       "settings": {
         "servers": [
           {
+            "address": "66.163.112.76",
+            "port": 443,
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "api.unlockyourfuturefindyourperfectcareer.com"
+        }
+      },
+      "tag": "server 🇺🇸 27422"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
             "address": "166.1.36.83",
             "port": 443,
             "password": "humanity"
@@ -4088,6 +4232,26 @@
         }
       },
       "tag": "server 🇩🇪 8590"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "216.152.155.59",
+            "port": 443,
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "api.nextjobopportunityandclaimyouridealrole.com"
+        }
+      },
+      "tag": "server 🇺🇸 27604"
     },
     {
       "protocol": "vless",
@@ -4329,6 +4493,32 @@
       "tag": "server 🇺🇸 30869"
     },
     {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "172.67.203.46",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.cordweave.com",
+          "alpn": [
+            "http/1.1"
+          ]
+        },
+        "wsSettings": {
+          "path": "/assignment"
+        }
+      },
+      "tag": "server 🇺🇸 29996"
+    },
+    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -4358,32 +4548,6 @@
         }
       },
       "tag": "server 🇺🇸 30216"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "172.67.203.46",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.cordweave.com",
-          "alpn": [
-            "http/1.1"
-          ]
-        },
-        "wsSettings": {
-          "path": "/assignment"
-        }
-      },
-      "tag": "server 🇺🇸 29996"
     },
     {
       "protocol": "vless",
@@ -4461,26 +4625,6 @@
       "settings": {
         "servers": [
           {
-            "address": "216.152.147.93",
-            "port": 443,
-            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "connectingpeoplewithgreatjobs.com"
-        }
-      },
-      "tag": "server 🇨🇦 30981"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
             "address": "216.152.147.48",
             "port": 443,
             "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
@@ -4495,6 +4639,26 @@
         }
       },
       "tag": "server 🇨🇦 30991"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "216.152.147.93",
+            "port": 443,
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "connectingpeoplewithgreatjobs.com"
+        }
+      },
+      "tag": "server 🇨🇦 30981"
     },
     {
       "protocol": "trojan",
@@ -4605,6 +4769,37 @@
         }
       },
       "tag": "server 🇺🇸 19336"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "172.66.0.162",
+            "port": 443,
+            "users": [
+              {
+                "id": "d342d11e-d224-4463-b982-532309285094",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "ccc.010304.xyz"
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "ccc.010304.xyz"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 29859"
     },
     {
       "protocol": "vless",
@@ -4756,6 +4951,41 @@
       "tag": "server 🇺🇸 8582"
     },
     {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "hw7.divarkhaghazi.com",
+            "port": 465,
+            "users": [
+              {
+                "id": "d0d3d49c-56e8-40e1-9e83-793d03f83d93",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hw7.divarkhaghazi.com.",
+          "fingerprint": "chrome",
+          "alpn": [
+            "http/1.1"
+          ]
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "hw7.divarkhaghazi.com."
+          }
+        }
+      },
+      "tag": "server 🇩🇪 30267"
+    },
+    {
       "protocol": "trojan",
       "settings": {
         "servers": [
@@ -4861,36 +5091,6 @@
       "tag": "server 🇺🇸 19890"
     },
     {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "109.248.170.119",
-            "port": 13447,
-            "users": [
-              {
-                "id": "b573cefb-7bc7-4a42-b407-b8b534e66773",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "yahoo.com",
-          "publicKey": "_0wM2ep44eAcrgf5PflKaBivknCWT6kMvQBQUoScCkE",
-          "shortId": "83",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇰🇿 194"
-    },
-    {
       "protocol": "shadowsocks",
       "settings": {
         "servers": [
@@ -4931,6 +5131,37 @@
         ]
       },
       "tag": "server 🇨🇦 446"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "51.158.206.98",
+            "port": 23576,
+            "users": [
+              {
+                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "fuck.rkn",
+          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
+          "shortId": "01",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇳🇱 253"
     },
     {
       "protocol": "vless",
@@ -5026,6 +5257,85 @@
       "tag": "server 🇸🇬 28975"
     },
     {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "141.101.115.104",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com",
+          "fingerprint": "chrome",
+          "alpn": [
+            "http/1.1"
+          ]
+        },
+        "wsSettings": {
+          "path": "/assignment"
+        }
+      },
+      "tag": "server 🇺🇸 27267"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "185.18.250.245",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com"
+        },
+        "wsSettings": {
+          "path": "/assignment",
+          "headers": {
+            "Host": "www.calmlunch.com"
+          }
+        }
+      },
+      "tag": "server 🇨🇭 8453"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "172.67.231.254",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com"
+        },
+        "wsSettings": {
+          "path": "/assignment",
+          "headers": {
+            "Host": "www.calmlunch.com"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 8615"
+    },
+    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -5058,35 +5368,15 @@
       "tag": "server 🇺🇸 24814"
     },
     {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "216.152.155.59",
-            "port": 443,
-            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "api.nextjobopportunityandclaimyouridealrole.com"
-        }
-      },
-      "tag": "server 🇺🇸 27604"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "3.39.4.109",
-            "port": 13672,
+            "address": "15.204.97.219",
+            "port": 23576,
             "users": [
               {
-                "id": "814bd064-544d-4255-a070-5705c03f6da9",
+                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
                 "encryption": "none",
                 "flow": "xtls-rprx-vision"
               }
@@ -5099,154 +5389,21 @@
         "security": "reality",
         "realitySettings": {
           "show": false,
-          "serverName": "www.apple.com",
-          "publicKey": "k2hPp0tTW0Da-HK94wYpSCLbuK44LfGqC2MSJIM1Ti0",
-          "shortId": "48050fab",
-          "fingerprint": "qq",
+          "serverName": "fuck.rkn",
+          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
+          "shortId": "",
+          "fingerprint": "chrome",
           "spiderX": "/"
         }
       },
-      "tag": "server 🇰🇷 19520"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.175",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 209"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.175",
-            "port": 443,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 697"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.174",
-            "port": 443,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 408"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.174",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 321"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "169.40.42.163",
-            "port": 443,
-            "users": [
-              {
-                "id": "d65cc14c-f53f-4fe2-b262-97856601319c",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "yahoo.com",
-          "publicKey": "e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg",
-          "shortId": "c39cc7310a",
-          "fingerprint": "ios",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇺🇸 1295"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "104.17.154.123",
-            "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz",
-          "fingerprint": "chrome"
-        },
-        "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 6784"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.10",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "oZIoA69Q8yhcQV8ka3Pa3A"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 97"
+      "tag": "server 🇺🇸 363"
     },
     {
       "protocol": "trojan",
       "settings": {
         "servers": [
           {
-            "address": "66.163.112.76",
+            "address": "66.163.112.171",
             "port": 443,
             "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
           }
@@ -5256,41 +5413,30 @@
         "network": "tcp",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "api.unlockyourfuturefindyourperfectcareer.com"
+          "serverName": "learn.unlockyourfuturefindyourperfectcareer.com"
         }
       },
-      "tag": "server 🇺🇸 27422"
+      "tag": "server 🇺🇸 27426"
     },
     {
-      "protocol": "vless",
+      "protocol": "trojan",
       "settings": {
-        "vnext": [
+        "servers": [
           {
-            "address": "172.66.0.162",
+            "address": "66.163.112.242",
             "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
           }
         ]
       },
       "streamSettings": {
-        "network": "ws",
+        "network": "tcp",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "ccc.010304.xyz"
-        },
-        "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "ccc.010304.xyz"
-          }
+          "serverName": "resources.unlockyourfuturefindyourperfectcareer.com"
         }
       },
-      "tag": "server 🇺🇸 29859"
+      "tag": "server 🇺🇸 27447"
     },
     {
       "protocol": "vless",
@@ -5452,29 +5598,6 @@
         }
       },
       "tag": "server 🇩🇪 31041"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "104.18.32.47",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com"
-        },
-        "wsSettings": {
-          "path": "/assignment"
-        }
-      },
-      "tag": "server 🇺🇸 10748"
     },
     {
       "protocol": "vless",
@@ -5911,26 +6034,6 @@
       "settings": {
         "servers": [
           {
-            "address": "www.findlocaljobnetworkandbuildcommunityconnections.com",
-            "port": 443,
-            "password": "242a3d8eee5e4ed1a6bfa4141d549a25"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.findlocaljobnetworkandbuildcommunityconnections.com"
-        }
-      },
-      "tag": "server 🇺🇸 19647"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
             "address": "172.66.40.99",
             "port": 443,
             "password": "humanity"
@@ -5948,6 +6051,20 @@
         }
       },
       "tag": "server 🇺🇸 27263"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.200",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "k1dBOmOB4oqi7Ump37a1bQ"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 62"
     },
     {
       "protocol": "vless",
@@ -6159,41 +6276,6 @@
       "tag": "server 🇸🇬 4785"
     },
     {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "hw7.divarkhaghazi.com",
-            "port": 465,
-            "users": [
-              {
-                "id": "d0d3d49c-56e8-40e1-9e83-793d03f83d93",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "hw7.divarkhaghazi.com.",
-          "fingerprint": "chrome",
-          "alpn": [
-            "http/1.1"
-          ]
-        },
-        "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "hw7.divarkhaghazi.com."
-          }
-        }
-      },
-      "tag": "server 🇩🇪 30267"
-    },
-    {
       "protocol": "trojan",
       "settings": {
         "servers": [
@@ -6308,6 +6390,41 @@
       "settings": {
         "vnext": [
           {
+            "address": "144.124.245.52",
+            "port": 2096,
+            "users": [
+              {
+                "id": "6da2c981-8c77-4340-bda3-93399b7aea26",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "www.apple.com",
+          "publicKey": "2riaCWjnC6m96hid0WcL9BG4vwzh8NoW_ps8CrVo1mo",
+          "shortId": "3649e084544949f1",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        },
+        "xhttpSettings": {
+          "path": "/apple-xh",
+          "host": "144.124.245.52",
+          "mode": "auto"
+        }
+      },
+      "tag": "server 🇳🇱 21749"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
             "address": "169.40.42.104",
             "port": 443,
             "users": [
@@ -6383,68 +6500,6 @@
       "settings": {
         "vnext": [
           {
-            "address": "51.158.206.19",
-            "port": 23576,
-            "users": [
-              {
-                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "fuck.rkn",
-          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
-          "shortId": "01",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇳🇱 493"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "51.158.206.98",
-            "port": 23576,
-            "users": [
-              {
-                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "fuck.rkn",
-          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
-          "shortId": "01",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇳🇱 253"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
             "address": "3.39.4.109",
             "port": 18967,
             "users": [
@@ -6476,20 +6531,83 @@
       "settings": {
         "servers": [
           {
-            "address": "resources.findlocaljobnetworkandbuildcommunityconnections.com",
+            "address": "172.64.150.28",
             "port": 443,
-            "password": "f0eb8c92ce8946aaba856569cff1a16b"
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com"
+        },
+        "wsSettings": {
+          "path": "/assignment",
+          "headers": {
+            "Host": "www.calmlunch.com"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 28978"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "51.158.206.19",
+            "port": 23576,
+            "users": [
+              {
+                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
           }
         ]
       },
       "streamSettings": {
         "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "resources.findlocaljobnetworkandbuildcommunityconnections.com"
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "fuck.rkn",
+          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
+          "shortId": "01",
+          "fingerprint": "chrome",
+          "spiderX": "/"
         }
       },
-      "tag": "server 🇺🇸 19273"
+      "tag": "server 🇳🇱 493"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "104.19.229.21",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com"
+        },
+        "wsSettings": {
+          "path": "//assignment",
+          "headers": {
+            "Host": "www.calmlunch.com"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 1797"
     },
     {
       "protocol": "vmess",
@@ -6525,35 +6643,8 @@
       "settings": {
         "servers": [
           {
-            "address": "141.101.115.104",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com",
-          "fingerprint": "chrome",
-          "alpn": [
-            "http/1.1"
-          ]
-        },
-        "wsSettings": {
-          "path": "/assignment"
-        }
-      },
-      "tag": "server 🇺🇸 27267"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "185.18.250.245",
-            "port": 443,
+            "address": "212.24.104.79",
+            "port": 2053,
             "password": "humanity"
           }
         ]
@@ -6571,114 +6662,7 @@
           }
         }
       },
-      "tag": "server 🇨🇭 8453"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "144.124.245.52",
-            "port": 2096,
-            "users": [
-              {
-                "id": "6da2c981-8c77-4340-bda3-93399b7aea26",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "xhttp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "www.apple.com",
-          "publicKey": "2riaCWjnC6m96hid0WcL9BG4vwzh8NoW_ps8CrVo1mo",
-          "shortId": "3649e084544949f1",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        },
-        "xhttpSettings": {
-          "path": "/apple-xh",
-          "host": "144.124.245.52",
-          "mode": "auto"
-        }
-      },
-      "tag": "server 🇳🇱 21749"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "172.67.231.254",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com"
-        },
-        "wsSettings": {
-          "path": "/assignment",
-          "headers": {
-            "Host": "www.calmlunch.com"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 8615"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "104.16.72.41",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com"
-        },
-        "wsSettings": {
-          "path": "/assignment",
-          "headers": {
-            "Host": "www.calmlunch.com"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 4666"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "216.106.186.66",
-            "port": 443,
-            "password": "242a3d8eee5e4ed1a6bfa4141d549a25"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.findlocaljobnetworkandbuildcommunityconnections.com"
-        }
-      },
-      "tag": "server 🇺🇸 23604"
+      "tag": "server 🇱🇹 29355"
     },
     {
       "protocol": "trojan",
@@ -6705,6 +6689,32 @@
       "settings": {
         "servers": [
           {
+            "address": "45.130.125.160",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com"
+        },
+        "wsSettings": {
+          "path": "/assignment",
+          "headers": {
+            "Host": "www.calmlunch.com"
+          }
+        }
+      },
+      "tag": "server 🇸🇨 8497"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
             "address": "www.calmlunch.com",
             "port": 443,
             "password": "humanity"
@@ -6725,6 +6735,35 @@
         }
       },
       "tag": "server 🇺🇸 1959"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "104.25.124.54",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com",
+          "alpn": [
+            "http/1.1"
+          ]
+        },
+        "wsSettings": {
+          "path": "//assignment",
+          "headers": {
+            "Host": "www.calmlunch.com"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 23576"
     },
     {
       "protocol": "vless",
@@ -6793,54 +6832,38 @@
       "settings": {
         "servers": [
           {
-            "address": "66.163.112.171",
+            "address": "45.80.111.7",
             "port": 443,
-            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+            "password": "humanity"
           }
         ]
       },
       "streamSettings": {
-        "network": "tcp",
+        "network": "ws",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "learn.unlockyourfuturefindyourperfectcareer.com"
+          "serverName": "www.calmlunch.com",
+          "fingerprint": "android"
+        },
+        "wsSettings": {
+          "path": "/assignment"
         }
       },
-      "tag": "server 🇺🇸 27426"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "66.163.112.242",
-            "port": 443,
-            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "resources.unlockyourfuturefindyourperfectcareer.com"
-        }
-      },
-      "tag": "server 🇺🇸 27447"
+      "tag": "server 🇩🇪 8648"
     },
     {
       "protocol": "shadowsocks",
       "settings": {
         "servers": [
           {
-            "address": "82.38.31.200",
-            "port": 8080,
+            "address": "178.253.16.185",
+            "port": 8388,
             "method": "chacha20-ietf-poly1305",
-            "password": "k1dBOmOB4oqi7Ump37a1bQ"
+            "password": "x2A6AsyZ-rAllz0wbKHzWA"
           }
         ]
       },
-      "tag": "server 🇳🇱 62"
+      "tag": "server 🇫🇮 29995"
     },
     {
       "protocol": "vless",
@@ -6874,6 +6897,20 @@
       "tag": "server 🇸🇬 20409"
     },
     {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "ams1.rvpn.app",
+            "port": 8388,
+            "method": "chacha20-ietf-poly1305",
+            "password": "x2A6AsyZ-rAllz0wbKHzWA"
+          }
+        ]
+      },
+      "tag": "server 🇫🇮 28930"
+    },
+    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -6904,46 +6941,6 @@
         }
       },
       "tag": "server 🇺🇸 31356"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "162.159.244.91",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com"
-        },
-        "wsSettings": {
-          "path": "/assignment",
-          "headers": {
-            "Host": "www.calmlunch.com"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 5403"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "82.38.31.217",
-            "port": 8080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "k1dBOmOB4oqi7Ump37a1bQ"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 729"
     },
     {
       "protocol": "vless",
@@ -6981,7 +6978,7 @@
       "settings": {
         "servers": [
           {
-            "address": "172.64.150.28",
+            "address": "104.16.71.213",
             "port": 443,
             "password": "humanity"
           }
@@ -7000,14 +6997,82 @@
           }
         }
       },
-      "tag": "server 🇺🇸 28978"
+      "tag": "server 🇺🇸 8538"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "82.38.31.217",
+            "port": 8080,
+            "method": "chacha20-ietf-poly1305",
+            "password": "k1dBOmOB4oqi7Ump37a1bQ"
+          }
+        ]
+      },
+      "tag": "server 🇳🇱 729"
     },
     {
       "protocol": "trojan",
       "settings": {
         "servers": [
           {
-            "address": "104.19.229.21",
+            "address": "104.21.103.254",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com",
+          "fingerprint": "chrome",
+          "alpn": [
+            "http/1.1"
+          ]
+        },
+        "wsSettings": {
+          "path": "/assignment",
+          "headers": {
+            "Host": "www.calmlunch.com"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 4685"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "45.80.111.7",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com",
+          "fingerprint": "chrome"
+        },
+        "wsSettings": {
+          "path": "/assignment"
+        }
+      },
+      "tag": "server 🇩🇪 1934"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "104.18.8.83",
             "port": 443,
             "password": "humanity"
           }
@@ -7020,13 +7085,13 @@
           "serverName": "www.calmlunch.com"
         },
         "wsSettings": {
-          "path": "//assignment",
+          "path": "/assignment",
           "headers": {
             "Host": "www.calmlunch.com"
           }
         }
       },
-      "tag": "server 🇺🇸 1797"
+      "tag": "server 🇺🇸 6772"
     },
     {
       "protocol": "vless",
@@ -7141,87 +7206,6 @@
       "settings": {
         "servers": [
           {
-            "address": "212.24.104.79",
-            "port": 2053,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com"
-        },
-        "wsSettings": {
-          "path": "/assignment",
-          "headers": {
-            "Host": "www.calmlunch.com"
-          }
-        }
-      },
-      "tag": "server 🇱🇹 29355"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "45.130.125.160",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com"
-        },
-        "wsSettings": {
-          "path": "/assignment",
-          "headers": {
-            "Host": "www.calmlunch.com"
-          }
-        }
-      },
-      "tag": "server 🇸🇨 8497"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "104.25.124.54",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com",
-          "alpn": [
-            "http/1.1"
-          ]
-        },
-        "wsSettings": {
-          "path": "//assignment",
-          "headers": {
-            "Host": "www.calmlunch.com"
-          }
-        }
-      },
-      "tag": "server 🇺🇸 23576"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
             "address": "172.64.152.23",
             "port": 443,
             "password": "humanity"
@@ -7242,30 +7226,6 @@
         }
       },
       "tag": "server 🇺🇸 20890"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "45.80.111.7",
-            "port": 443,
-            "password": "humanity"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "www.calmlunch.com",
-          "fingerprint": "android"
-        },
-        "wsSettings": {
-          "path": "/assignment"
-        }
-      },
-      "tag": "server 🇩🇪 8648"
     },
     {
       "protocol": "vless",
@@ -7295,34 +7255,6 @@
         }
       },
       "tag": "server 🇺🇸 7995"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "ccc.010304.xyz",
-            "port": 443,
-            "users": [
-              {
-                "id": "d342d11e-d224-4463-b982-532309285094",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "ccc.010304.xyz"
-        },
-        "wsSettings": {
-          "path": "/"
-        }
-      },
-      "tag": "server 🇺🇸 5244"
     },
     {
       "protocol": "vless",
@@ -7407,20 +7339,6 @@
       "tag": "server 🇸🇬 19539"
     },
     {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "178.253.16.185",
-            "port": 8388,
-            "method": "chacha20-ietf-poly1305",
-            "password": "x2A6AsyZ-rAllz0wbKHzWA"
-          }
-        ]
-      },
-      "tag": "server 🇫🇮 29995"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -7452,25 +7370,11 @@
       "tag": "server 🇳🇱 238"
     },
     {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "ams1.rvpn.app",
-            "port": 8388,
-            "method": "chacha20-ietf-poly1305",
-            "password": "x2A6AsyZ-rAllz0wbKHzWA"
-          }
-        ]
-      },
-      "tag": "server 🇫🇮 28930"
-    },
-    {
       "protocol": "trojan",
       "settings": {
         "servers": [
           {
-            "address": "104.16.71.213",
+            "address": "chat.openai.com",
             "port": 443,
             "password": "humanity"
           }
@@ -7480,92 +7384,37 @@
         "network": "ws",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "www.calmlunch.com"
+          "serverName": "www.calmlunch.com",
+          "fingerprint": "chrome",
+          "alpn": [
+            "h2"
+          ]
         },
         "wsSettings": {
-          "path": "/assignment",
-          "headers": {
-            "Host": "www.calmlunch.com"
-          }
+          "path": "/assignment"
         }
       },
-      "tag": "server 🇺🇸 8538"
+      "tag": "server 🇺🇸 5649"
     },
     {
-      "protocol": "shadowsocks",
+      "protocol": "trojan",
       "settings": {
         "servers": [
           {
-            "address": "149.22.87.204",
+            "address": "66.163.118.62",
             "port": 443,
-            "method": "aes-128-gcm",
-            "password": "shadowsocks"
-          }
-        ]
-      },
-      "tag": "server 🇯🇵 64"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "169.40.42.231",
-            "port": 443,
-            "users": [
-              {
-                "id": "d65cc14c-f53f-4fe2-b262-97856601319c",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
           }
         ]
       },
       "streamSettings": {
         "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "yahoo.com",
-          "publicKey": "e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg",
-          "shortId": "c39cc7310a",
-          "fingerprint": "ios",
-          "spiderX": "/"
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "courses.discovergreatjobsandadvanceyourcareer.com"
         }
       },
-      "tag": "server 🇺🇸 26029"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "137.74.16.237",
-            "port": 443,
-            "users": [
-              {
-                "id": "aaec4e42-a095-44b6-a239-f16d234a0798",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "www.icloud.com",
-          "publicKey": "7LSzvilTVKGMtBDuKGeMrLtlhY7tQf5YcG566dEgO0I",
-          "shortId": "b390e0a721d242b0",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇫🇷 1519"
+      "tag": "server 🇪🇸 27458"
     },
     {
       "protocol": "vless",
@@ -7688,6 +7537,152 @@
         }
       },
       "tag": "server 🇺🇸 31127"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "70.34.252.255",
+            "port": 443,
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "browseexecutivejobopeningsandenhanceleadershipcareer.com"
+        }
+      },
+      "tag": "server 🇵🇱 31131"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "170.101.101.53",
+            "port": 443,
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.explorecreativejobsandenhanceyourcareerportfolio.com"
+        }
+      },
+      "tag": "server 🇺🇸 31193"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "167.88.61.175",
+            "port": 443,
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "blog.browseseniorrolesandenhanceyourcareertoday.com"
+        }
+      },
+      "tag": "server 🇺🇸 31267"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "169.197.140.218",
+            "port": 443,
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "learn.discoverfreshgraduatejobsstartyourprofessionaljourney.com"
+        }
+      },
+      "tag": "server 🇺🇸 31274"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "172.64.231.133",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.trusteeforward.com"
+        },
+        "wsSettings": {
+          "path": "/assignment",
+          "headers": {
+            "Host": "www.trusteeforward.com"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 31208"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "149.22.87.204",
+            "port": 443,
+            "method": "aes-128-gcm",
+            "password": "shadowsocks"
+          }
+        ]
+      },
+      "tag": "server 🇯🇵 64"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "188.114.97.6",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "www.calmlunch.com"
+        },
+        "wsSettings": {
+          "path": "//assignment",
+          "headers": {
+            "Host": "www.calmlunch.com"
+          }
+        }
+      },
+      "tag": "server 🇺🇸 22526"
     }
   ]
 }
