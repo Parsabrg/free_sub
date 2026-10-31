@@ -1,28 +1,150 @@
 {
-  "mode": "health",
-  "health": "ok",
+  "mode": "full",
+  "health": "retained_previous",
   "tested_on": "operator network; local Xray",
   "xray_version": "Xray 26.3.27 (Xray, Penetrates Everything.) d2758a0 (go1.26.1 windows/amd64)",
-  "source_status": {},
-  "unique_selected_for_test": 403,
-  "first_pass": {
-    "TimeoutError": 392,
-    "pass": 1,
-    "CandidateDeadline": 5,
-    "TimeoutExpired": 2,
-    "SSLEOFError": 3
+  "source_status": {
+    "Barry": {
+      "raw": 0,
+      "supported": 0,
+      "error": "TimeoutError"
+    },
+    "Epodonios": {
+      "raw": 0,
+      "supported": 0,
+      "error": "HTTPError"
+    },
+    "Shadowmere": {
+      "raw": 0,
+      "supported": 0,
+      "error": "TimeoutError"
+    },
+    "Radikal": {
+      "raw": 1757,
+      "supported": 998,
+      "error": null
+    },
+    "Pawdroid": {
+      "raw": 0,
+      "supported": 0,
+      "error": "URLError"
+    },
+    "MahdiblandPublic": {
+      "raw": 0,
+      "supported": 0,
+      "error": "TimeoutError"
+    },
+    "Patterniha": {
+      "raw": 120,
+      "supported": 44,
+      "error": null
+    },
+    "Whitedns": {
+      "raw": 128,
+      "supported": 64,
+      "error": null
+    },
+    "Kahrobas": {
+      "raw": 133,
+      "supported": 123,
+      "error": null
+    },
+    "ALIILAPRO": {
+      "raw": 4078,
+      "supported": 850,
+      "error": null
+    },
+    "Ermaozi": {
+      "raw": 78,
+      "supported": 17,
+      "error": null
+    },
+    "MatinGhanbari": {
+      "raw": 199,
+      "supported": 67,
+      "error": null
+    },
+    "EpodoniosSub21": {
+      "raw": 0,
+      "supported": 0,
+      "error": "HTTPError"
+    },
+    "EpodoniosSub22": {
+      "raw": 0,
+      "supported": 0,
+      "error": "HTTPError"
+    },
+    "EpodoniosSub23": {
+      "raw": 0,
+      "supported": 0,
+      "error": "HTTPError"
+    },
+    "EpodoniosSub24": {
+      "raw": 0,
+      "supported": 0,
+      "error": "HTTPError"
+    },
+    "EpodoniosSub25": {
+      "raw": 0,
+      "supported": 0,
+      "error": "HTTPError"
+    },
+    "EpodoniosSub26": {
+      "raw": 0,
+      "supported": 0,
+      "error": "HTTPError"
+    },
+    "EpodoniosVless": {
+      "raw": 0,
+      "supported": 0,
+      "error": "HTTPError"
+    },
+    "RadikalAll": {
+      "raw": 10912,
+      "supported": 4506,
+      "error": null
+    },
+    "Bahemmat": {
+      "raw": 499,
+      "supported": 98,
+      "error": null
+    },
+    "Hamedcode443": {
+      "raw": 6059,
+      "supported": 1728,
+      "error": null
+    },
+    "MorpheusIran": {
+      "raw": 2756,
+      "supported": 1954,
+      "error": null
+    }
   },
-  "second_pass": {},
+  "unique_selected_for_test": 6602,
+  "first_pass": {
+    "ValueError": 114,
+    "pass": 23,
+    "CandidateDeadline": 5832,
+    "TimeoutExpired": 435,
+    "CalledProcessError": 159,
+    "SSLEOFError": 15,
+    "ConnectionResetError": 13,
+    "RuntimeError": 11
+  },
+  "second_pass": {
+    "TimeoutError": 22,
+    "CandidateDeadline": 1
+  },
   "max_tests": 0,
-  "workers": 16,
+  "workers": 64,
   "verification_workers": 16,
   "first_pass_timeout_seconds": 30,
-  "screen_network_timeout_seconds": null,
+  "screen_network_timeout_seconds": 5,
   "verification_timeout_seconds": 30,
-  "failure_reason": null,
+  "failure_reason": "No current verified transfer; previous nodes age normally",
   "schema": 2,
-  "generated_epoch": 1793487509.4486818,
-  "generated_utc": "2026-10-31T22:58:29+00:00",
+  "generated_epoch": 1793490385.165719,
+  "generated_utc": "2026-10-31T23:46:25+00:00",
   "published": 1,
   "nodes": [
     {
@@ -34,13 +156,13 @@
       "endpoint_ip": "82.38.31.186",
       "last_success_epoch": 1793487010.1303883,
       "expires_epoch": 1793508610.1303883,
-      "success_rate": 0.8476,
+      "success_rate": 0.8228,
       "latency_ms": 6853.2,
       "jitter_ms": 3000.1,
       "body_bytes": 34929,
       "transfer_kbps_estimate": 20.4,
       "full_size": false,
-      "verified_this_run": true
+      "verified_this_run": false
     }
   ],
   "flag_definition": "IP pinned for the successful proxy connection; may be CDN ingress, not exit",
