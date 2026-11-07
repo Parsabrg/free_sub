@@ -218,39 +218,18 @@
       "tag": "server 🇵🇱 43360"
     },
     {
-      "protocol": "vless",
+      "protocol": "shadowsocks",
       "settings": {
-        "vnext": [
+        "servers": [
           {
-            "address": "143.246.211.240",
-            "port": 443,
-            "users": [
-              {
-                "id": "11512726-b692-406f-ab49-7b28f44a8294",
-                "encryption": "none"
-              }
-            ]
+            "address": "38.180.38.19",
+            "port": 15231,
+            "method": "aes-128-gcm",
+            "password": "5126ccc78eea4c643cbed4e6c21465e8"
           }
         ]
       },
-      "streamSettings": {
-        "network": "xhttp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "fr.gorobsub.com",
-          "publicKey": "_LNT4Kf7pPmeEBAnmJ7xsBu3y6Kih0Ew9AFVoDa3QSg",
-          "shortId": "",
-          "fingerprint": "firefox",
-          "spiderX": "/"
-        },
-        "xhttpSettings": {
-          "path": "/ae1b809ceb77",
-          "host": "143.246.211.240",
-          "mode": "auto"
-        }
-      },
-      "tag": "server 🇫🇷 43991"
+      "tag": "server 🇰🇿 45867"
     },
     {
       "protocol": "shadowsocks",
@@ -267,18 +246,24 @@
       "tag": "server 🇦🇱 43334"
     },
     {
-      "protocol": "shadowsocks",
+      "protocol": "trojan",
       "settings": {
         "servers": [
           {
-            "address": "38.180.38.19",
-            "port": 15231,
-            "method": "aes-128-gcm",
-            "password": "5126ccc78eea4c643cbed4e6c21465e8"
+            "address": "sclass-00.catcat321.com",
+            "port": 20123,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
           }
         ]
       },
-      "tag": "server 🇰🇿 45867"
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com"
+        }
+      },
+      "tag": "server 🇭🇰 43446"
     },
     {
       "protocol": "shadowsocks",
@@ -309,130 +294,25 @@
       "tag": "server 🇦🇱 40939"
     },
     {
-      "protocol": "vless",
+      "protocol": "trojan",
       "settings": {
-        "vnext": [
+        "servers": [
           {
-            "address": "api.ferrin.uk",
-            "port": 443,
-            "users": [
-              {
-                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
-                "encryption": "none"
-              }
-            ]
+            "address": "sclass-00.catcat321.com",
+            "port": 20123,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
           }
         ]
       },
       "streamSettings": {
-        "network": "xhttp",
+        "network": "tcp",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "7d1a74fd.ferrin.uk",
+          "serverName": "hk.catxstar.com",
           "fingerprint": "chrome"
-        },
-        "xhttpSettings": {
-          "path": "/es",
-          "host": "api.ferrin.uk",
-          "mode": "stream-one"
         }
       },
-      "tag": "server 🇳🇱 34144"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "api.ferrin.uk",
-            "port": 443,
-            "users": [
-              {
-                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "xhttp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "7d1a74fd.ferrin.uk",
-          "fingerprint": "chrome",
-          "alpn": [
-            "h2"
-          ]
-        },
-        "xhttpSettings": {
-          "path": "/es",
-          "host": "api.ferrin.uk",
-          "mode": "stream-one"
-        }
-      },
-      "tag": "server 🇳🇱 39949"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "api.ferrin.uk",
-            "port": 443,
-            "users": [
-              {
-                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "xhttp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "7d1a74fd.ferrin.uk"
-        },
-        "xhttpSettings": {
-          "path": "/es/?@MARAMBASHI---MARAMBASHI---MARAMBASHI---MARAMBASHI?ed=2048",
-          "host": "api.ferrin.uk",
-          "mode": "stream-one"
-        }
-      },
-      "tag": "server 🇳🇱 33929"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "api.ferrin.uk",
-            "port": 443,
-            "users": [
-              {
-                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "xhttp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "7d1a74fd.ferrin.uk",
-          "fingerprint": "firefox"
-        },
-        "xhttpSettings": {
-          "path": "/es",
-          "host": "api.ferrin.uk",
-          "mode": "stream-one"
-        }
-      },
-      "tag": "server 🇳🇱 34123"
+      "tag": "server 🇭🇰 40961"
     },
     {
       "protocol": "vless",
@@ -490,11 +370,11 @@
           "serverName": "ru-mow.probe.geomyip.com",
           "publicKey": "siD4oj2gdtLLEphV6fUXb8ueIc2WHVn7msOUhNGPf2o",
           "shortId": "8d03c10b6a874a9c",
-          "fingerprint": "chrome",
+          "fingerprint": "safari",
           "spiderX": "/"
         }
       },
-      "tag": "server 🇷🇺 43355"
+      "tag": "server 🇷🇺 44040"
     },
     {
       "protocol": "shadowsocks",
@@ -509,6 +389,47 @@
         ]
       },
       "tag": "server 🇰🇷 24729"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "sclass-c1.catcat321.com",
+            "port": 20086,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com",
+          "fingerprint": "chrome"
+        }
+      },
+      "tag": "server 🇭🇰 40962"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "sclass-c1.catcat321.com",
+            "port": 20086,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com"
+        }
+      },
+      "tag": "server 🇭🇰 42166"
     },
     {
       "protocol": "vless",
@@ -540,20 +461,6 @@
         }
       },
       "tag": "server 🇷🇺 43842"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "fn1s.sublinkplas.ir",
-            "port": 53731,
-            "method": "chacha20-ietf-poly1305",
-            "password": "tztS0JGqX91pDVi5g8QyffaUPJlPUnWm"
-          }
-        ]
-      },
-      "tag": "server 🇫🇮 43301"
     }
   ]
 }
