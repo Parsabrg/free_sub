@@ -125,18 +125,56 @@
       "tag": "server 🇭🇰 43446"
     },
     {
-      "protocol": "shadowsocks",
+      "protocol": "vless",
       "settings": {
-        "servers": [
+        "vnext": [
           {
-            "address": "130.49.189.158",
-            "port": 43558,
-            "method": "chacha20-ietf-poly1305",
-            "password": "LNc9h/4NA9Q6ZHNeYHoT5X/fR9aoE9KQR1SWhVDHBog="
+            "address": "85.202.192.131",
+            "port": 36746,
+            "users": [
+              {
+                "id": "7e8eea89-16dd-4a6d-ad9b-192e23c59ffb",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
           }
         ]
       },
-      "tag": "server 🇦🇱 43334"
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "splitter.wb.ru",
+          "publicKey": "a7pyyCqFCfWKtsr-Umm5g_Ii5XzhFznIrOtg_U3V2RI",
+          "shortId": "f1eb436223e1a36a",
+          "fingerprint": "ios",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇰🇿 41275"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "sclass-00.catcat321.com",
+            "port": 20123,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com",
+          "fingerprint": "chrome"
+        }
+      },
+      "tag": "server 🇭🇰 40961"
     },
     {
       "protocol": "vless",
@@ -168,20 +206,6 @@
         }
       },
       "tag": "server 🇳🇱 34144"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "130.49.189.158",
-            "port": 43558,
-            "method": "chacha20-ietf-poly1305",
-            "password": "yZiPrr484OdSYcivDUv+UIygwvyW+HQYytKsIgTw9tU="
-          }
-        ]
-      },
-      "tag": "server 🇦🇱 40939"
     },
     {
       "protocol": "vless",
@@ -349,20 +373,6 @@
         }
       },
       "tag": "server 🇷🇺 43842"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "fn1s.sublinkplas.ir",
-            "port": 53731,
-            "method": "chacha20-ietf-poly1305",
-            "password": "tztS0JGqX91pDVi5g8QyffaUPJlPUnWm"
-          }
-        ]
-      },
-      "tag": "server 🇫🇮 43301"
     }
   ]
 }
