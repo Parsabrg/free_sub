@@ -1,27 +1,6 @@
 {
   "outbounds": [
     {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "sclass-00.catcat321.com",
-            "port": 20123,
-            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "hk.catxstar.com",
-          "fingerprint": "chrome"
-        }
-      },
-      "tag": "server 🇭🇰 40961"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -51,6 +30,47 @@
         }
       },
       "tag": "server 🇩🇪 47247"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "sclass-00.catcat321.com",
+            "port": 20123,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com",
+          "fingerprint": "chrome"
+        }
+      },
+      "tag": "server 🇭🇰 40961"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "sclass-00.catcat321.com",
+            "port": 20123,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com"
+        }
+      },
+      "tag": "server 🇭🇰 43446"
     },
     {
       "protocol": "trojan",
@@ -126,6 +146,51 @@
         }
       },
       "tag": "server 🇳🇱 39949"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "4.168.233.69",
+            "port": 443,
+            "method": "chacha20-ietf-poly1305",
+            "password": "cdrSQWa9CwUAVdt3"
+          }
+        ]
+      },
+      "tag": "server 🇿🇦 46064"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "3.0.70.13",
+            "port": 1114,
+            "users": [
+              {
+                "id": "6ba2eac6-0ec9-44ca-a42b-a8e23aafb530",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "yahoo.com",
+          "publicKey": "WfkCF0eEuIoO0MyJsKOddU89QrTzCZ4y2dzCJbH99CQ",
+          "shortId": "79a1e14b",
+          "fingerprint": "firefox",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇸🇬 46632"
     },
     {
       "protocol": "vless",
@@ -224,62 +289,31 @@
       "settings": {
         "vnext": [
           {
-            "address": "3.0.70.13",
-            "port": 1114,
+            "address": "api.ferrin.uk",
+            "port": 443,
             "users": [
               {
-                "id": "6ba2eac6-0ec9-44ca-a42b-a8e23aafb530",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
+                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
+                "encryption": "none"
               }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "yahoo.com",
-          "publicKey": "WfkCF0eEuIoO0MyJsKOddU89QrTzCZ4y2dzCJbH99CQ",
-          "shortId": "79a1e14b",
-          "fingerprint": "firefox",
-          "spiderX": "/"
+        "network": "xhttp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "7d1a74fd.ferrin.uk",
+          "fingerprint": "chrome"
+        },
+        "xhttpSettings": {
+          "path": "/es/?@MARAMBASHI---MARAMBASHI---MARAMBASHI---MARAMBASHI?ed=2048",
+          "host": "api.ferrin.uk",
+          "mode": "stream-one"
         }
       },
-      "tag": "server 🇸🇬 46632"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "dddz-2-y.473221.xyz",
-            "port": 33161,
-            "users": [
-              {
-                "id": "65ec84f5-0dd4-4582-8b4f-592e50b22116",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "updates.cdn-apple.com",
-          "publicKey": "9WulHOrPZIMdOVwTo-9Z2puTD8GNlt6ctR3hpemHgxc",
-          "shortId": "e5086b3dc5",
-          "fingerprint": "edge",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇸🇬 45912"
+      "tag": "server 🇩🇪 39492"
     },
     {
       "protocol": "shadowsocks",
@@ -294,37 +328,6 @@
         ]
       },
       "tag": "server 🇷🇺 43370"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "dddz-1-x.473221.xyz",
-            "port": 33170,
-            "users": [
-              {
-                "id": "65ec84f5-0dd4-4582-8b4f-592e50b22116",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "web.hkha.org",
-          "publicKey": "e-3jHS8LUXVi0ZWuwUAxd7OjFznKPr3N0B-H4SuW0yk",
-          "shortId": "c732f5c7529fa4",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇸🇬 47097"
     }
   ]
 }
