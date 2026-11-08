@@ -64,6 +64,37 @@
       "tag": "server 🇭🇰 40961"
     },
     {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "yoni.dobryak.online",
+            "port": 443,
+            "users": [
+              {
+                "id": "3c821552-97f0-42d1-bb1a-adc67a637d9e",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "ebay.de",
+          "publicKey": "r0DQs82BcdfowCDyVJ05lRNuMarpjEJfl5a14La6ZW4",
+          "shortId": "",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇩🇪 47247"
+    },
+    {
       "protocol": "trojan",
       "settings": {
         "servers": [
@@ -123,41 +154,6 @@
         }
       },
       "tag": "server 🇭🇰 42166"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "n4.topingr.ir",
-            "port": 443,
-            "users": [
-              {
-                "id": "f9cb35cd-e905-4b8a-8188-44873be88c2f",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "static.zovip2.ir",
-          "fingerprint": "chrome",
-          "alpn": [
-            "http/1.1"
-          ]
-        },
-        "wsSettings": {
-          "path": "/api/v3/pulse",
-          "headers": {
-            "Host": "static.zovip2.ir"
-          }
-        }
-      },
-      "tag": "server 🇱🇻 47535"
     },
     {
       "protocol": "shadowsocks",
