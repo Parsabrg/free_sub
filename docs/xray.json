@@ -75,20 +75,6 @@
       "settings": {
         "servers": [
           {
-            "address": "194.87.233.93",
-            "port": 46190,
-            "method": "chacha20-ietf-poly1305",
-            "password": "2Ef8X21WALqK7H6N8A78j5WYtzZ999PP8rF8DaLsb5LLyDLQpf5dGVAjdA3mj1wudigKXTt5heYU9jmaBbfxXBJJAqhPHkxe"
-          }
-        ]
-      },
-      "tag": "server 🇳🇱 47262"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
             "address": "23.230.52.119",
             "port": 42878,
             "method": "chacha20-ietf-poly1305",
@@ -111,6 +97,47 @@
         ]
       },
       "tag": "server 🇺🇸 36281"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "sclass-00.catcat321.com",
+            "port": 20123,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com"
+        }
+      },
+      "tag": "server 🇭🇰 43446"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "sclass-00.catcat321.com",
+            "port": 20123,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com",
+          "fingerprint": "chrome"
+        }
+      },
+      "tag": "server 🇭🇰 40961"
     },
     {
       "protocol": "vless",
