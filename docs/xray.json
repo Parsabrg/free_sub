@@ -43,6 +43,20 @@
       "tag": "server 🇳🇱 47346"
     },
     {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "mojtun.mlbaz.ir",
+            "port": 555,
+            "method": "chacha20-ietf-poly1305",
+            "password": "60806a2e4c3945f4ba08beade8d71d4e"
+          }
+        ]
+      },
+      "tag": "server 🇮🇷 47606"
+    },
+    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -74,7 +88,7 @@
           "mode": "stream-one"
         }
       },
-      "tag": "server 🇩🇪 39949"
+      "tag": "server 🇳🇱 39949"
     },
     {
       "protocol": "vless",
@@ -105,7 +119,7 @@
           "mode": "stream-one"
         }
       },
-      "tag": "server 🇩🇪 34123"
+      "tag": "server 🇳🇱 34123"
     },
     {
       "protocol": "vless",
@@ -136,7 +150,28 @@
           "mode": "stream-one"
         }
       },
-      "tag": "server 🇩🇪 39492"
+      "tag": "server 🇳🇱 39492"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "sclass-00.catcat321.com",
+            "port": 20123,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com",
+          "fingerprint": "chrome"
+        }
+      },
+      "tag": "server 🇭🇰 40961"
     },
     {
       "protocol": "vless",
@@ -167,7 +202,82 @@
           "mode": "stream-one"
         }
       },
-      "tag": "server 🇩🇪 34144"
+      "tag": "server 🇳🇱 34144"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "sclass-00.catcat321.com",
+            "port": 20123,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com"
+        }
+      },
+      "tag": "server 🇭🇰 43446"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "sclass-c1.catcat321.com",
+            "port": 20086,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com",
+          "fingerprint": "chrome"
+        }
+      },
+      "tag": "server 🇭🇰 40962"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "sclass-c1.catcat321.com",
+            "port": 20086,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com"
+        }
+      },
+      "tag": "server 🇭🇰 42166"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "87.228.61.175",
+            "port": 1443,
+            "method": "chacha20-ietf-poly1305",
+            "password": "tAGGzgRCi6W95UwG0qerf6"
+          }
+        ]
+      },
+      "tag": "server 🇷🇺 47361"
     },
     {
       "protocol": "vless",
@@ -199,50 +309,6 @@
         }
       },
       "tag": "server 🇸🇬 46632"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "87.228.61.175",
-            "port": 1443,
-            "method": "chacha20-ietf-poly1305",
-            "password": "tAGGzgRCi6W95UwG0qerf6"
-          }
-        ]
-      },
-      "tag": "server 🇷🇺 47361"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "43.108.85.54",
-            "port": 443,
-            "users": [
-              {
-                "id": "e15db5c2-2dca-49fc-857b-aa37a7ba1c79",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "cloudflare.com",
-          "publicKey": "v5HjgwMvPEsrpqwtgEytMQ3xs-1Cdv2gOCiGMZ2vimc",
-          "shortId": "68307e",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇰🇷 42101"
     }
   ]
 }
