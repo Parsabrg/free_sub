@@ -92,6 +92,37 @@
       "settings": {
         "vnext": [
           {
+            "address": "179.255.124.23",
+            "port": 443,
+            "users": [
+              {
+                "id": "a3940ddb-ba50-5109-a0fd-4a06990f1ded",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "www.logitech.com",
+          "publicKey": "ZxdYEReKF-M_vIMpZWVMHf7ixDZmzIg-6Xt7IzstgwE",
+          "shortId": "16e300b06a6a7413",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇺🇸 47750"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
             "address": "images.mediacorphub.org",
             "port": 443,
             "users": [
@@ -144,37 +175,6 @@
         }
       },
       "tag": "server 🇳🇱 48566"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "179.255.124.23",
-            "port": 443,
-            "users": [
-              {
-                "id": "a3940ddb-ba50-5109-a0fd-4a06990f1ded",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "www.logitech.com",
-          "publicKey": "ZxdYEReKF-M_vIMpZWVMHf7ixDZmzIg-6Xt7IzstgwE",
-          "shortId": "16e300b06a6a7413",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇺🇸 47750"
     },
     {
       "protocol": "vless",
@@ -346,20 +346,6 @@
       "tag": "server 🇺🇸 36281"
     },
     {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "news.bushyjenz.cyou",
-            "port": 42878,
-            "method": "chacha20-ietf-poly1305",
-            "password": "ijoUwfdnkz7mX4pWdkSpmEixTZCt2TRm1JDr4BSaBAWkLxYGoXBHXadFKY5D5ZfoVTwqsx46jCmEUDnQUizJDYrM7B5anhnu"
-          }
-        ]
-      },
-      "tag": "server 🇺🇸 47609"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -390,6 +376,20 @@
         }
       },
       "tag": "server 🇺🇸 47297"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "news.bushyjenz.cyou",
+            "port": 42878,
+            "method": "chacha20-ietf-poly1305",
+            "password": "ijoUwfdnkz7mX4pWdkSpmEixTZCt2TRm1JDr4BSaBAWkLxYGoXBHXadFKY5D5ZfoVTwqsx46jCmEUDnQUizJDYrM7B5anhnu"
+          }
+        ]
+      },
+      "tag": "server 🇺🇸 47609"
     },
     {
       "protocol": "shadowsocks",
@@ -708,41 +708,6 @@
       "tag": "server 🇭🇰 40961"
     },
     {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "171.22.27.161",
-            "port": 2083,
-            "users": [
-              {
-                "id": "ca39b355-b488-9297-918f-9d011d075ba2",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "xhttp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "www.aparat.com",
-          "publicKey": "yeEgcP0ehhicUQZdFGJBhLuU3wsEMSRyg8l2voakZBs",
-          "shortId": "2f567c6d",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        },
-        "xhttpSettings": {
-          "path": "/",
-          "host": "171.22.27.161",
-          "mode": "auto"
-        }
-      },
-      "tag": "server 🇮🇷 47660"
-    },
-    {
       "protocol": "trojan",
       "settings": {
         "servers": [
@@ -788,6 +753,164 @@
       "settings": {
         "vnext": [
           {
+            "address": "api.ferrin.uk",
+            "port": 443,
+            "users": [
+              {
+                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "7d1a74fd.ferrin.uk",
+          "fingerprint": "chrome",
+          "alpn": [
+            "h2"
+          ]
+        },
+        "xhttpSettings": {
+          "path": "/es",
+          "host": "api.ferrin.uk",
+          "mode": "stream-one"
+        }
+      },
+      "tag": "server 🇩🇪 39949"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "api.ferrin.uk",
+            "port": 443,
+            "users": [
+              {
+                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "7d1a74fd.ferrin.uk",
+          "fingerprint": "chrome"
+        },
+        "xhttpSettings": {
+          "path": "/es/?@MARAMBASHI---MARAMBASHI---MARAMBASHI---MARAMBASHI?ed=2048",
+          "host": "api.ferrin.uk",
+          "mode": "stream-one"
+        }
+      },
+      "tag": "server 🇩🇪 39492"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "api.ferrin.uk",
+            "port": 443,
+            "users": [
+              {
+                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "7d1a74fd.ferrin.uk",
+          "fingerprint": "firefox"
+        },
+        "xhttpSettings": {
+          "path": "/es",
+          "host": "api.ferrin.uk",
+          "mode": "stream-one"
+        }
+      },
+      "tag": "server 🇩🇪 34123"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "api.ferrin.uk",
+            "port": 443,
+            "users": [
+              {
+                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "7d1a74fd.ferrin.uk",
+          "fingerprint": "chrome"
+        },
+        "xhttpSettings": {
+          "path": "/es",
+          "host": "api.ferrin.uk",
+          "mode": "stream-one"
+        }
+      },
+      "tag": "server 🇩🇪 34144"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "188.130.209.212",
+            "port": 443,
+            "users": [
+              {
+                "id": "c8c2ddff-825a-46c3-bbdd-4a101de468a7",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "thumbs.mycdn-io.ru",
+          "publicKey": "6vubZmkLVtaiFF8JyGFy7XSy2pc7ywN4P625QLKw8wc",
+          "shortId": "11979c0c9b2da371",
+          "fingerprint": "ios",
+          "spiderX": "/"
+        }
+      },
+      "tag": "server 🇷🇺 47903"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
             "address": "43.108.85.54",
             "port": 443,
             "users": [
@@ -812,37 +935,6 @@
         }
       },
       "tag": "server 🇰🇷 42101"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "no.cnd.germany.myfilecdn.com",
-            "port": 443,
-            "users": [
-              {
-                "id": "0d628b17-8ac4-49b9-a422-6b99077bfdf6",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "tradingview.com",
-          "publicKey": "rj8GjMgtHuf5iZ5sWKmV62ihJbQWB6M4E-BJZBk1Z1A",
-          "shortId": "8a2b3c4d5e6f7012",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "server 🇩🇪 20780"
     }
   ]
 }
