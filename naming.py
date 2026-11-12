@@ -9,10 +9,55 @@ import json
 from urllib.parse import quote, unquote, urlsplit, urlunsplit
 
 
-def name_for_position(flag: str, position: int) -> str:
-    if position < 1:
-        raise ValueError('Positions start at 1')
-    return f'server {flag} {position}'
+TRANSPORTS = {'ws': 'WS', 'grpc': 'GRPC', 'httpupgrade': 'HTTPUPGRADE', 'xhttp': 'XHTTP'}
+PROTOCOLS = {'shadowsocks': 'SS'}
+
+
+def describe(outbound: dict) -> str:
+    """VLESS-WS-TLS, VLESS-REALITY, TROJAN-TLS, SS: what the tested outbound actually is."""
+    stream = outbound.get('streamSettings') or {}
+    parts = [PROTOCOLS.get(outbound['protocol'], outbound['protocol'].upper())]
+    if stream.get('network') in TRANSPORTS:
+        parts.append(TRANSPORTS[stream['network']])
+    if stream.get('security') in ('tls', 'reality'):
+        parts.append(stream['security'].upper())
+    return '-'.join(parts)
+
+
+def node_name(flag: str, country_code: str | None, number: int, outbound: dict) -> str:
+    """The usual subscription form, e.g. "🇩🇪 DE-07 | VLESS-WS-TLS"; XX is an unknown country."""
+    if number < 1:
+        raise ValueError('Numbers start at 1')
+    return f'{flag} {country_code or "XX"}-{number:02d} | {describe(outbound)}'
+
+
+def assign_labels(selected, nodes, now, hold_seconds=86400):
+    """Give each listed node a small number within its country and keep it between runs.
+
+    The old names carried one counter for every config ever tested (server 🇳🇱 50186).
+    A number stays reserved for a day after its node last worked, so a node that
+    misses one health check comes back under the same name."""
+    taken = {}
+    listed = {candidate.key for candidate, _ in selected}
+    for key, row in nodes.items():
+        label = row.get('label')
+        if not label:
+            continue
+        code = (row.get('country_code') or 'XX').upper()
+        current = key in listed or now - row.get('last_success', 0) < hold_seconds
+        if label[0] != code or not current or label[1] in taken.setdefault(code, set()):
+            row['label'] = None
+        else:
+            taken[code].add(label[1])
+    for candidate, _ in selected:
+        row = nodes[candidate.key]
+        if row.get('label'):
+            continue
+        code = (row.get('country_code') or 'XX').upper()
+        used = taken.setdefault(code, set())
+        number = next(n for n in range(1, len(used) + 2) if n not in used)
+        used.add(number)
+        row['label'] = [code, number]
 
 
 def rename_share_link(url: str, name: str) -> str:

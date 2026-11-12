@@ -18,8 +18,9 @@ import sys
 import time
 from collector import collect, parse
 from geolocation import geolocate_hosts, country_flag
-from naming import name_for_position, rename_share_link
+from naming import assign_labels, node_name, rename_share_link
 from publishing import publish, validate_outputs
+from sources import Registry
 from state import atomic_write, keep_awake, observe, read_state, reliability, run_lock, save_state, sweep_stale_probe_dirs
 from network import BIND_ENV, physical_interface
 from xray_test import ProbeResult, run_probe
@@ -38,6 +39,27 @@ def balanced(groups, seed):
                 if candidate.key not in seen:
                     seen.add(candidate.key); result.append(candidate)
     return result
+
+
+def resting(row, now, hours):
+    """A config that failed its last three tests and has not worked for three days waits
+    before the next one. In one discovery run on 2026-11-12, 5,127 of 7,439 screening
+    tests ended in a timeout, and every one of those configs was tested again four hours
+    later; found feeds need that room."""
+    if not hours or not row or now-row.get('last_success',0)<3*86400:
+        return False
+    history=row.get('history',[])
+    return (len(history)>=3 and not any(e['ok'] for e in history[-3:])
+            and now-row.get('last_attempt',0)<hours*3600)
+
+
+def pick(candidates, quota, state, rng):
+    """Up to quota of a found feed's configs: never-tested ones first, then the longest untested."""
+    if len(candidates)<=quota:
+        return candidates
+    shuffled=rng.sample(candidates,len(candidates))
+    shuffled.sort(key=lambda c:state['nodes'].get(c.key,{}).get('last_attempt',0))
+    return shuffled[:quota]
 
 
 def rank_key(candidate, result, state, now):
@@ -78,9 +100,10 @@ def test_batch(nodes, xray, workers, timeout, label, probe=run_probe, quick=Fals
 def write_outputs(docs, selected, state, report, now, ttl):
     docs=Path(docs)
     rows=[]; urls=[]; outbounds=[]
+    assign_labels(selected,state['nodes'],now)
     for rank,(candidate,result) in enumerate(selected,1):
         row=state['nodes'][candidate.key]
-        name=name_for_position(country_flag(row.get('country_code')),row['number'])
+        name=node_name(country_flag(row.get('country_code')),*row['label'],candidate.outbound)
         url=rename_share_link(candidate.url,name)
         if parse(url).key != candidate.key:
             raise ValueError('PublishedConfigDiffersFromTestedConfig')
@@ -130,16 +153,33 @@ INDEX='''<!doctype html><html lang="en"><meta charset="utf-8">
 <script>fetch('status.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(s=>{const now=Date.now()/1000;const fresh=s.nodes.filter(n=>n.expires_epoch>now).length;const age=Math.max(0,Math.round((now-s.generated_epoch)/60));const e=document.querySelector('#health');e.textContent=`${fresh} unexpired of ${s.published} nodes; last attempt ${age} minutes ago; mode: ${s.mode}; state: ${s.health}.`;if(age>60||s.health!=='ok'||fresh===0)e.className='warning';}).catch(()=>document.querySelector('#health').textContent='Status unavailable; freshness unknown.');</script></html>'''
 
 
-def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolocate_hosts, now=None):
+def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolocate_hosts, now=None, registry=None):
     root=Path(root); live_clock=now is None; now=time.time() if live_clock else now
     local=root/'.local'; history_path=local/'history.json'
     state=read_state(history_path)
     mode=args.mode
     if mode=='auto':
         mode='full' if now-state.get('last_discovery',0)>=args.discovery_hours*3600 else 'health'
-    stats={}; groups={}
+    stats={}; groups={}; found=set(); rested=0
     if mode=='full':
         groups=collect_fn(stats=stats)
+        extra={}
+        if registry is not None:
+            own,extra=registry.collect(now,stats)
+            groups.update(own)
+        hours=getattr(args,'retry_failed_hours',0)
+        for name,group in groups.items():
+            awake=[c for c in group if not resting(state['nodes'].get(c.key),now,hours)]
+            rested+=len(group)-len(awake); groups[name]=awake
+        # A found feed is tested only on what the listed sources do not already carry.
+        carried={c.key for group in groups.values() for c in group}
+        rng=random.Random(str(int(now//1800)))
+        for name,group in extra.items():
+            fresh=[c for c in group if c.key not in carried
+                   and not resting(state['nodes'].get(c.key),now,hours)]
+            stats[name]['new']=len(fresh)
+            groups[name]=pick(fresh,registry.quota(name,now),state,rng)
+            found.add(name)
     # Existing entries are always tested first, including when all sources are unavailable.
     old=[]
     for key in state.get('published',[]):
@@ -191,6 +231,19 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
                 verified=c.key in passed and mode=='full')
     passed={key:pair for key,pair in passed.items()
             if now-state['nodes'][key]['last_success']<args.ttl_hours*3600}
+    if mode=='full':
+        # What each source was worth this run, so a feed can be judged by what works from here.
+        # "working" is a pass in the last test a config got this run. Verification takes only
+        # the --recheck best-ranked finalists, so a new feed's configs can pass and miss it.
+        tested={c.key for c in queue}
+        working={c.key for c in queue if second_results.get(c.key,first_results[c.key]).passed}
+        for name,group in groups.items():
+            keys={c.key for c in group}
+            stats.setdefault(name,{}).update(tested=len(keys&tested),working=len(keys&working))
+        if registry is not None:
+            registry.record({name:(stats[name]['tested'],stats[name]['working']) for name in found},now)
+        # Health runs carry no source results; the control panel shows the last discovery's.
+        atomic_write(local/'source_status.json',json.dumps({'at':now,'sources':stats},indent=2,ensure_ascii=False)+'\n')
     selected=sorted(passed.values(),key=lambda pair:rank_key(pair[0],pair[1],state,now))
     diverse=[]; endpoints=Counter()
     for c,r in selected:
@@ -228,7 +281,7 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
     report={'mode':mode,'health':health,'tested_on':'operator network; local Xray',
             'xray_version':args.xray_version,'source_status':stats,'unique_selected_for_test':len(queue),
             'first_pass':first_counts,'second_pass':second_counts,'_verified_keys':list(passed),
-            'max_tests':args.max_tests,'workers':first_workers,'verification_workers':min(args.workers,16),
+            'resting_skipped':rested,'max_tests':args.max_tests,'workers':first_workers,'verification_workers':min(args.workers,16),
             'first_pass_timeout_seconds':args.timeout,'screen_network_timeout_seconds':screen_timeout,
             'verification_timeout_seconds':args.timeout,
             'failure_reason':None if passed else 'No current verified transfer; previous nodes age normally'}
@@ -250,19 +303,26 @@ def arguments(argv=None):
     ap.add_argument('--workers',type=int,default=64)
     ap.add_argument('--screen-timeout',type=float,default=5,help='Discovery real-delay network deadline after Xray readiness; startup remains bounded by --timeout')
     ap.add_argument('--timeout',type=float,default=30,help='Full verification and health deadline per candidate including DNS and all probes')
-    ap.add_argument('--recheck',type=int,default=400)
+    # 600, not 400: 422 to 505 configs passed each screen on 2026-11-12, so 22 to 105 passes a
+    # run were never verified or listed. A config with no history ranks below a known one.
+    ap.add_argument('--recheck',type=int,default=600,help='Finalists verified per discovery run; standby nodes per health check')
     ap.add_argument('--geo-workers',type=int,default=3)
     ap.add_argument('--require-country',action='store_true',help='Optional; otherwise preserve good nodes with a globe flag')
     ap.add_argument('--discovery-hours',type=float,default=4)
     ap.add_argument('--ttl-hours',type=float,default=6)
     ap.add_argument('--publish',action='store_true')
+    ap.add_argument('--found-sources',type=int,default=40,
+                    help='Feeds found on GitHub to test per discovery run; 0 uses only the listed sources')
+    ap.add_argument('--retry-failed-hours',type=float,default=24,
+                    help='Wait before retesting a config that failed three times running; 0 retests every run')
     ap.add_argument('--allow-non-iran',action='store_true',
                     help='Test even when this machine does not reach the internet from Iran (e.g. through a VPN)')
     args=ap.parse_args(argv)
     if not (1<=args.limit<=300 and 1<=args.workers<=64 and 1<=args.geo_workers<=8 and
             args.max_tests>=0 and 5<=args.timeout<=120 and 1<=args.screen_timeout<=args.timeout and args.recheck>=args.limit and
-            1<=args.discovery_hours<=24 and 1<=args.ttl_hours<=24):
-        ap.error('Invalid budget, worker count, deadline, TTL or discovery interval')
+            1<=args.discovery_hours<=24 and 1<=args.ttl_hours<=24 and
+            0<=args.found_sources<=200 and 0<=args.retry_failed_hours<=168):
+        ap.error('Invalid budget, worker count, deadline, TTL, discovery interval or source count')
     binary=Path(args.xray).expanduser()
     resolved=binary.resolve() if binary.is_file() else shutil.which(args.xray)
     if not resolved: ap.error('Xray missing; run python download_xray.py first')
@@ -327,7 +387,8 @@ def main(argv=None):
     with run_lock(ROOT/'.local'/'run.lock'), keep_awake():
         removed=sweep_stale_probe_dirs()
         if removed: print(f'[CLEANUP] Removed {removed} stale probe folders from the temp directory.',flush=True)
-        run_cycle(args)
+        registry=Registry(ROOT/'.local'/'sources.json',discover=args.found_sources)
+        run_cycle(args,collect_fn=lambda **kw:collect(registry.builtin(),**kw),registry=registry)
         if args.publish:
             publish(ROOT,args.xray,ROOT/'docs')
 
@@ -336,6 +397,10 @@ if __name__=='__main__':
     try:
         main()
     except Exception as exc:
+        if str(exc)=='Another subscription run is active':
+            # Safe to say, and the control panel needs to tell it from a failure.
+            print('[BUSY] Another run is already active (the scheduled task, or a second window).',file=sys.stderr)
+            sys.exit(2)
         # Redact source URLs, credentials, subprocess stderr and Git remote tokens.
         print(f'[ERROR] {type(exc).__name__}: run failed; inspect .local/last_run.json and logs.',file=sys.stderr)
         sys.exit(2)

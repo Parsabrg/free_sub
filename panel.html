@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Sub control panel</title>
+<style>
+:root {
+  --bg: #f4f5f7; --panel: #ffffff; --ink: #18202b; --muted: #5f6b7a; --line: #dfe3ea;
+  --accent: #0b6bcb; --accent-ink: #ffffff; --good: #18794e; --warn: #a15c00; --bad: #c0362c;
+  --chip: #eef1f5; --log-bg: #10151d; --log-ink: #cfd9e6;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f141b; --panel: #171e28; --ink: #e3eaf3; --muted: #93a0b2; --line: #2a3442;
+    --accent: #5aa9f5; --accent-ink: #08121d; --good: #4cc38a; --warn: #f0b35a; --bad: #ff7b6e;
+    --chip: #212b38; --log-bg: #0a0e14; --log-ink: #cfd9e6;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, "Segoe UI", sans-serif; }
+main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 16px; }
+main > * { min-width: 0; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: 15px; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.pill { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; background: var(--chip); font-weight: 600; }
+.pill::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+.pill.running::before { background: var(--good); animation: pulse 1.2s ease-in-out infinite; }
+.pill.waiting::before { background: var(--warn); }
+@keyframes pulse { 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .pill.running::before { animation: none; } }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+button { font: inherit; font-weight: 600; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 8px 18px; cursor: pointer; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+button.danger { border-color: var(--bad); color: var(--bad); }
+button:disabled { opacity: 0.45; cursor: default; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.controls label { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0; }
+select { min-width: 0; max-width: 100%; flex: 0 1 auto; }
+select, input[type=text], input[type=url] { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+label.check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.progress { margin-top: 14px; display: none; }
+.progress.on { display: block; }
+.bar { height: 8px; border-radius: 4px; background: var(--chip); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.4s; }
+.progress p { margin: 6px 0 0; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.tile b { display: block; font-size: 26px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.tile span { color: var(--muted); }
+.good { color: var(--good); } .warn { color: var(--warn); } .bad { color: var(--bad); }
+form.add { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+form.add input[type=url] { flex: 3 1 260px; min-width: 0; }
+form.add input[type=text] { flex: 1 1 140px; min-width: 0; }
+.note { color: var(--muted); margin: 0 0 14px; font-size: 14px; }
+.message { min-height: 1.5em; margin: 0 0 8px; font-size: 14px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 7px 10px; border-top: 1px solid var(--line); vertical-align: middle; }
+th { color: var(--muted); font-weight: 600; border-top: 0; white-space: nowrap; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.group td { background: var(--chip); font-weight: 600; border-top: 0; }
+tr.off td:not(:first-child) { opacity: 0.5; }
+td.where { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+td button { padding: 2px 10px; font-weight: 500; font-size: 13px; }
+pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius: 8px; padding: 12px; height: 320px; overflow: auto; font: 12.5px/1.5 ui-monospace, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+</style>
+<main>
+  <header>
+    <h1>Free Sub control panel</h1>
+    <span id="pill" class="pill">Connecting…</span>
+  </header>
+
+  <section>
+    <h2>Run</h2>
+    <div class="controls">
+      <button id="start" class="primary">Start</button>
+      <button id="stop" class="danger" disabled>Stop</button>
+      <label>Mode
+        <select id="mode">
+          <option value="auto">Automatic: health check, new feeds every 4 hours</option>
+          <option value="full">Full scan now: fetch every source</option>
+          <option value="health">Health check only</option>
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" id="repeat"> Keep running every 30 minutes</label>
+      <label class="check"><input type="checkbox" id="publish"> Publish the list to GitHub</label>
+    </div>
+    <div id="progress" class="progress"><div class="bar"><i id="fill"></i></div><p id="progress-text"></p></div>
+  </section>
+
+  <div class="tiles">
+    <div class="tile"><b id="t-published">–</b><span>working nodes in the list</span></div>
+    <div class="tile"><b id="t-health">–</b><span>state of the last run</span></div>
+    <div class="tile"><b id="t-age">–</b><span>since the list was updated</span></div>
+    <div class="tile"><b id="t-protocols" style="font-size:16px;line-height:2">–</b><span>protocols</span></div>
+  </div>
+
+  <section>
+    <h2>Sources</h2>
+    <form class="add" id="add">
+      <input type="url" id="add-url" placeholder="https://… subscription address" required aria-label="Subscription address">
+      <input type="text" id="add-name" placeholder="Name (optional)" maxlength="40" aria-label="Name">
+      <button class="primary">Add subscription</button>
+    </form>
+    <p id="message" class="message" role="status"></p>
+    <p class="note">Every source is only a list of candidates: each config is tested through Xray before it is listed.
+      Working configs from every source go into your public subscription, so do not add a private or paid one.
+      Results are from the last full scan<span id="scan-age"></span>.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>On</th><th>Name</th><th>Address</th><th class="num">Configs</th><th class="num">Tested</th><th class="num">Working</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Log</h2>
+    <pre id="log" tabindex="0" aria-label="Run log"></pre>
+  </section>
+</main>
+<script>
+const TOKEN = '__TOKEN__';
+const $ = id => document.getElementById(id);
+let first = true, busy = false;
+
+async function call(path, body) {
+  const options = body === undefined ? {headers: {'X-Token': TOKEN}} :
+    {method: 'POST', headers: {'X-Token': TOKEN, 'Content-Type': 'application/json'}, body: JSON.stringify(body)};
+  const response = await fetch(path, options);
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+function ago(seconds) {
+  if (seconds < 90) return 'just now';
+  if (seconds < 5400) return Math.round(seconds / 60) + ' min';
+  if (seconds < 172800) return Math.round(seconds / 3600) + ' h';
+  return Math.round(seconds / 86400) + ' days';
+}
+const clock = epoch => new Date(epoch * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+const count = value => value == null ? '–' : Number(value).toLocaleString();
+
+function cell(row, text, cls) {
+  const td = row.insertCell();
+  if (cls) td.className = cls;
+  td.textContent = text;
+  return td;
+}
+
+function renderSources(state) {
+  const body = $('rows');
+  body.textContent = '';
+  const groups = [['manual', 'Yours'], ['builtin', 'Built in'], ['found', 'Found on GitHub']];
+  for (const [kind, title] of groups) {
+    const rows = state.sources.filter(s => s.kind === kind);
+    const head = body.insertRow();
+    head.className = 'group';
+    const label = head.insertCell();
+    label.colSpan = 7;
+    let text = `${title} (${rows.length})`;
+    if (kind === 'manual' && !rows.length) text += ' · add a subscription address above';
+    if (kind === 'found') {
+      text += state.discovery.searched ? ` · ${state.discovery.repositories} repositories seen, searched ${ago(state.now - state.discovery.searched)} ago`
+                                       : ' · searched during the first full scan';
+    }
+    label.textContent = text;
+    for (const source of rows) {
+      const tr = body.insertRow();
+      if (!source.enabled) tr.className = 'off';
+      const toggle = document.createElement('input');
+      toggle.type = 'checkbox'; toggle.checked = source.enabled;
+      toggle.setAttribute('aria-label', 'Use ' + source.name);
+      toggle.onchange = () => act('/api/source/enable', {name: source.name, enabled: toggle.checked});
+      tr.insertCell().append(toggle);
+      cell(tr, source.name);
+      cell(tr, source.where, 'where').title = source.where;
+      const found = kind === 'found';
+      cell(tr, count(found ? source.size : source.supported), 'num');
+      cell(tr, count(found ? source.all_tested : source.tested), 'num');
+      const working = cell(tr, count(found ? source.all_working : source.working), 'num');
+      if ((found ? source.all_working : source.working) > 0) working.classList.add('good');
+      const last = tr.insertCell();
+      if (kind === 'manual') {
+        const remove = document.createElement('button');
+        remove.textContent = 'Remove';
+        remove.onclick = () => act('/api/source/remove', {name: source.name});
+        last.append(remove);
+      } else if (source.error) {
+        last.textContent = source.error === 'NoSupportedLinks' ? 'no usable links' : 'could not fetch';
+        last.className = 'warn';
+      } else if (found && source.next > state.now) {
+        last.textContent = 'resting until ' + new Date(source.next * 1000).toLocaleString([], {weekday: 'short', hour: '2-digit', minute: '2-digit'});
+        last.className = 'where';
+      } else if (found && !source.runs) {
+        last.textContent = 'not tested yet'; last.className = 'where';
+      }
+    }
+  }
+  $('scan-age').textContent = state.discovery.at ? ` (${ago(state.now - state.discovery.at)} ago)` : ' (none yet)';
+}
+
+function render(state) {
+  const run = state.run, pill = $('pill');
+  pill.className = 'pill ' + run.state;
+  pill.textContent = run.state === 'running' ? `Running: ${run.mode} run since ${clock(run.started)}`
+                   : run.state === 'waiting' ? `Waiting: next run at ${clock(run.next_run)}` : 'Idle';
+  $('start').disabled = busy || run.state !== 'idle';
+  $('stop').disabled = busy || run.state === 'idle';
+  for (const id of ['mode', 'repeat', 'publish']) $(id).disabled = run.state !== 'idle';
+  if (first) {
+    $('mode').value = state.settings.mode;
+    $('repeat').checked = state.settings.repeat;
+    $('publish').checked = state.settings.publish;
+    first = false;
+  }
+  let step = null;
+  for (let i = state.log.length - 1; i >= 0 && !step; i--) step = state.log[i].match(/\[(CHECK|VERIFY)[^\]]*\] (\d+)\/(\d+); passed=(\d+)/);
+  const showing = run.state === 'running' && step;
+  $('progress').className = 'progress' + (showing ? ' on' : '');
+  if (showing) {
+    $('fill').style.width = (100 * step[2] / Math.max(1, step[3])) + '%';
+    $('progress-text').textContent = `${step[1] === 'CHECK' ? 'Testing' : 'Verifying'} ${count(step[2])} of ${count(step[3])} · ${count(step[4])} passed`;
+  }
+  const last = state.last;
+  $('t-published').textContent = count(last.published);
+  const health = $('t-health');
+  health.textContent = last.health ? last.health.replaceAll('_', ' ') : '–';
+  health.className = last.health === 'ok' ? 'good' : last.health ? 'warn' : '';
+  $('t-age').textContent = last.generated ? ago(state.now - last.generated) : '–';
+  const protocols = Object.entries(last.protocols).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(' · ');
+  $('t-protocols').textContent = protocols || '–';
+  renderSources(state);
+  const log = $('log'), pinned = log.scrollTop + log.clientHeight >= log.scrollHeight - 30;
+  const text = state.log.join('\n') || 'Nothing has run from this panel yet. Press Start.';
+  if (log.textContent !== text) { log.textContent = text; if (pinned) log.scrollTop = log.scrollHeight; }
+}
+
+async function act(path, body) {
+  busy = true;
+  const message = $('message');
+  try {
+    render(await call(path, body));
+    message.textContent = ''; message.className = 'message';
+    return true;
+  } catch (error) {
+    message.textContent = error.message; message.className = 'message bad';
+    return false;
+  } finally { busy = false; }
+}
+
+$('start').onclick = () => act('/api/start', {mode: $('mode').value, repeat: $('repeat').checked, publish: $('publish').checked});
+$('stop').onclick = () => act('/api/stop', {});
+$('add').onsubmit = async event => {
+  event.preventDefault();
+  if (await act('/api/source/add', {url: $('add-url').value, name: $('add-name').value})) event.target.reset();
+};
+
+async function poll() {
+  try { if (!busy) render(await call('/api/state')); }
+  catch (error) { const pill = $('pill'); pill.className = 'pill'; pill.textContent = 'Panel is not running'; }
+  setTimeout(poll, 1500);
+}
+poll();
+</script>
+</html>

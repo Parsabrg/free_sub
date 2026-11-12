@@ -20,6 +20,26 @@ computer, runs, releases its sleep inhibitor, and normal idle sleep resumes.
 Shutdown is not supported. Firmware, Modern Standby, power settings, lid behavior,
 Wi-Fi recovery and corporate policies can prevent wake; verify on your actual PC.
 
+## Control panel
+
+Double-click `panel_windows.bat` (or run `python app.py`) for a page at
+`http://127.0.0.1:8765/` with Start and Stop, the live log, and the source list.
+
+- **Start** runs the same `main.py` as the scheduled task: once, or every 30 minutes
+  while the panel stays open. **Stop** ends the run and every Xray process under it;
+  the published list and the history stay as the last completed run left them.
+- **Publish the list to GitHub** can be unticked to test without pushing.
+- **Add subscription** takes any `https://` subscription address. It is tested in full
+  on every discovery run, like a built-in feed. Working configs from every source go
+  into the public subscription: do not add a private or paid one.
+- Every source, built-in or found, has a switch; the table shows how many configs each
+  one carried, how many were tested and how many worked in the last full scan.
+
+The page is served to this computer only, and needs the token it was loaded with.
+The panel and the scheduled task never run at once: the second to start reports
+`[BUSY]` and exits. To use only the panel, remove the task (see the end of this file).
+Without the task nothing runs while the panel is closed.
+
 ## One-time Windows setup
 
 Requirements: Windows 10/11 x64, Python 3.11+ (python.org installation recommended),
@@ -125,19 +145,41 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
 
 ## What actually gets tested
 
-- Feeds: Barry, Epodonios (plus its `Sub21`-`Sub26` and VLESS lists, which its combined
-  file omits), Shadowmere, 0xRadikal, Pawdroid, Mahdibland
+- Feeds: Barry, Shadowmere, 0xRadikal, Pawdroid, Mahdibland
   Public (`Eternity.txt`, not the account/airport list), Patterniha, Whitedns,
   Kahrobas, ALIILAPRO, Ermaozi, MatinGhanbari, and (since 2026-10-26) the
   0xRadikal's full list, MohammadBahemmat, hamedcode (port 443) and morpheusadam
   (`iran`): the four of sixteen screened collectors with any config that worked from
   Iran. These are untrusted
-  candidate sources, not endorsed providers. (EbraSha's repository was deleted
-  and is no longer used.)
-- Sources have an 8 MiB fetch limit. No hidden per-source 1,800-node cap.
+  candidate sources, not endorsed providers. (EbraSha's and Epodonios' repositories
+  were deleted, 404 on 2026-10-26 and 2026-11-12, and are no longer used.)
+- The feed list is no longer fixed. Once a day a discovery run asks GitHub's
+  repository search for collectors pushed in the last two days, reads each new one's
+  README for raw files in that same repository, and keeps the up to three files that
+  together carry the most supported configs. From this development environment on
+  2026-11-12 the search returned 171 repositories; the 25 most starred gave 13 usable
+  feeds. **Whether any of their configs works from Iran is not known until this PC
+  tests them.** `--found-sources 0` turns this off.
+- A found feed is tested only on configs no listed source carries, 150 per run
+  (never-tested first) until one of them passes a test. Then up to 1,500
+  per run for the next seven days. A feed with nothing working waits 8 hours, then
+  16, 32 and so on up to a week. Found feeds are named `gh:owner/repository` in
+  `status.json`, with `tested` and `working` counts for every source.
+- Verification takes the 600 best-ranked configs that passed the screen (`--recheck`,
+  400 before). 422 to 505 passed each screen on 2026-11-12, so with 400 the 22 to
+  105 lowest-ranked passes each run were never verified or listed; a config with no
+  history ranks below one that has worked before.
+- A config that failed its last three tests and has not worked for three days is
+  retested once a day rather than every discovery run (`--retry-failed-hours 24`;
+  `0` retests every time). In one discovery run on 2026-11-12, 5,127 of 7,439
+  screening tests ended in a timeout, and each of those configs was tested again four
+  hours later. Published nodes are always tested.
+- Sources have an 8 MiB fetch limit, are fetched eight at a time, and get one retry.
+  No hidden per-source 1,800-node cap on listed sources.
 - Source candidates are balanced and rotated between discovery runs. Previously
   published nodes are checked first. Full discovery tests every supported unique
-  configuration by default (`--max-tests 0`) within the documented fetch limits.
+  configuration of the listed sources that is not resting (`--max-tests 0`), within
+  the documented fetch limits.
   Set a positive `--max-tests` only when deliberately choosing a sample.
 - Private, loopback, link-local and mixed public/private DNS endpoint answers are
   rejected. DNS resolution runs with a deadline. The Xray endpoint is pinned to
@@ -167,8 +209,11 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
 - History keeps at most 20,000 nodes from 30 days and uses recent weighted successes/failures and penalizes one-off results.
   Up to four credentials per actual connection IP:port limit clones. Historical
   scores improve selection but cannot guarantee uptime or available capacity.
-- Names are `server 🇩🇪 123` with persistent, globally allocated numbers. Numbers
-  are stable identities, not current rank; use `status.json` for rank.
+- Names are `🇩🇪 DE-07 | VLESS-WS-TLS`: flag, country code, a number within that
+  country, then the tested protocol, transport and security (`XX` and a globe when the
+  country is unknown). A node keeps its number while it is listed and for a day after
+  its last success; then the number is free for another node. Numbers
+  are identities, not current rank; use `status.json` for rank.
 - Flags refer to the exact pinned connection IP of the last passing test, possibly
   a CDN ingress, not necessarily exit country. GeoIP is cached for 14 days, capped
   at 300 new lookups/run and 900/day. GeoIP failure keeps a globe flag by default;
@@ -176,8 +221,9 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
 
 Unsupported connection parameters fail closed. XHTTP `extra`, complex headers,
 external Shadowsocks plugins, unsupported transports/ciphers, insecure TLS,
-and unknown URL extensions are rejected rather than tested as a simplified
-configuration. This deliberately sacrifices some coverage for accurate testing.
+and unknown URL extensions that carry a value are rejected rather than tested as a
+simplified configuration. An extension with an empty value sets nothing and is
+ignored, as is a `host` or `path` on RAW transport without an HTTP header. This deliberately sacrifices some coverage for accurate testing.
 Original accepted share-link connection parameters are preserved on output, and
 renamed links are parsed again to verify the effective configuration fingerprint.
 
@@ -245,7 +291,6 @@ maintainers endorse this project or guarantee the proxy operators.
 | Resource | Published repository license / terms |
 |---|---|
 | [Barry](https://github.com/barry-far/V2ray-Config) | MIT |
-| [Epodonios](https://github.com/Epodonios/v2ray-configs) | GPL-3.0 |
 | [Shadowmere](https://shadowmere.xyz/) | Check the provider's terms |
 | [0xRadikal](https://github.com/0xRadikal/Free-v2ray-Configs) | MIT |
 | [Pawdroid](https://github.com/Pawdroid/Free-servers) | No license detected by GitHub; check upstream terms |
@@ -260,6 +305,10 @@ maintainers endorse this project or guarantee the proxy operators.
 | [MohammadBahemmat](https://github.com/MohammadBahemmat/V2ray-Collector), [morpheusadam](https://github.com/morpheusadam/v2ray-config) | No license detected by GitHub; check upstream terms |
 | [XTLS / Xray-core](https://github.com/XTLS/Xray-core) | MPL-2.0; official binary downloaded locally, not committed |
 
+Feeds found automatically are not in this table and their licenses have not been
+checked by anyone: `status.json` names each one (`gh:owner/repository`) on every
+discovery run. Switch one off in the control panel, or all with `--found-sources 0`.
+
 License metadata was checked on 2026-10-15 (ALIILAPRO, Ermaozi and MatinGhanbari on 2026-10-26) and may change. Consult each upstream
 license and retain required copyright/license notices when redistributing covered
 material. A repository's software license does not by itself establish permission
@@ -270,6 +319,8 @@ license. Do not add private or paid subscription credentials.
 ## Local data, troubleshooting and removal
 
 `.local/history.json` includes public feed credentials and stays off Git.
+`.local/sources.json` holds your added subscriptions, switched-off sources and the
+record of found feeds; it stays off Git too. Delete it to start discovery afresh.
 `.local/geo_cache*` and `.local/logs/` stay local. `tools/` stays off Git.
 Do not upload these directories or add private subscription sources.
 
