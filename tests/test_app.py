@@ -69,6 +69,20 @@ class PanelTests(unittest.TestCase):
         self.assertEqual(state['settings'], {'mode': 'full', 'publish': False, 'repeat': False})
         self.assertEqual(self.request('POST', '/api/start', {'mode': 'everything'})[0], 400)
 
+    def test_a_run_that_ends_before_it_is_contained_still_counts(self):
+        # Windows refuses to put an already finished process in a job. On CI a run that
+        # printed one line and exited was then reported as "could not start" (exit -1).
+        from unittest.mock import patch
+        def too_late(proc):
+            proc.wait()
+            raise OSError('Cannot contain probe process tree')
+        with patch('app.ProcessTree', too_late):
+            self.request('POST', '/api/start', {'mode': 'health', 'publish': False, 'repeat': False})
+            self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
+        state = self.state()
+        self.assertEqual(state['run']['exit'], 0)
+        self.assertTrue(any('[CHECK] 25/100' in line for line in state['log']))
+
     def test_stop_kills_a_run_and_ends_the_repeat(self):
         self.script = 'import time; print("started", flush=True); time.sleep(60)'
         self.request('POST', '/api/start', {'mode': 'auto', 'publish': True, 'repeat': True})

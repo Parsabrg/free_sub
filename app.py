@@ -92,10 +92,15 @@ class Runner:
                                     text=True, encoding='utf-8', errors='replace',
                                     start_new_session=os.name != 'nt',
                                     creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
-            tree = ProcessTree(proc)
         except OSError as exc:
             self.say(f'Could not start the run ({type(exc).__name__}).')
             return -1
+        try:
+            tree = ProcessTree(proc)
+        except OSError:
+            # Windows cannot contain a process that has already ended, and one that ended
+            # needs no containing. ProcessTree has killed one that was still running.
+            tree = None
         with self.lock:
             self.tree = tree
             stop_now = self.stopping
@@ -109,7 +114,8 @@ class Runner:
             with self.lock:
                 self.tree = None
             try:
-                tree.close()
+                if tree is not None:
+                    tree.close()
             except (OSError, subprocess.SubprocessError):
                 pass
             proc.stdout.close()
