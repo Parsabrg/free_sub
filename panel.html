@@ -84,6 +84,7 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
     <div class="controls">
       <button id="start" class="primary">Start</button>
       <button id="stop" class="danger" disabled>Stop</button>
+      <button id="update" title="Get the newest version of this program from GitHub">Update program</button>
       <label>Mode
         <select id="mode">
           <option value="auto">Automatic: health check, new feeds every 4 hours</option>
@@ -246,6 +247,7 @@ function render(state) {
                    : run.state === 'waiting' ? `Waiting: next run at ${clock(run.next_run)}` : 'Idle';
   $('start').disabled = busy || run.state !== 'idle';
   $('stop').disabled = busy || run.state === 'idle';
+  $('update').disabled = busy || run.state !== 'idle';
   for (const id of ['mode', 'repeat', 'publish']) $(id).disabled = run.state !== 'idle';
   if (first) {
     $('mode').value = state.settings.mode;
@@ -292,6 +294,7 @@ async function act(path, body) {
 
 $('start').onclick = () => act('/api/start', {mode: $('mode').value, repeat: $('repeat').checked, publish: $('publish').checked});
 $('stop').onclick = () => act('/api/stop', {});
+$('update').onclick = () => act('/api/update', {});
 $('add').onsubmit = async event => {
   event.preventDefault();
   if (await act('/api/source/add', {url: $('add-url').value, name: $('add-name').value})) event.target.reset();

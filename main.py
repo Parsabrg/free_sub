@@ -145,14 +145,62 @@ def write_outputs(docs, selected, state, report, now, ttl):
     return report
 
 
-INDEX='''<!doctype html><html lang="en"><meta charset="utf-8">
-<meta name="viewport" content="width=device-width"><title>Free Xray subscription</title>
-<style>body{font:16px system-ui;max-width:760px;margin:4rem auto;padding:0 1rem;line-height:1.6;background:#10151d;color:#dce6f4}a{color:#86c9ff}code{overflow-wrap:anywhere}.warning{color:#ffce83}</style>
-<h1>Free Xray subscription</h1><p id="health">Loading test status…</p>
-<p><a href="sub.txt">Plain subscription</a> · <a href="sub.b64">Base64 subscription</a> · <a href="xray.json">Xray feed for v2rayN</a> · <a href="status.json">Test report</a></p>
-<p>Real HTTPS transfers through Xray, tested on the operator’s network. Country flags describe the connection endpoint, which can be a CDN ingress. Public proxies are untrusted.</p>
-<p>Refresh the subscription hourly. Clients should ignore nodes after their individual expiry in status.json.</p>
-<script>fetch('status.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(s=>{const now=Date.now()/1000;const fresh=s.nodes.filter(n=>n.expires_epoch>now).length;const age=Math.max(0,Math.round((now-s.generated_epoch)/60));const e=document.querySelector('#health');e.textContent=`${fresh} unexpired of ${s.published} nodes; last attempt ${age} minutes ago; mode: ${s.mode}; state: ${s.health}.`;if(age>60||s.health!=='ok'||fresh===0)e.className='warning';}).catch(()=>document.querySelector('#health').textContent='Status unavailable; freshness unknown.');</script></html>'''
+INDEX='''<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Sub: tested Xray subscription</title>
+<style>
+:root{--bg:#f4f5f7;--panel:#fff;--ink:#18202b;--muted:#5f6b7a;--line:#dfe3ea;--accent:#0b6bcb;--good:#18794e;--warn:#a15c00;--chip:#eef1f5}
+@media (prefers-color-scheme:dark){:root{--bg:#0f141b;--panel:#171e28;--ink:#e3eaf3;--muted:#93a0b2;--line:#2a3442;--accent:#5aa9f5;--good:#4cc38a;--warn:#f0b35a;--chip:#212b38}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:40px 16px 56px;display:grid;gap:16px}
+main>*{min-width:0}
+h1{font-size:26px;margin:0;letter-spacing:-.01em}
+h2{font-size:13px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+p{margin:0}
+section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+#health{font-weight:600}
+.good{color:var(--good)}.warn{color:var(--warn)}
+.links{display:grid;gap:10px}
+.links div{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
+.links span{flex:0 0 150px;color:var(--muted)}
+.links a{flex:1 1 220px;min-width:0;color:var(--accent);overflow-wrap:anywhere}
+button{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);padding:3px 12px;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{background:var(--chip);border-radius:999px;padding:2px 10px;font-size:14px;font-variant-numeric:tabular-nums}
+.notes{color:var(--muted);font-size:14px;display:grid;gap:6px}
+</style>
+<main>
+<header><h1>Free Sub</h1><p>Public proxy configurations, each tested with real HTTPS traffic through the Xray core before it is listed.</p></header>
+<section><h2>Status</h2><p id="health">Loading test status…</p></section>
+<section><h2>Subscription</h2><div class="links" id="links"></div></section>
+<section id="summary" hidden><h2>In the list</h2><div class="chips" id="protocols"></div><div class="chips" id="countries" style="margin-top:8px"></div></section>
+<section class="notes"><p>Use the Xray core in your client and refresh the subscription about once an hour.</p>
+<p>Tests run on the operator’s network; a node can behave differently on yours. A flag shows where the connection endpoint is, which may be a CDN rather than the exit country.</p>
+<p>These are public proxies run by unknown operators. Do not send anything through them that you would not send over an untrusted network.</p></section>
+</main>
+<script>
+const base=location.href.replace(/[^/]*$/,'');
+for(const [label,file] of [['v2rayN (desktop)','xray.json'],['v2rayNG (Android)','sub.b64'],['Plain list','sub.txt'],['Test report','status.json']]){
+  const row=document.createElement('div'),name=document.createElement('span'),link=document.createElement('a'),copy=document.createElement('button');
+  name.textContent=label;link.href=file;link.textContent=base+file;copy.textContent='Copy';
+  copy.onclick=async()=>{try{await navigator.clipboard.writeText(base+file);copy.textContent='Copied'}catch(e){copy.textContent='Select and copy'}setTimeout(()=>copy.textContent='Copy',1500)};
+  row.append(name,link,copy);document.querySelector('#links').append(row);
+}
+function chips(id,counts){const box=document.querySelector(id);for(const [key,n] of Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,12)){const chip=document.createElement('span');chip.textContent=key+' '+n;box.append(chip)}}
+fetch('status.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(s=>{
+  const now=Date.now()/1000,fresh=s.nodes.filter(n=>n.expires_epoch>now),age=Math.max(0,Math.round((now-s.generated_epoch)/60)),e=document.querySelector('#health');
+  e.textContent=`${fresh.length} unexpired of ${s.published} nodes; last attempt ${age} minutes ago; mode: ${s.mode}; state: ${s.health}.`;
+  e.className=(age>60||s.health!=='ok'||fresh.length===0)?'warn':'good';
+  const protocols={},countries={};
+  for(const n of fresh){protocols[n.protocol]=(protocols[n.protocol]||0)+1;const c=n.country_code||'unknown';countries[c]=(countries[c]||0)+1}
+  if(fresh.length){chips('#protocols',protocols);chips('#countries',countries);document.querySelector('#summary').hidden=false}
+}).catch(()=>{const e=document.querySelector('#health');e.textContent='Status unavailable; freshness unknown.';e.className='warn'});
+</script>
+</html>
+'''
 
 
 def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolocate_hosts, now=None, registry=None, relay=False):
@@ -408,6 +456,11 @@ if __name__=='__main__':
     try:
         main()
     except Exception as exc:
+        if str(exc)=='Remote diverged; update the clone before publishing':
+            print('[UPDATE] GitHub has commits this copy lacks (usually a newer version of the program), so '
+                  'nothing was published. Press "Update program" in the panel, or run: '
+                  'git pull --no-rebase --no-edit',file=sys.stderr)
+            sys.exit(2)
         if str(exc)=='Another subscription run is active':
             # Safe to say, and the control panel needs to tell it from a failure.
             print('[BUSY] Another run is already active (the scheduled task, or a second window).',file=sys.stderr)

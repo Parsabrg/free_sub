@@ -19,6 +19,7 @@ import time
 import webbrowser
 import collector
 import sources
+from publishing import noninteractive_env
 from process_guard import ProcessTree
 from state import atomic_write, keep_awake
 
@@ -207,6 +208,30 @@ class Panel:
         self.runner.start(chosen['mode'], chosen['publish'], chosen['repeat'])
         atomic_write(self.local / 'panel.json', json.dumps(chosen) + '\n')
 
+    def update(self):
+        """Bring this copy up to date with GitHub. Never during a run: its files are in use."""
+        if self.runner.status['state'] != 'idle':
+            raise ValueError('Stop the run before updating')
+        say = self.runner.say
+        say('Checking GitHub for a newer version.')
+        try:
+            result = subprocess.run(['git', 'pull', '--no-rebase', '--no-edit'], cwd=self.root, capture_output=True,
+                                    text=True, encoding='utf-8', errors='replace', env=noninteractive_env(),
+                                    timeout=180, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+        except (OSError, subprocess.SubprocessError) as exc:
+            say(f'Update could not run ({type(exc).__name__}).')
+            return
+        # Only stdout is shown: Git's stderr names the remote, which can hold a credential.
+        for line in result.stdout.splitlines()[-12:]:
+            say('  ' + line)
+        if result.returncode:
+            say(f'Update failed (exit code {result.returncode}). Run "git pull --no-rebase --no-edit" '
+                'in this folder to see why.')
+        elif 'Already up to date' in result.stdout:
+            say('This is already the newest version.')
+        else:
+            say('Updated. Close this window and open the panel again to load the new version.')
+
     def change(self, action, body):
         with self.edit:
             registry = sources.load(self.registry_path)
@@ -299,6 +324,8 @@ def handler_for(panel, page):
                     panel.start(body)
                 elif self.path == '/api/stop':
                     panel.runner.stop()
+                elif self.path == '/api/update':
+                    panel.update()
                 elif self.path in ('/api/source/add', '/api/source/remove', '/api/source/enable'):
                     panel.change(self.path.rsplit('/', 1)[1], body)
                 else:
