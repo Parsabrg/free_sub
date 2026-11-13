@@ -15,7 +15,7 @@
 
 | Operation | Default |
 |---|---|
-| A run (panel repeat, or the scheduled task) | Every 30 minutes |
+| A run (panel repeat, or the scheduled task) | Every 30 minutes; the panel's "Run every" field changes it |
 | Health check of the published and standby nodes | Every run |
 | Discovery: fetch all sources, screen and verify | Every 4 hours in `--mode auto` |
 | Search GitHub for new feeds | Once a day, during a discovery |
@@ -156,7 +156,7 @@ never how a candidate is tested.
   variation between the two transfers.
 - **Diversity.** At most four credentials per connection IP and port, so one server
   cannot fill the list with clones.
-- **Limit.** Up to 300 nodes (`--limit`).
+- **Limit.** Every working node is listed, unless a maximum is set (`--limit`, or the panel's "Max nodes in the list"); then the most reliable ones up to that number. A larger list is rechecked on every run, so each run takes longer.
 
 A historical score improves selection. It cannot guarantee uptime or capacity.
 
@@ -206,7 +206,7 @@ hardware or publishes results; that stays on the operator's PC.
   the next completed run (`expired_or_empty`).
 - A failure before the outputs are written leaves the previous deployment in place,
   and its timestamps keep aging.
-- No success is ever invented to fill the 300 places.
+- No success is ever invented to fill the list.
 
 ## What is not certified
 

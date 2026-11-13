@@ -72,7 +72,7 @@ class PanelTests(unittest.TestCase):
         state = self.state()
         self.assertEqual(state['run']['exit'], 0)
         self.assertTrue(any('[CHECK] 25/100' in line for line in state['log']))
-        self.assertEqual(state['settings'], {'mode': 'full', 'publish': False, 'repeat': False})
+        self.assertEqual(state['settings'], {'mode': 'full', 'publish': False, 'repeat': False, 'limit': 0, 'interval': 30})
         self.assertEqual(self.request('POST', '/api/start', {'mode': 'everything'})[0], 400)
 
     def test_a_run_that_ends_before_it_is_contained_still_counts(self):
@@ -108,6 +108,48 @@ class PanelTests(unittest.TestCase):
         connection.request('GET', '/api/state', headers={'Host': f'127.0.0.1:{self.port}', 'X-Token': 'caf\u00e9'})
         self.assertEqual(connection.getresponse().status, 403)
         connection.close()
+
+    def test_the_maximum_and_the_interval_are_checked_remembered_and_passed_on(self):
+        for bad in ({'limit': -1}, {'limit': 1001}, {'limit': 2.5}, {'limit': True}, {'limit': 'ten'},
+                    {'interval': 4}, {'interval': 1441}, {'interval': None}, {'interval': float('nan')}):
+            status, body = self.request('POST', '/api/start', dict({'mode': 'health'}, **bad))
+            self.assertEqual(status, 400, bad)
+            self.assertIn('must be a whole number from', json.loads(body)['error'])
+        self.assertEqual(self.state()['run']['state'], 'idle')
+        self.assertEqual(app.clean_settings({}), {'limit': 0, 'interval': 30})
+        self.assertEqual(app.clean_settings({'limit': 250.0, 'interval': 60}), {'limit': 250, 'interval': 60})
+        self.assertEqual(self.request('POST', '/api/start', {'mode': 'health', 'repeat': True, 'limit': 250, 'interval': 5})[0], 200)
+        self.assertEqual(self.runner.interval, 5 * 60)
+        self.assertEqual(self.runner.settings, {'limit': 250, 'interval': 5})
+        self.request('POST', '/api/stop', {})
+        self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
+        self.assertEqual({k: self.state()['settings'][k] for k in ('limit', 'interval')}, {'limit': 250, 'interval': 5})
+        # A damaged settings file falls back to the defaults instead of breaking the page.
+        (self.root / '.local' / 'panel.json').write_text('{"limit": -7, "interval": "x", "mode": "full"}')
+        self.assertEqual({k: self.state()['settings'][k] for k in ('limit', 'interval', 'mode')},
+                         {'limit': 0, 'interval': 30, 'mode': 'full'})
+
+    def test_the_tile_counts_what_worked_in_the_last_run_not_what_is_listed(self):
+        docs = self.root / 'docs'
+        docs.mkdir()
+        status = {'published': 300, 'working_this_run': 412, 'list_limit': 300, 'mode': 'health', 'nodes': []}
+        (docs / 'status.json').write_text(json.dumps(status))
+        last = self.state()['last']
+        self.assertEqual((last['working'], last['published'], last['limit'], last['limit_known']), (412, 300, 300, True))
+        # An older report has no such field: the listed count stands in, and the page says nothing of a limit.
+        (docs / 'status.json').write_text(json.dumps({'published': 300, 'mode': 'health', 'nodes': []}))
+        last = self.state()['last']
+        self.assertEqual((last['working'], last['limit_known']), (300, False))
+
+    def test_the_default_command_hands_the_settings_to_main(self):
+        (self.root / 'main.py').write_text('import sys; print("ARGS", *sys.argv[1:], flush=True)')
+        runner = app.Runner(self.root)
+        self.addCleanup(runner.stop)
+        runner.start('full', False, False, {'limit': 0, 'interval': 45}, 45 * 60)
+        self.assertTrue(wait_for(lambda: runner.status['state'] == 'idle' and any('ARGS' in x for x in runner.log)))
+        line = next(x for x in runner.log if 'ARGS' in x)
+        self.assertIn('ARGS --mode full --limit 0 --interval-minutes 45', line)
+        self.assertNotIn('--publish', line)
 
     def test_stop_kills_a_run_and_ends_the_repeat(self):
         self.script = 'import time; print("started", flush=True); time.sleep(60)'

@@ -10,6 +10,7 @@ from collections import deque
 from contextlib import ExitStack
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import math
 import os
 from pathlib import Path
 import secrets
@@ -59,15 +60,40 @@ def task_installed():
     return bool(result and result.returncode == 0)
 
 
-def run_command(root, mode, publish):
-    return [sys.executable, '-u', str(Path(root) / 'main.py'), '--mode', mode] + (['--publish'] if publish else [])
+# What the page lets the operator choose: (lowest, highest, default, name). A maximum of 0
+# means no maximum: every working node is listed.
+SETTINGS = {
+    'limit': (0, 1000, 0, 'Maximum nodes in the list'),
+    'interval': (5, 1440, 30, 'Run interval in minutes'),
+}
+
+
+def clean_settings(body):
+    """The three numeric settings from a request, or ValueError naming the one that is wrong."""
+    result = {}
+    for key, (low, high, default, label) in SETTINGS.items():
+        value = body.get(key, default)
+        whole = (isinstance(value, int) or (isinstance(value, float) and math.isfinite(value) and value == int(value)))
+        if isinstance(value, bool) or not whole or not low <= value <= high:
+            raise ValueError(f'{label} must be a whole number from {low} to {high}')
+        result[key] = int(value)
+    return result
+
+
+def run_command(root, mode, publish, settings=None):
+    command = [sys.executable, '-u', str(Path(root) / 'main.py'), '--mode', mode]
+    if settings:
+        command += ['--limit', str(settings['limit']), '--interval-minutes', str(settings['interval'])]
+    return command + (['--publish'] if publish else [])
 
 
 class Runner:
     """One run at a time, optionally repeated, with its output kept for the page."""
 
-    def __init__(self, root=ROOT, command=run_command, interval=1800):
-        self.root = Path(root); self.command = command; self.interval = interval
+    def __init__(self, root=ROOT, command=None, interval=1800):
+        self.root = Path(root); self.interval = interval
+        self.settings = {}
+        self.command = command or (lambda root, mode, publish: run_command(root, mode, publish, self.settings))
         self.lock = threading.Lock()
         self.log = deque(maxlen=2000)
         self.thread = None; self.tree = None
@@ -77,12 +103,15 @@ class Runner:
     def say(self, text):
         self.log.append(time.strftime('%H:%M:%S ') + text)
 
-    def start(self, mode, publish, repeat):
+    def start(self, mode, publish, repeat, settings=None, interval=None):
         if mode not in MODES:
             raise ValueError('Unknown mode')
         with self.lock:
             if self.thread and self.thread.is_alive():
                 raise ValueError('A run is already active')
+            self.settings = dict(settings or {})
+            if interval:
+                self.interval = interval   # seconds between the starts of two runs
             self.stopping = False; self.wake.clear()
             self.status.update(state='running', mode=mode, started=time.time(), next_run=None, exit=None)
             self.thread = threading.Thread(target=self._loop, args=(mode, bool(publish), bool(repeat)), daemon=True)
@@ -204,12 +233,19 @@ class Panel:
 
     def settings(self):
         saved = read_json(self.local / 'panel.json', {})
+        try:
+            numbers = clean_settings(saved)
+        except ValueError:
+            numbers = clean_settings({})
         return {'mode': saved.get('mode') if saved.get('mode') in MODES else 'auto',
-                'publish': bool(saved.get('publish', True)), 'repeat': bool(saved.get('repeat', True))}
+                'publish': bool(saved.get('publish', True)), 'repeat': bool(saved.get('repeat', True)), **numbers}
 
     def start(self, body):
-        chosen = {'mode': body.get('mode', 'auto'), 'publish': bool(body.get('publish')), 'repeat': bool(body.get('repeat'))}
-        self.runner.start(chosen['mode'], chosen['publish'], chosen['repeat'])
+        chosen = {'mode': body.get('mode', 'auto'), 'publish': bool(body.get('publish')),
+                  'repeat': bool(body.get('repeat')), **clean_settings(body)}
+        self.runner.start(chosen['mode'], chosen['publish'], chosen['repeat'],
+                          {key: chosen[key] for key in SETTINGS},
+                          chosen['interval'] * 60 if 'interval' in body else None)
         atomic_write(self.local / 'panel.json', json.dumps(chosen) + '\n')
 
     def quit(self):
@@ -286,6 +322,10 @@ class Panel:
                 'now': time.time(), 'sources': rows, 'discovery': discovery,
                 'pages': self.pages, 'task': self.task_active(),
                 'last': {'published': status.get('published'), 'health': status.get('health'),
+                         # Configs that passed in the last run; the list may hold fewer (a maximum)
+                         # or, after an outage, older ones kept within their expiry.
+                         'working': status.get('working_this_run', status.get('published')),
+                         'limit_known': 'list_limit' in status, 'limit': status.get('list_limit'),
                          'mode': status.get('mode'), 'generated': status.get('generated_epoch'),
                          'protocols': protocols}}
 

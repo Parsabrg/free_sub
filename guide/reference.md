@@ -15,11 +15,12 @@
 | `--mode auto\|full\|health` | `auto` | `full` fetches every source, screens and verifies. `health` rechecks the published and standby nodes. `auto` picks `full` when the last discovery is older than `--discovery-hours`, otherwise `health`. |
 | `--publish` | off | Run the test gate, then commit and push the five files in `docs/`. |
 | `--xray PATH` | `tools\xray.exe` | The Xray binary (`tools/xray` on Linux). |
-| `--limit N` | 300 | Nodes in the published list (1 to 300). |
+| `--limit N` | 0 | Most nodes in the published list (1 to 1000). `0` lists every working node. |
+| `--interval-minutes N` | 30 | How often runs are started (1 to 1440), published in `status.json`. The panel or the scheduled task does the scheduling; this option only states it. |
 | `--workers N` | 64 | Parallel screening tests (1 to 64). Verification and health checks use at most 16. |
 | `--screen-timeout S` | 5 | Network deadline of a screening test, counted from when Xray is ready. |
 | `--timeout S` | 30 | Total deadline of a verification or health test, and of a screening test including startup. |
-| `--recheck N` | 600 | Screen passes verified per discovery; standby nodes rechecked per health run. Not below `--limit`. |
+| `--recheck N` | 600, or `--limit` if larger | Screen passes verified per discovery; standby nodes rechecked per health run. Not below `--limit`. |
 | `--max-tests N` | 0 | Cap on candidates per discovery. `0` tests every supported candidate that is not resting. |
 | `--discovery-hours H` | 4 | Interval between discoveries in `auto` mode (1 to 24). |
 | `--ttl-hours H` | 6 | How long a node stays listed after its last success (1 to 24). |
@@ -85,12 +86,14 @@ Top level:
 | `mode` | `full` or `health`. |
 | `health` | `ok`; `retained_previous` when nothing passed and the previous list is kept within its expiry; `expired_or_empty` when the list is empty. |
 | `published` | Number of nodes in the list. |
+| `working_this_run` | Configs that passed in this run. Equal to `published` unless a maximum is set, or an outage left older nodes listed within their expiry. |
+| `list_limit` | The maximum set for the list, or `null` when every working node is listed. |
 | `nodes` | One entry per node, in rank order. |
 | `source_status` | Per source, for a `full` run: `raw` links found, `supported` unique configurations, `error`, `tested`, `working`. Found feeds also have `kind: "found"` and `new`, the configurations no listed source carries. Empty for a `health` run. |
 | `unique_selected_for_test` | Candidates tested in this run. |
 | `first_pass`, `second_pass` | Result counts by outcome for the screen and the verification. |
 | `resting_skipped` | Candidates left out because they are resting. |
-| `node_ttl_seconds`, `health_interval_seconds`, `discovery_interval_seconds`, `recommended_client_refresh_seconds` | The schedule in force. |
+| `node_ttl_seconds`, `health_interval_seconds`, `discovery_interval_seconds`, `recommended_client_refresh_seconds` | The schedule in force: node expiry, the run interval, the interval between discoveries, and the advice to clients. |
 | `xray_version`, `workers`, `verification_workers`, `max_tests`, the `*_timeout_seconds` fields | The settings of the run. |
 | `flag_definition`, `tested_on`, `failure_reason` | Explanatory text. |
 

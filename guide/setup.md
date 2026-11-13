@@ -93,7 +93,7 @@ side by side: they never run at the same time, and the panel shows a notice whil
 the task is installed.
 ## Unattended runs (scheduled task)
 
-The task runs every 30 minutes, wakes the PC from supported sleep on AC power, and
+The task runs every 30 minutes, lists every working node, wakes the PC from supported sleep on AC power, and
 needs nobody at the keyboard: no unlock, no approval for a test or a push.
 
 In an **Administrator PowerShell window for your normal Windows account**:
@@ -114,6 +114,9 @@ Check the installed task:
 ```powershell
 powershell -NoProfile -File .\scripts\check-task.ps1
 ```
+
+The panel's settings (maximum list size, run interval) apply to runs started from the
+panel only. The task uses the defaults: every working node, every 30 minutes.
 
 What the task does and does not do:
 

@@ -274,6 +274,37 @@ class BudgetTests(unittest.TestCase):
             report = run_cycle(args, folder, probe, collect_fn, lambda *a, **kw: {}, now + 34 * 3600)
             self.assertEqual((report['unique_selected_for_test'], report['resting_skipped']), (6, 0))
 
+    def cycle(self, folder, *options):
+        candidates = [parse(f'trojan://p{i}@h{i}.example.com:443?security=tls') for i in range(7)]
+        # A different address for each, so that the four-per-address rule stays out of the way.
+        probe = lambda c, xray, timeout, **kw: ProbeResult(True, endpoint_ip='8.8.8.' + str(int(c.host[1:].split('.')[0]) + 1),
+                                                           body_bytes=16384)
+        args = args_for(*options)
+        return args, run_cycle(args, folder, probe, lambda **kw: {'Fixture': candidates}, lambda *a, **kw: {}, 1_800_000_000)
+
+    def test_every_working_node_is_listed_unless_a_maximum_is_set(self):
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            args, report = self.cycle(folder)
+            self.assertEqual((args.limit, args.recheck), (0, 600))
+            self.assertEqual((report['published'], report['working_this_run'], report['list_limit']), (7, 7, None))
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            args, report = self.cycle(folder, '--limit', '3')
+            self.assertEqual((report['published'], report['working_this_run'], report['list_limit']), (3, 7, 3))
+
+    def test_the_status_report_states_the_schedule_it_was_started_with(self):
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            args, report = self.cycle(folder, '--interval-minutes', '10', '--discovery-hours', '2')
+            self.assertEqual((report['health_interval_seconds'], report['discovery_interval_seconds']), (600, 7200))
+
+    def test_the_maximum_and_the_interval_are_bounded_and_recheck_follows_a_large_maximum(self):
+        self.assertEqual(args_for('--limit', '800').recheck, 800)
+        self.assertEqual(args_for('--limit', '800', '--recheck', '900').recheck, 900)
+        self.assertEqual((args_for('--limit', '1000').limit, args_for('--interval-minutes', '1440').interval_minutes), (1000, 1440))
+        for bad in (['--limit', '1001'], ['--limit', '-1'], ['--interval-minutes', '0'], ['--interval-minutes', '1441'],
+                    ['--limit', '800', '--recheck', '500']):
+            with self.assertRaises(SystemExit), patch('sys.stderr', new=io.StringIO()):
+                args_for(*bad)
+
     def test_sampling_prefers_configs_never_tested(self):
         import random
         candidates = [parse(link(i)) for i in range(10)]

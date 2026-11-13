@@ -51,6 +51,10 @@ label.check { display: inline-flex; align-items: center; gap: 8px; cursor: point
 .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
 .tile b { display: block; font-size: 26px; line-height: 1.2; font-variant-numeric: tabular-nums; }
 .tile span { color: var(--muted); }
+.tile small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+.settings { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; margin-top: 14px; }
+.settings label { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; }
+input[type=number] { width: 7.5em; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
 .notice { margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--chip); border-left: 3px solid var(--warn); font-size: 14px; }
 code { font: 13px ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
 .links { display: grid; gap: 8px; }
@@ -98,9 +102,16 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
           <option value="health">Health check only</option>
         </select>
       </label>
-      <label class="check"><input type="checkbox" id="repeat"> Keep running every 30 minutes (keeps this PC awake)</label>
+      <label class="check"><input type="checkbox" id="repeat"> Keep running (keeps this PC awake)</label>
       <label class="check"><input type="checkbox" id="publish"> Publish the list to GitHub</label>
     </div>
+    <div class="settings">
+      <label>Max nodes in the list <input type="number" id="limit" min="1" max="1000" step="1" placeholder="all working"></label>
+      <label>Run every <input type="number" id="interval" min="5" max="1440" step="1"> minutes</label>
+    </div>
+    <p class="note" style="margin:8px 0 0">Leave the maximum empty to list every working node. Both apply the next
+      time you press Start.</p>
+    <p id="run-message" class="message" role="status"></p>
     <div id="progress" class="progress"><div class="bar"><i id="fill"></i></div><p id="progress-text"></p></div>
     <p class="note" style="margin:12px 0 0">The panel runs in the background: closing this tab or any window leaves it
       running. Use <b>Quit panel</b> (top right) to end it.</p>
@@ -110,7 +121,7 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
   </section>
 
   <div class="tiles">
-    <div class="tile"><b id="t-published">–</b><span>working nodes in the list</span></div>
+    <div class="tile"><b id="t-published">–</b><span>working configs in the last run</span><small id="t-listed"></small></div>
     <div class="tile"><b id="t-health">–</b><span>state of the last run</span></div>
     <div class="tile"><b id="t-age">–</b><span>since the list was updated</span></div>
     <div class="tile"><b id="t-protocols" style="font-size:16px;line-height:2">–</b><span>protocols</span></div>
@@ -263,11 +274,13 @@ function render(state) {
   $('stop').disabled = busy || run.state === 'idle';
   $('update').disabled = busy || run.state !== 'idle';
   $('quit').disabled = false;
-  for (const id of ['mode', 'repeat', 'publish']) $(id).disabled = run.state !== 'idle';
+  for (const id of ['mode', 'repeat', 'publish', 'limit', 'interval']) $(id).disabled = run.state !== 'idle';
   if (first) {
     $('mode').value = state.settings.mode;
     $('repeat').checked = state.settings.repeat;
     $('publish').checked = state.settings.publish;
+    $('limit').value = state.settings.limit || '';
+    $('interval').value = state.settings.interval;
     first = false;
   }
   let step = null;
@@ -279,7 +292,11 @@ function render(state) {
     $('progress-text').textContent = `${step[1] === 'CHECK' ? 'Testing' : 'Verifying'} ${count(step[2])} of ${count(step[3])} · ${count(step[4])} passed`;
   }
   const last = state.last;
-  $('t-published').textContent = count(last.published);
+  $('t-published').textContent = count(last.working);
+  // The list can differ from what worked: a maximum, or nodes kept from earlier after an outage.
+  const listed = last.published == null ? '' : `${count(last.published)} in your list` +
+    (last.limit_known && last.limit ? ` (maximum ${count(last.limit)})` : '');
+  $('t-listed').textContent = listed;
   const health = $('t-health');
   health.textContent = last.health ? last.health.replaceAll('_', ' ') : '–';
   health.className = last.health === 'ok' ? 'good' : last.health ? 'warn' : '';
@@ -294,9 +311,9 @@ function render(state) {
   if (log.textContent !== text) { log.textContent = text; if (pinned) log.scrollTop = log.scrollHeight; }
 }
 
-async function act(path, body) {
+async function act(path, body, target = 'message') {
   busy = true;
-  const message = $('message');
+  const message = $(target);
   try {
     render(await call(path, body));
     message.textContent = ''; message.className = 'message';
@@ -307,9 +324,23 @@ async function act(path, body) {
   } finally { busy = false; }
 }
 
-$('start').onclick = () => act('/api/start', {mode: $('mode').value, repeat: $('repeat').checked, publish: $('publish').checked});
-$('stop').onclick = () => act('/api/stop', {});
-$('update').onclick = () => act('/api/update', {});
+function whole(id) { const text = $(id).value.trim(); return text === '' ? null : Number(text); }
+
+$('start').onclick = () => {
+  // An empty maximum means every working node (0 to the program).
+  const limit = whole('limit') ?? 0, interval = whole('interval');
+  const problem = !Number.isInteger(limit) || limit < 0 || limit > 1000
+      ? ['limit', 'Max nodes: enter a whole number from 1 to 1000, or leave it empty to list every working node.']
+    : !Number.isInteger(interval) || interval < 5 || interval > 1440
+      ? ['interval', 'Run every: enter a whole number of minutes from 5 to 1440.'] : null;
+  if (problem) {
+    $('run-message').textContent = problem[1]; $('run-message').className = 'message bad'; $(problem[0]).focus();
+    return;
+  }
+  act('/api/start', {mode: $('mode').value, repeat: $('repeat').checked, publish: $('publish').checked, limit, interval}, 'run-message');
+};
+$('stop').onclick = () => act('/api/stop', {}, 'run-message');
+$('update').onclick = () => act('/api/update', {}, 'run-message');
 $('add').onsubmit = async event => {
   event.preventDefault();
   if (await act('/api/source/add', {url: $('add-url').value, name: $('add-name').value})) event.target.reset();
