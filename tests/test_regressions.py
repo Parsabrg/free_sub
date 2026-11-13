@@ -240,6 +240,16 @@ class RegressionTests(unittest.TestCase):
         self.assertTrue(result.passed)
         self.assertEqual(seen,[True])
 
+    def test_the_bundled_windows_xray_is_the_pinned_official_binary(self):
+        import hashlib
+        import download_xray
+        root=Path(download_xray.__file__).resolve().parent
+        binary=root/'tools'/'xray.exe'
+        self.assertTrue(binary.is_file(),'tools/xray.exe belongs to the repository')
+        self.assertEqual(hashlib.sha256(binary.read_bytes()).hexdigest(),download_xray.BUNDLED_WINDOWS_SHA256)
+        self.assertIn(download_xray.BUNDLED_WINDOWS_SHA256,(root/'tools'/'README.md').read_text(encoding='utf-8'))
+        self.assertIn(download_xray.RELEASE,(root/'tools'/'README.md').read_text(encoding='utf-8'))
+
     def test_stale_probe_folders_are_swept_and_nothing_else(self):
         from state import sweep_stale_probe_dirs
         import os

@@ -11,6 +11,10 @@ import zipfile
 import io
 
 RELEASE='v26.3.27'
+# tools/xray.exe of this release is committed, so a clone on Windows needs no download.
+# When RELEASE changes: run this on Windows, set the new hash here and in tools/README.md,
+# and commit tools/xray.exe. The tests refuse a bundled file with any other hash.
+BUNDLED_WINDOWS_SHA256='15c2d007954ac53ba69b80ec91242786b3c0b71d52649165b4ca1d5cc96ef8f1'
 ROOT=Path(__file__).resolve().parent
 
 
