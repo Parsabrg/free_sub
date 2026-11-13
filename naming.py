@@ -1,7 +1,7 @@
 """Rename successful proxy *share links*, preserving their connection credentials.
 
-VMess uses the `ps` field embedded in its Base64 JSON, not URL fragments.
-VLESS, Trojan, and Shadowsocks use a URL-encoded #fragment label.
+Legacy VMess uses the `ps` field embedded in its Base64 JSON. URI formats
+use a URL-encoded fragment label.
 """
 from __future__ import annotations
 import base64
@@ -9,8 +9,8 @@ import json
 from urllib.parse import quote, unquote, urlsplit, urlunsplit
 
 
-TRANSPORTS = {'ws': 'WS', 'grpc': 'GRPC', 'httpupgrade': 'HTTPUPGRADE', 'xhttp': 'XHTTP'}
-PROTOCOLS = {'shadowsocks': 'SS'}
+TRANSPORTS = {'kcp': 'MKCP', 'ws': 'WS', 'grpc': 'GRPC', 'httpupgrade': 'HTTPUPGRADE', 'xhttp': 'XHTTP'}
+PROTOCOLS = {'shadowsocks': 'SS', 'hysteria': 'HYSTERIA2', 'socks': 'SOCKS5'}
 
 
 def describe(outbound: dict) -> str:
@@ -66,7 +66,7 @@ def rename_share_link(url: str, name: str) -> str:
         raise ValueError('Not a share link')
     scheme = scheme.lower()
     payload = rest.split('#', 1)[0]
-    if scheme == 'vmess':
+    if scheme == 'vmess' and '@' not in payload:
         # The VMess label is JSON.ps. Appending #name breaks some clients.
         raw = payload.replace('-', '+').replace('_', '/')
         config = json.loads(base64.b64decode(raw + '=' * (-len(raw) % 4), validate=True))
@@ -76,13 +76,13 @@ def rename_share_link(url: str, name: str) -> str:
         encoded = base64.b64encode(json.dumps(config, ensure_ascii=False,
                                                separators=(',', ':')).encode('utf-8')).decode('ascii')
         return 'vmess://' + encoded
-    if scheme in ('vless', 'trojan'):
+    if scheme in ('vless', 'vmess', 'trojan'):
         uri = urlsplit(scheme + '://' + payload)
         if uri.username is None or uri.password is not None:
             raise ValueError('Invalid share-link credentials')
         # Raw @ and + in passwords break .NET URI import or URL decoding.
         authority = quote(unquote(uri.username), safe='') + '@' + uri.netloc.rsplit('@', 1)[1]
         return urlunsplit((scheme, authority, uri.path, uri.query, quote(name, safe='')))
-    if scheme == 'ss':
+    if scheme in ('ss','hysteria2','hy2','socks','socks5','socks5h'):
         return scheme + '://' + payload + '#' + quote(name, safe='')
     raise ValueError('Unsupported share link scheme')

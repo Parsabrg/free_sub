@@ -1,0 +1,10 @@
+name: Subscription snapshot
+on:
+  push:
+    branches: [subscriptions]
+permissions: {}
+jobs:
+  signal:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'A new subscription snapshot is available.'

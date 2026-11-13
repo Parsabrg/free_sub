@@ -63,6 +63,12 @@ class ProcessTree:
         self.proc.wait(timeout=5)
 
 
+class ProbeDeadline(subprocess.TimeoutExpired):
+    def __init__(self, command, timeout, phase):
+        super().__init__(command, timeout)
+        self.phase = phase
+
+
 def communicate_bounded(command, payload, timeout, *, ready_timeout=None):
     proc = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                             stderr=subprocess.DEVNULL, text=True, encoding='utf-8',
@@ -98,11 +104,11 @@ def communicate_bounded(command, payload, timeout, *, ready_timeout=None):
             exchange_thread = threading.Thread(target=exchange, daemon=True)
             exchange_thread.start()
             if not ready_or_done.wait(max(0, deadline-time.monotonic())):
-                raise subprocess.TimeoutExpired(command, timeout)
+                raise ProbeDeadline(command, timeout, 'startup')
             if 'ready_at' in response:
                 deadline = min(deadline, response['ready_at'] + ready_timeout)
             if not done.wait(max(0, deadline-time.monotonic())):
-                raise subprocess.TimeoutExpired(command, ready_timeout)
+                raise ProbeDeadline(command, ready_timeout, 'network')
             if 'error' in response:
                 raise response['error']
             stdout = response['stdout']

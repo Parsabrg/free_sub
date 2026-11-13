@@ -6,8 +6,10 @@ import http.server
 import json
 import os
 from pathlib import Path
+import re
 import socket
 import ssl
+import struct
 import subprocess
 import tempfile
 import threading
@@ -15,12 +17,13 @@ import time
 import unittest
 from unittest.mock import patch
 from urllib.parse import urlsplit
-from collector import collect, parse
+from collector import collect, import_candidates, parse
 from geolocation import CountryInfo
 from main import arguments, run_cycle
+from naming import rename_share_link
 from publishing import validate_outputs
 from state import read_state
-from xray_test import allocate_port, check_ready, run_probe
+from xray_test import VIDEO_BYTES, allocate_port, check_ready, run_probe
 
 BINARY=os.environ.get('XRAY_E2E_BINARY')
 
@@ -49,6 +52,21 @@ class RealXrayEndToEnd(unittest.TestCase):
                     self.send_response(204)
                     self.end_headers()
                     return
+                if self.path in ('/video','/bad-video','/bad-range','/short-video','/html-video'):
+                    if self.headers.get('Range') != f'bytes=0-{VIDEO_BYTES-1}':
+                        self.send_error(416)
+                        return
+                    data = struct.pack('>I4s4sI4s',12,b'ftyp',b'isom',VIDEO_BYTES,b'mdat')
+                    data += bytes(VIDEO_BYTES-len(data))
+                    if self.path=='/bad-video': data=b'x'*VIDEO_BYTES
+                    if self.path=='/short-video': data=data[:-1]
+                    self.send_response(206)
+                    self.send_header('Content-Range', f'bytes 0-{VIDEO_BYTES-(2 if self.path=="/bad-range" else 1)}/{VIDEO_BYTES+1}')
+                    self.send_header('Content-Type','text/html' if self.path=='/html-video' else 'video/mp4')
+                    self.send_header('Content-Length',str(len(data)))
+                    self.end_headers()
+                    self.wfile.write(data)
+                    return
                 if self.path=='/feed':
                     data=cls.feed.encode()
                 else:
@@ -58,10 +76,22 @@ class RealXrayEndToEnd(unittest.TestCase):
                 self.end_headers()
                 self.wfile.write(data)
             def log_message(self,*args): pass
-        cls.origin=http.server.ThreadingHTTPServer(('127.0.0.1',0),Handler)
         context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         context.load_cert_chain(str(cls.cert),str(cls.key))
-        cls.origin.socket=context.wrap_socket(cls.origin.socket,server_side=True)
+        context.set_alpn_protocols(['h2','http/1.1'])
+        class Origin(http.server.ThreadingHTTPServer):
+            request_queue_size=64
+
+            def process_request_thread(self, request, client_address):
+                # REALITY probes its TLS target concurrently. Handshakes belong in the request threads.
+                try:
+                    request.settimeout(5)
+                    request=context.wrap_socket(request,server_side=True)
+                except OSError:
+                    request.close()
+                    return
+                super().process_request_thread(request,client_address)
+        cls.origin=Origin(('127.0.0.1',0),Handler)
         cls.thread=threading.Thread(target=cls.origin.serve_forever,daemon=True);cls.thread.start()
         cls.proxy_port=allocate_port()
         config={'log':{'loglevel':'none'},'inbounds':[{'listen':'127.0.0.1','port':cls.proxy_port,
@@ -73,9 +103,9 @@ class RealXrayEndToEnd(unittest.TestCase):
         cls.proxy=subprocess.Popen([BINARY,'run','-c',str(cfg)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
         check_ready(cls.proxy_port,cls.proxy)
         cls.url=f'trojan://fixture-secret@127.0.0.1:{cls.proxy_port}?security=tls&sni=localhost'
-        cls.fixture={'ca_file':str(cls.cert),'probes':[
-            (f'https://localhost:{cls.origin.server_port}/payload-a',8192),
-            (f'https://localhost:{cls.origin.server_port}/payload-b',8192)]}
+        cls.origin_url=f'https://localhost:{cls.origin.server_port}'
+        cls.fixture={'ca_file':str(cls.cert),'probes':[(cls.origin_url+'/payload-a',8192)],
+                     'video_probes':[cls.origin_url+'/video']}
     @classmethod
     def tearDownClass(cls):
         cls.proxy.terminate();cls.proxy.wait(timeout=5)
@@ -87,6 +117,7 @@ class RealXrayEndToEnd(unittest.TestCase):
         self.assertTrue(good.passed,good.error)
         self.assertEqual(good.successes,2)
         self.assertGreater(good.body_bytes,32768)
+        self.assertEqual((good.video_bytes,good.video_host),(VIDEO_BYTES,'localhost'))
         self.assertEqual(good.endpoint_ip,'127.0.0.1')
         bad=run_probe(parse(self.url.replace('fixture-secret@','incorrect-password@')),BINARY,8,local_fixture=self.fixture)
         self.assertFalse(bad.passed)
@@ -116,7 +147,7 @@ class RealXrayEndToEnd(unittest.TestCase):
         self.assertFalse(run_probe(wrong,BINARY,8,local_fixture=self.fixture).passed)
 
     def test_026_real_delay_is_authenticated_https_not_a_body_download(self):
-        fixture=dict(self.fixture,probes=[(f'https://localhost:{self.origin.server_port}/generate_204',0)])
+        fixture=dict(self.fixture,probes=[(self.origin_url+'/generate_204',0)],video_probes=[])
         result=run_probe(parse(self.url),BINARY,8,quick=True,screen_timeout=2,local_fixture=fixture)
         self.assertTrue(result.passed,result.error)
         self.assertEqual((result.successes,result.body_bytes),(1,0))
@@ -125,6 +156,156 @@ class RealXrayEndToEnd(unittest.TestCase):
         self.assertFalse(run_probe(parse(self.url),BINARY,8,quick=True,local_fixture=wrong).passed)
         # Screening success alone cannot pass the two-transfer publication gate.
         self.assertFalse(run_probe(parse(self.url),BINARY,8,quick=False,local_fixture=fixture).passed)
+
+    def test_026_video_gate_rejects_invalid_responses_and_uses_fallback(self):
+        for path in ('bad-video','bad-range','short-video','html-video'):
+            with self.subTest(path=path):
+                fixture=dict(self.fixture,video_probes=[f'{self.origin_url}/{path}'])
+                result=run_probe(parse(self.url),BINARY,8,local_fixture=fixture)
+                self.assertFalse(result.passed)
+                self.assertEqual((result.error,result.successes),('VideoVerificationFailed',1))
+        fixture=dict(self.fixture,video_probes=[self.origin_url+'/bad-video',self.origin_url+'/video'])
+        result=run_probe(parse(self.url),BINARY,8,local_fixture=fixture)
+        self.assertTrue(result.passed,result.error)
+        self.assertEqual(result.attempts,3)
+
+    def test_protocols_and_transports_carry_https_and_video(self):
+        uid = '14a2c062-1234-5678-abcd-0123456789ab'
+        legacy = {'add':'127.0.0.1','id':uid,'net':'tcp','tls':'none','scy':'auto'}
+        ss_key=base64.b64encode(bytes(range(16))).decode()
+        encryption_keys=subprocess.run([BINARY,'vlessenc'],capture_output=True,text=True,check=True,timeout=10).stdout
+        decryption=re.search(r'"decryption": "([^"]+)"',encryption_keys)[1]
+        encryption=re.search(r'"encryption": "([^"]+)"',encryption_keys)[1]
+        reality_keys=subprocess.run([BINARY,'x25519'],capture_output=True,text=True,check=True,timeout=10).stdout.splitlines()
+        private_key=reality_keys[0].split(': ',1)[1]
+        public_key=reality_keys[1].split(': ',1)[1]
+        cases = [
+            ('vless', {'clients':[{'id':uid}],'decryption':'none'}, f'vless://{uid}@{{addr}}', 'tcp', 'tls', '', {}),
+            ('vmess', {'clients':[{'id':uid}]}, f'vmess://{uid}@{{addr}}', 'ws', 'tls', '&path=%2Fchat', {'wsSettings':{'path':'/chat'}}),
+            ('vmess', {'clients':[{'id':uid}]}, None, 'tcp', 'none', '', {}),
+            ('shadowsocks', {'method':'aes-256-gcm','password':'fixture-secret','network':'tcp'}, 'ss://aes-256-gcm:fixture-secret@{addr}', 'tcp', 'none', '', {}),
+            ('shadowsocks', {'method':'2022-blake3-aes-128-gcm','password':ss_key,'network':'tcp'}, 'ss://'+base64.urlsafe_b64encode(f'2022-blake3-aes-128-gcm:{ss_key}'.encode()).decode()+'@{addr}', 'tcp', 'none', '', {}),
+            ('socks', {'auth':'password','accounts':[{'user':'fixture','pass':'secret'}]}, 'socks5://fixture:secret@{addr}', 'tcp', 'none', '', {}),
+            ('trojan', {'clients':[{'password':'fixture-secret'}]}, 'trojan://fixture-secret@{addr}', 'grpc', 'tls', '&serviceName=fixture&authority=localhost', {'grpcSettings':{'serviceName':'fixture'}}),
+            ('trojan', {'clients':[{'password':'fixture-secret'}]}, 'trojan://fixture-secret@{addr}', 'httpupgrade', 'tls', '&path=%2Fchat', {'httpupgradeSettings':{'path':'/chat'}}),
+            ('trojan', {'clients':[{'password':'fixture-secret'}]}, 'trojan://fixture-secret@{addr}', 'xhttp', 'tls', '&path=%2Fchat&mode=packet-up&extra=%7B%22xPaddingBytes%22%3A%22100-200%22%7D', {'xhttpSettings':{'path':'/chat','mode':'packet-up'}}),
+            ('vmess', {'clients':[{'id':uid}]}, f'vmess://{uid}@{{addr}}', 'kcp', 'none', '?type=kcp&mtu=1200&seed=fixture-seed', {'kcpSettings':{'mtu':1200},'finalmask':{'udp':[{'type':'mkcp-aes128gcm','settings':{'password':'fixture-seed'}}]}}),
+            ('hysteria', {'version':2,'clients':[{'auth':'fixture-secret'}]}, 'hy2://fixture-secret@{addr}-{port}?sni=localhost&obfs=salamander&obfs-password=fixture-mask', 'hysteria', 'tls', '', {'hysteriaSettings':{'version':2},'finalmask':{'udp':[{'type':'salamander','settings':{'password':'fixture-mask'}}]}}),
+            ('vless', {'clients':[{'id':uid}],'decryption':decryption}, f'vless://{uid}@{{addr}}', 'tcp', 'none', f'?encryption={encryption}', {}),
+            ('vless', {'clients':[{'id':uid,'flow':'xtls-rprx-vision'}],'decryption':'none'}, f'vless://{uid}@{{addr}}', 'tcp', 'reality', f'?security=reality&sni=localhost&fp=chrome&sid=0708&pbk={public_key}&flow=xtls-rprx-vision', {'realitySettings':{'target':f'127.0.0.1:{self.origin.server_port}','privateKey':private_key,'serverNames':['localhost'],'shortIds':['0708']}}),
+        ]
+        for protocol, settings, link, transport, security, query, transport_settings in cases:
+            with self.subTest(protocol=protocol,transport=transport,security=security):
+                port=allocate_port()
+                if link is None:
+                    encoded=base64.b64encode(json.dumps(dict(legacy,port=port)).encode()).decode()
+                    url='vmess://'+encoded
+                else:
+                    url=link.format(addr=f'127.0.0.1:{port}',port=port)
+                    if security=='tls' and protocol!='hysteria':
+                        url+=f'?type={transport}&security=tls&sni=localhost'
+                    url+=query
+                stream=dict(transport_settings,network=transport,security=security)
+                if security=='tls':
+                    stream['tlsSettings']={'certificates':[{'certificateFile':str(self.cert),'keyFile':str(self.key)}]}
+                if transport=='hysteria':
+                    stream['tlsSettings']['alpn']=['h3']
+                inbound={'listen':'127.0.0.1','port':port,'protocol':protocol,'settings':settings,'streamSettings':stream}
+                config={'inbounds':[inbound],'outbounds':[{'protocol':'freedom'}]}
+                cfg=self.root/'matrix.json'
+                cfg.write_text(json.dumps(config))
+                with subprocess.Popen([BINARY,'run','-c',str(cfg)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL) as server:
+                    try:
+                        if transport in ('kcp','hysteria'):
+                            # Wait for the UDP bind without sending a protocol packet.
+                            deadline=time.monotonic()+4
+                            while time.monotonic()<deadline:
+                                self.assertIsNone(server.poll(),'Xray fixture exited')
+                                with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as udp:
+                                    if os.name=='nt':
+                                        udp.setsockopt(socket.SOL_SOCKET,socket.SO_EXCLUSIVEADDRUSE,1)
+                                    try: udp.bind(('127.0.0.1',port))
+                                    except OSError: break
+                                time.sleep(0.05)
+                            else: self.fail('Xray fixture did not bind UDP')
+                        else:
+                            check_ready(port,server)
+                        candidate=parse(url)
+                        self.assertIsNotNone(candidate)
+                        self.assertEqual(parse(rename_share_link(url,'Verified fixture')).key,candidate.key)
+                        result=run_probe(candidate,BINARY,12,local_fixture=self.fixture)
+                        self.assertTrue(result.passed,result.error)
+                        self.assertGreaterEqual(result.body_bytes,VIDEO_BYTES)
+                    finally:
+                        if server.poll() is None: server.terminate()
+                        server.wait(timeout=5)
+
+    def test_private_https_connect_and_xhttp_split_download(self):
+        certificates={'certificates':[{'certificateFile':str(self.cert),'keyFile':str(self.key)}]}
+        tls={'network':'tcp','security':'tls','tlsSettings':dict(certificates,alpn=['http/1.1'])}
+        port=allocate_port()
+        download=allocate_port()
+        auth={'user':'fixture','pass':'secret'}
+        xhttp=dict(tls,network='xhttp',tlsSettings=certificates,xhttpSettings={'path':'/split','mode':'packet-up'})
+        trojan={'clients':[{'password':'secret'}]}
+        cases=[
+            ([{'port':port,'protocol':'http','settings':{'accounts':[auth]},'streamSettings':tls}],
+             {'protocol':'http','settings':{'address':'127.0.0.1','port':port,**auth},
+              'streamSettings':{'network':'tcp','security':'tls','tlsSettings':{'serverName':'localhost'}}}),
+            ([{'port':port,'protocol':'trojan','settings':trojan,'streamSettings':xhttp},
+              {'port':download,'protocol':'tunnel','settings':{'address':'127.0.0.1','port':port,'network':'tcp'}}],
+             {'protocol':'trojan','settings':{'address':'127.0.0.1','port':port,'password':'secret'},
+              'streamSettings':{'network':'xhttp','security':'tls','tlsSettings':{'serverName':'localhost'},
+                  'xhttpSettings':{'path':'/split','mode':'packet-up','downloadSettings':{
+                      'address':'127.0.0.1','port':download,'network':'xhttp','security':'tls',
+                      'tlsSettings':{'serverName':'localhost'},'xhttpSettings':{'path':'/split','mode':'packet-up'}}}}}),
+        ]
+        for inbounds,outbound in cases:
+            with self.subTest(protocol=outbound['protocol']):
+                for inbound in inbounds:
+                    inbound['listen']='127.0.0.1'
+                config={'inbounds':inbounds,'outbounds':[{'protocol':'freedom'}]}
+                cfg=self.root/'private.json'
+                cfg.write_text(json.dumps(config))
+                with subprocess.Popen([BINARY,'run','-c',str(cfg)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL) as server:
+                    try:
+                        for inbound in inbounds:
+                            check_ready(inbound['port'],server)
+                        candidate,=import_candidates(json.dumps({'outbounds':[outbound]}))
+                        result=run_probe(candidate,BINARY,12,local_fixture=self.fixture)
+                        self.assertTrue(result.passed,f'{result.stage}/{result.error}')
+                    finally:
+                        if server.poll() is None: server.terminate()
+                        server.wait(timeout=5)
+
+    def test_private_wireguard(self):
+        def keypair():
+            result=subprocess.run([BINARY,'x25519'],capture_output=True,text=True,check=True,timeout=10)
+            return [line.split(': ',1)[1] for line in result.stdout.splitlines()[:2]]
+        server_key,server_public=keypair()
+        client_key,client_public=keypair()
+        with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as sock:
+            sock.bind(('127.0.0.1',0))
+            port=sock.getsockname()[1]
+        inbound={'listen':'127.0.0.1','port':port,'protocol':'wireguard','settings':{
+            'secretKey':server_key,'address':['10.11.12.1'],'noKernelTun':True,
+            'peers':[{'publicKey':client_public,'allowedIPs':['10.11.12.2/32']}]}}
+        cfg=self.root/'wireguard.json'
+        cfg.write_text(json.dumps({'inbounds':[inbound],'outbounds':[{'protocol':'freedom','settings':{
+            'redirect':f'127.0.0.1:{self.origin.server_port}'}}]}))
+        outbound={'protocol':'wireguard','settings':{'secretKey':client_key,'address':['10.11.12.2'],
+                  'peers':[{'publicKey':server_public,'endpoint':f'127.0.0.1:{port}'}]}}
+        candidate,=import_candidates(json.dumps(outbound))
+        # Route to the fixture tunnel address and preserve localhost as the HTTPS name.
+        fixture=dict(self.fixture,connect_host='10.11.12.1')
+        with subprocess.Popen([BINARY,'run','-c',str(cfg)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL) as server:
+            try:
+                self.assertIsNone(server.poll())
+                result=run_probe(candidate,BINARY,12,local_fixture=fixture)
+                self.assertTrue(result.passed,f'{result.stage}/{result.error}')
+            finally:
+                if server.poll() is None: server.terminate()
+                server.wait(timeout=5)
 
     def test_027_a_failed_direct_fetch_goes_through_a_verified_node(self):
         import collector
@@ -168,6 +349,7 @@ class RealXrayEndToEnd(unittest.TestCase):
             report=run_cycle(args,folder,probe,collector,geo,now)
             self.assertEqual(report['published'],1)
             self.assertTrue(report['nodes'][0]['verified_this_run'])
+            self.assertEqual(report['nodes'][0]['video_bytes'],VIDEO_BYTES)
             first_url=(Path(folder)/'docs/sub.txt').read_text()
             validate_outputs(Path(folder)/'docs')
             self.assertEqual(parse(first_url.strip()).key,parse(self.url).key)
@@ -187,6 +369,10 @@ class RealXrayEndToEnd(unittest.TestCase):
                 (Path(folder)/'.gitignore').write_text('.local/\n')
                 git('add','.gitignore');git('commit','-m','Initialize fixture')
                 git('remote','add','origin',str(remote));git('push','-u','origin','main')
+                workflow=Path(folder)/publishing.SNAPSHOT_WORKFLOW
+                workflow.parent.mkdir(parents=True)
+                workflow.write_bytes((Path(__file__).resolve().parents[1]/publishing.SNAPSHOT_WORKFLOW).read_bytes())
+                code_head=git('rev-parse','HEAD').stdout.strip()
                 actual_run=subprocess.run
                 gates=[]
                 def dispatch(command,**kwargs):
@@ -197,11 +383,12 @@ class RealXrayEndToEnd(unittest.TestCase):
                 with patch('publishing.subprocess.run',side_effect=dispatch):
                     publishing.publish(folder,BINARY,Path(folder)/'docs')
                 self.assertEqual(len(gates),1)
-                local_sha=git('rev-parse','HEAD').stdout.strip()
-                remote_sha=git('ls-remote','origin','refs/heads/main').stdout.split()[0]
-                self.assertEqual(local_sha,remote_sha)
-                committed=git('diff-tree','--no-commit-id','--name-only','-r','HEAD').stdout.splitlines()
-                self.assertEqual(set(committed),{'docs/sub.txt','docs/sub.b64','docs/xray.json','docs/status.json','docs/index.html'})
+                self.assertEqual(code_head,git('rev-parse','HEAD').stdout.strip())
+                self.assertEqual(code_head,git('ls-remote','origin','refs/heads/main').stdout.split()[0])
+                git('fetch','origin',publishing.FEED_BRANCH)
+                committed=git('ls-tree','-r','--name-only','FETCH_HEAD').stdout.splitlines()
+                self.assertEqual(set(committed),{publishing.SNAPSHOT_WORKFLOW,*(f'docs/{name}' for name in publishing.OUTPUTS)})
+                self.assertEqual(len(git('rev-list','--parents','-1','FETCH_HEAD').stdout.split()),1)
                 self.assertFalse(any('.local' in p for p in committed))
             finally:
                 import shutil

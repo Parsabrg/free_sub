@@ -68,7 +68,8 @@ python main.py --mode full --publish
 ## 3. Switch on GitHub Pages
 
 In the repository on GitHub: **Settings → Pages → Source: GitHub Actions**. The
-workflow in `.github/workflows/pages.yml` deploys the `docs/` folder.
+workflow in `.github/workflows/pages.yml` deploys the latest verified snapshot
+from the `subscriptions` branch. The first successful publish creates that branch.
 
 - On GitHub Free the repository must be **public** for Pages. Eligible paid plans
   can host Pages from a private repository. Choose the visibility yourself; the
@@ -170,8 +171,8 @@ A panel older than this feature does not restart itself after its first update: 
 git pull --no-rebase --no-edit
 ```
 
-When GitHub holds a newer version than the PC, publishing stops with an `[UPDATE]`
-line in the log until this is done. Nothing is merged or pushed over silently.
+Update the program periodically to use the current verifier. Feed snapshots are
+published to the `subscriptions` branch, separate from the program updates.
 
 ## Troubleshooting
 
@@ -183,7 +184,6 @@ line in the log until this is done. Nothing is merged or pushed over silently.
 | `[BUSY] Another run is already active` | The scheduled task or a second window is running. Wait, or remove the task. |
 | `FAIL: …` lines, then `CalledProcessError` | The test gate that runs before every push failed, so nothing was published and the failing test is named just above. Update the program first (a newer version may already fix it); if the same test still fails, send those lines. |
 | `Update program works only in a Git clone` | The folder is not itself a clone (a downloaded ZIP, or a copy inside another repository). Clone the project as in step 1 and run it from there. |
-| `[UPDATE] GitHub has commits this copy lacks` | Update as described above. |
 | `[SKIP] Tests would reach the internet from …` | The PC reaches the internet from outside Iran and no physical adapter bypasses the VPN. Results would describe the VPN's network, so the published list is left as it is. `--allow-non-iran` overrides this. |
 | `[PUBLISH ERROR] … category=authentication` | Run `git push` once interactively as the account that runs the tests. Do not use `SYSTEM`, S4U, or an SSH key that needs a prompt. |
 | The task runs but the PC does not wake | Check `powercfg /a`, `powercfg /waketimers`, the task's WakeToRun property, AC power, firmware wake support and Modern Standby. |

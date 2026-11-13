@@ -2,7 +2,11 @@ name: Deploy locally verified subscription
 on:
   push:
     branches: [main]
-    paths: ['docs/**', '.github/workflows/pages.yml']
+    paths: ['docs/**', '.github/workflows/pages.yml', 'public_page.py', 'publishing.py']
+  workflow_run:
+    workflows: [Subscription snapshot]
+    branches: [subscriptions]
+    types: [completed]
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,6 +18,7 @@ concurrency:
 jobs:
   deploy:
     # Configure Settings > Pages > GitHub Actions once. No source collection on hosted runners.
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:
@@ -21,15 +26,21 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
-      - name: Validate generated subscription
-        if: hashFiles('docs/status.json') != ''
-        run: python -c "from publishing import validate_outputs; validate_outputs('docs')"
-      - uses: actions/configure-pages@v5
-        if: hashFiles('docs/status.json') != ''
-      - uses: actions/upload-pages-artifact@v4
-        if: hashFiles('docs/status.json') != ''
         with:
-          path: docs
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Prepare verified subscription
+        shell: bash
+        run: |
+          feed=refs/heads/subscriptions
+          ref=''
+          if [[ -n $(git ls-remote --heads origin "$feed") ]]; then
+            git fetch --no-tags origin "$feed"
+            ref=FETCH_HEAD
+          fi
+          python -c 'import sys; from publishing import prepare_pages; prepare_pages("_site", sys.argv[1])' "$ref"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
       - id: deployment
-        if: hashFiles('docs/status.json') != ''
         uses: actions/deploy-pages@v4

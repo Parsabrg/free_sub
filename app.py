@@ -5,6 +5,7 @@ A page served on 127.0.0.1 only, by the Python standard library. Runs are the sa
 """
 from __future__ import annotations
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import http.client
 from collections import deque
 from contextlib import ExitStack
@@ -23,6 +24,7 @@ import traceback
 import webbrowser
 import collector
 import sources
+from network import physical_interface
 from publishing import noninteractive_env
 from process_guard import ProcessTree
 from state import atomic_write, keep_awake
@@ -229,6 +231,7 @@ class Panel:
         self.runner = runner or Runner(self.root)
         self.registry_path = self.local / 'sources.json'
         self.edit = threading.Lock()
+        self.test_lock = threading.Lock()
         self.token = secrets.token_urlsafe(24)
         remote = quiet(['git', 'remote', 'get-url', 'origin'], self.root) if clone_root(self.root) else None
         self.pages = pages_address(remote.stdout if remote and remote.returncode == 0 else '')
@@ -266,6 +269,39 @@ class Panel:
                           {key: chosen[key] for key in SETTINGS},
                           chosen['interval'] * 60 if 'interval' in body else None)
         atomic_write(self.local / 'panel.json', json.dumps(chosen) + '\n')
+
+    def test_configs(self, body):
+        from xray_test import run_probe
+        text = body.get('text')
+        if not isinstance(text, str) or not text.strip():
+            raise ValueError('Paste a share link or select a subscription file')
+        text = text.lstrip('\ufeff \t\r\n')
+        if text.startswith(('{','[')):
+            candidates = collector.import_candidates(text)
+        else:
+            entries = collector.links(text) or [text]
+            candidates = [collector.parse(entry,'private') for entry in entries]
+        if not 1<=len(candidates)<=16:
+            raise ValueError('Select between 1 and 16 configs per private test')
+        binary = self.root/'tools'/('xray.exe' if os.name=='nt' else 'xray')
+        if not binary.is_file():
+            raise ValueError('Install the pinned Xray binary first')
+        if not self.test_lock.acquire(blocking=False):
+            raise ValueError('A private test is already running')
+        try:
+            interface = physical_interface()
+            def check(candidate):
+                if candidate is None:
+                    return {'passed':False,'stage':'parse','error':'Unsupported or invalid share link'}
+                result = run_probe(candidate,binary,15,check_udp=body.get('udp') is True,
+                                   check_ipv6=body.get('ipv6') is True,interface=interface)
+                return {'protocol':candidate.protocol,'passed':result.passed,'stage':result.stage,
+                        'error':result.error,'video_bytes':result.video_bytes,'video_ms':result.video_ms,
+                        'udp':result.udp,'ipv6':result.ipv6}
+            with ThreadPoolExecutor(max_workers=4) as pool:
+                return list(pool.map(check,candidates))
+        finally:
+            self.test_lock.release()
 
     def quit(self):
         """End any run and its repeat, then the panel program itself."""
@@ -449,11 +485,14 @@ def handler_for(panel, page):
                 return self.send(403, {'error': 'Reload the panel page'})
             try:
                 length = int(self.headers.get('Content-Length') or 0)
-                if not 0 <= length <= 8192:
+                limit = 256 * 1024 if self.path == '/api/test' else 8192
+                if not 0 <= length <= limit:
                     raise ValueError('Request too large')
                 body = json.loads(self.rfile.read(length) or b'{}')
                 if not isinstance(body, dict):
                     raise ValueError('Bad request')
+                if self.path == '/api/test':
+                    return self.send(200, {'results': panel.test_configs(body)})
                 if self.path == '/api/start':
                     panel.start(body)
                 elif self.path == '/api/stop':

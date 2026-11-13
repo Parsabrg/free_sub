@@ -163,6 +163,21 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
   </section>
 
   <section>
+    <h2>Test configs privately</h2>
+    <form id="private-test">
+      <textarea id="private-configs" rows="4" style="width:100%; font:inherit" aria-label="Proxy configs" placeholder="Paste share links, a Base64 subscription, or Xray JSON"></textarea>
+      <div class="actions">
+        <label>Load file <input type="file" id="private-file" accept=".txt,.b64,.json,text/plain,application/json"></label>
+        <label><input id="private-udp" type="checkbox"> UDP</label>
+        <label><input id="private-ipv6" type="checkbox"> IPv6</label>
+        <button id="private-run" type="submit">Test configs</button>
+      </div>
+    </form>
+    <p id="private-status" role="status"></p>
+    <ol id="private-results"></ol>
+  </section>
+
+  <section>
     <h2>Log</h2>
     <pre id="log" tabindex="0" aria-label="Run log"></pre>
   </section>
@@ -175,7 +190,7 @@ let first = true, busy = false, linked = false, failures = 0, gone = false, last
 function renderLinks(pages) {
   if (linked || !pages) return;
   linked = true;
-  const files = [['v2rayN (desktop)', 'xray.json'], ['v2rayNG (Android)', 'sub.b64'], ['Plain list', 'sub.txt'], ['Status page', '']];
+  const files = [['v2rayN (desktop)', 'xray.json'], ['v2rayNG (Android)', 'sub.b64'], ['Compact (Android)', 'sub-compact.b64'], ['Plain list', 'sub.txt'], ['Status page', '']];
   for (const [label, file] of files) {
     const row = document.createElement('div'), name = document.createElement('span'), link = document.createElement('a');
     name.textContent = label;
@@ -205,6 +220,44 @@ async function call(path, body) {
   }
   return data;
 }
+
+$('private-file').onchange = async () => {
+  const [file] = $('private-file').files;
+  if (!file) return;
+  if (file.size > 128 * 1024) {
+    $('private-status').textContent = 'Choose a file under 128 KiB.';
+    return;
+  }
+  $('private-configs').value = await file.text();
+  $('private-status').textContent = '';
+};
+
+$('private-test').onsubmit = async event => {
+  event.preventDefault();
+  const button = $('private-run'), results = $('private-results'), status = $('private-status');
+  if (button.disabled) return;
+  button.disabled = true;
+  results.replaceChildren();
+  status.textContent = 'Testing through Xray…';
+  try {
+    const {results: rows} = await call('/api/test', {text: $('private-configs').value,
+      udp: $('private-udp').checked, ipv6: $('private-ipv6').checked});
+    status.textContent = `${rows.filter(row => row.passed).length} of ${rows.length} passed HTTPS and video.`;
+    for (const row of rows) {
+      const item = document.createElement('li');
+      const capabilities = [['UDP', row.udp], ['IPv6', row.ipv6]]
+        .filter(([, value]) => value != null)
+        .map(([name, value]) => `${name} ${value ? 'passed' : 'failed'}`);
+      item.textContent = [row.protocol, row.passed ? `${row.video_bytes} video bytes in ${row.video_ms} ms` :
+        [row.stage, row.error].filter(Boolean).join(' · '), ...capabilities].filter(Boolean).join(' · ');
+      results.append(item);
+    }
+  } catch (error) {
+    status.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+};
 
 function ago(seconds) {
   if (seconds < 90) return 'just now';

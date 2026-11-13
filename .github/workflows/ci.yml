@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: python download_xray.py
-      - name: Actual Xray traffic through loopback Trojan TLS and HTTPS fixtures
+      - name: Actual Xray traffic through loopback proxy and HTTPS video fixtures
         shell: bash
         run: |
           if [ "$RUNNER_OS" = "Windows" ]; then

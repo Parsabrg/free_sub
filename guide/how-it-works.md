@@ -72,16 +72,19 @@ is repeated after one hour instead of four.
 A share link becomes an Xray outbound or is rejected. It is never tested as a
 simplified version of itself.
 
-Supported: VLESS, VMess, Trojan and Shadowsocks; RAW (TCP), WebSocket, gRPC,
-HTTPUpgrade and XHTTP transports; TLS and REALITY; Shadowsocks with
-`aes-128-gcm`, `aes-256-gcm`, `chacha20-ietf-poly1305` and the two
-`2022-blake3-aes-*-gcm` ciphers.
+Supported share links include VLESS with TLS, REALITY or VLESS Encryption, VMess
+AEAD in URI and Base64 JSON forms, Trojan, Shadowsocks, Hysteria 2 (`hysteria2://`
+and `hy2://`, including Salamander and port lists), and SOCKS5. Supported stream transports
+include RAW (TCP), mKCP, WebSocket, gRPC, HTTPUpgrade and XHTTP where the protocol
+allows them. Shadowsocks accepts AEAD and Shadowsocks 2022 ciphers.
 
 Rejected:
 
 - anything that disables certificate verification (`allowInsecure`, `insecure`);
-- VLESS and Trojan without TLS or REALITY, and VMess without TLS;
-- an HTTP header on RAW transport, XHTTP `extra`, external Shadowsocks plugins;
+- VLESS without TLS, REALITY or VLESS Encryption, and Trojan without TLS or REALITY;
+- legacy VMess `alterId` and VMess without payload encryption or outer security;
+- RAW HTTP camouflage, XHTTP `downloadSettings`, external Shadowsocks plugins,
+  and Hysteria 2 obfuscation other than Salamander;
 - any unknown extension that carries a value.
 
 An extension with an empty value sets nothing and is ignored, as is a `host` or
@@ -89,6 +92,11 @@ An extension with an empty value sets nothing and is ignored, as is a `host` or
 effective Xray configuration, so the same server under two names is one candidate.
 The accepted parameters are preserved on output, and every renamed link is parsed
 again to confirm that it still describes the configuration that was tested.
+
+The panel’s private tester also accepts standalone Xray JSON outbounds, including
+userspace WireGuard, HTTPS CONNECT, and XHTTP with a separate download endpoint.
+The tester validates the outbound and pins its endpoints before running Xray.
+Private inputs stay outside the discovery history and publishing pipeline.
 
 ## Testing
 
@@ -101,21 +109,37 @@ to the validated public IP while SNI and transport Host values stay as given.
 
 **Screen (discovery, first pass).** Up to 64 workers. Once Xray is ready, the
 candidate has five seconds (`--screen-timeout`) to return a certificate-verified
-HTTPS 204 response. Python, DNS and Xray startup are covered by a separate
+HTTPS response from Google or Apple. Python, DNS and Xray startup are covered by a separate
 30-second total deadline, so a slow CPU is not mistaken for a slow proxy. The
 screen favors speed and can reject a working but slow node. It follows the approach
 of [v2rayNG](https://github.com/2dust/v2rayNG/blob/master/V2rayNG/app/src/main/java/com/v2ray/ang/AppConfig.kt)
 and [v2rayN](https://github.com/2dust/v2rayN/blob/7.25.4/v2rayN/ServiceLib/Handler/ConnectionHandler.cs).
 
 **Verify (discovery, second pass) and health checks.** At most 16 workers and a
-30-second deadline (`--timeout`). A node passes only with successful transfers to
-**two different sites**, in a new process. The 600 best-ranked screen passes are
-verified (`--recheck`).
+30-second deadline (`--timeout`). A node must pass both a small HTTPS request and
+a 128 KiB MP4 range request to a separate site in the same fresh Xray process.
+The verifier checks status `206`, the range and content type, the exact byte count,
+and that the range contains media data. The 600 best-ranked screen passes are
+verified (`--recheck`). Only full checks update the publication lifetime and
+reliability score. An upgrade rechecks saved nodes against the video gate.
 
-**Probe sites.** One download of roughly 16 KiB and two smaller ones. None is
-hosted on Cloudflare, because a Cloudflare Worker relay cannot open connections to
-Cloudflare's own addresses and would fail however well it carried everything else.
-The transfer figures include handshake time and are not sustained-speed benchmarks.
+**Probe sites.** Wikipedia and Apple supply the small HTTPS response. The video
+comes from MDN, with a W3C video as fallback. The video measurement covers a
+bounded transfer and includes connection setup time. It measures whether the node
+can carry video bytes at test time.
+
+Use `--video-mirror` to supply alternative public HTTPS MP4 origins and
+`--probe-control` with a local file containing a known-good share link. If the
+control can carry HTTPS but every video mirror fails, the run preserves node
+history and lets existing verification timestamps age. A full scan refreshes
+the current feed and up to 20 standby nodes before fetching new sources.
+
+Optional checks use the same verified outbound. `--stream-segments 4` measures
+four ranges from the video, and `--check-udp --check-ipv6` records those
+capabilities separately. For YouTube, install Playwright and its Chromium build
+with `python -m pip install playwright` and `python -m playwright install chromium`,
+then pass `--youtube-id` with an embeddable video ID. The browser check requires
+both playback progress and a media response through Xray.
 
 **Resting.** A configuration that failed its last three tests and has not worked
 for three days is retested once a day rather than on every discovery
@@ -178,25 +202,34 @@ filter.
 
 Before each push, `verify.py` runs the regression tests and real end-to-end tests
 with the installed Xray binary. The fixture generates its own temporary TLS
-certificate, starts a Trojan server and an HTTPS origin, fetches a source over
+certificate, starts loopback Xray proxy fixtures and an HTTPS origin, fetches a source over
 HTTPS, runs the whole pipeline, rejects wrong credentials and a wrong TLS hostname,
-enforces a hard deadline, rechecks health, keeps names stable and expires old
+rejects malformed MP4 responses, enforces a hard deadline, rechecks health, keeps names stable and expires old
 nodes. The loopback-only fixture override exists only in the tests: production has
 no switch to bypass the public-address checks or accept an untrusted certificate.
 
 - The plain, Base64 and Xray outputs and the report must agree, or nothing is
   written.
-- Only the five files under `docs/` are staged. Already staged work, a detached
-  HEAD or a remote that has moved on stop the publication.
-- Git runs without prompts and with time limits. There are no force pushes, no
-  automatic merges and no uploads of private history. A push that failed is retried
-  on the next run.
+- A separate Git index builds the `subscriptions` branch from the generated
+  feed files and a snapshot signal workflow. The Pages workflow deploys the feed
+  using the site and validation code from the default branch.
+- Git uses time limits and noninteractive authentication. A failed push can be
+  retried on the next run. Concurrent updates use normal fast-forward rules.
 - Share-link passwords are URL-escaped on output so that reserved characters
   survive import into a client.
 
 GitHub CI runs the same loopback-only Xray tests on Windows and Linux and parses
 the PowerShell scripts. It never tests public proxies, registers tasks, wakes
 hardware or publishes results; that stays on the operator's PC.
+
+For a client release smoke test, serve a generated `xray.json` over local HTTP
+and update that subscription in v2rayN **7.25.6**. Import the generated `sub.b64`
+from a local file in v2rayNG **2.3.15**. A SOCKS5 fixture lets you confirm both
+the imported label and the network path. Select the imported profile and request
+an HTTP `204` test path through the client’s SOCKS port. On an Android emulator,
+use `adb reverse` for the host-side fixture ports and `adb forward` for the
+client SOCKS port. Both client releases imported the fixture and returned `204`
+through their running cores.
 
 ## When things fail
 
