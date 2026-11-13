@@ -5,31 +5,37 @@
       "settings": {
         "vnext": [
           {
-            "address": "zfapi.zalolink.com",
-            "port": 43149,
+            "address": "fs.qicai99.com",
+            "port": 443,
             "users": [
               {
-                "id": "57beeeb0-03fc-4fc9-94da-7604488a7134",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
+                "id": "99c5b713-dedf-4a10-8070-916ff3f49b0e",
+                "encryption": "none"
               }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "psstatic.cdn.bcebos.com",
-          "publicKey": "cvong7paE8XIzzbKWgV5iUruP1pBqI2IhMuBHc8c0UE",
-          "shortId": "15aa0ad4",
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "fs.qicai99.com",
           "fingerprint": "chrome",
-          "spiderX": "/"
+          "alpn": [
+            "h3",
+            "h2",
+            "http/1.1"
+          ]
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "fs.qicai99.com"
+          }
         }
       },
-      "tag": "🇯🇵 JP-01 | VLESS-REALITY"
+      "tag": "🇺🇸 US-167 | VLESS-WS-TLS"
     },
     {
       "protocol": "vless",
@@ -60,38 +66,38 @@
           "spiderX": "/"
         }
       },
-      "tag": "🌐 XX-01 | VLESS-REALITY"
+      "tag": "🇭🇰 HK-13 | VLESS-REALITY"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "zfapi.zalolink.com",
-            "port": 47691,
+            "address": "api.ferrin.uk",
+            "port": 443,
             "users": [
               {
-                "id": "57beeeb0-03fc-4fc9-94da-7604488a7134",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
+                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
+                "encryption": "none"
               }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "m.media-amazon.com",
-          "publicKey": "6PbC7GxOg_YdXya-53llPReUzoU_yknQbkDvI4uorBg",
-          "shortId": "2905326a",
-          "fingerprint": "chrome",
-          "spiderX": "/"
+        "network": "xhttp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "7d1a74fd.ferrin.uk",
+          "fingerprint": "firefox"
+        },
+        "xhttpSettings": {
+          "path": "/es",
+          "host": "api.ferrin.uk",
+          "mode": "stream-one"
         }
       },
-      "tag": "🇯🇵 JP-02 | VLESS-REALITY"
+      "tag": "🌐 XX-04 | VLESS-XHTTP-TLS"
     },
     {
       "protocol": "vless",
@@ -99,7 +105,7 @@
         "vnext": [
           {
             "address": "zfapi.zalolink.com",
-            "port": 11802,
+            "port": 43149,
             "users": [
               {
                 "id": "57beeeb0-03fc-4fc9-94da-7604488a7134",
@@ -116,13 +122,41 @@
         "realitySettings": {
           "show": false,
           "serverName": "psstatic.cdn.bcebos.com",
-          "publicKey": "FUBjYwXlKIVwF7IuJf5dt_HU2sUnrEt10s4TIlTe8Q4",
-          "shortId": "6c84fbac2d",
-          "fingerprint": "ios",
+          "publicKey": "cvong7paE8XIzzbKWgV5iUruP1pBqI2IhMuBHc8c0UE",
+          "shortId": "15aa0ad4",
+          "fingerprint": "chrome",
           "spiderX": "/"
         }
       },
-      "tag": "🇯🇵 JP-03 | VLESS-REALITY"
+      "tag": "🌐 XX-42 | VLESS-REALITY"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "130.49.189.158",
+            "port": 43558,
+            "method": "chacha20-ietf-poly1305",
+            "password": "LNc9h/4NA9Q6ZHNeYHoT5X/fR9aoE9KQR1SWhVDHBog="
+          }
+        ]
+      },
+      "tag": "🌐 XX-45 | SS"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "130.49.189.158",
+            "port": 43558,
+            "method": "chacha20-ietf-poly1305",
+            "password": "yZiPrr484OdSYcivDUv+UIygwvyW+HQYytKsIgTw9tU="
+          }
+        ]
+      },
+      "tag": "🌐 XX-37 | SS"
     },
     {
       "protocol": "shadowsocks",
@@ -136,38 +170,7 @@
           }
         ]
       },
-      "tag": "🌐 XX-02 | SS"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "107.189.23.205",
-            "port": 443,
-            "users": [
-              {
-                "id": "63eecfaa-50b7-4ea9-9bec-a176bf03a215",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "suffolkprimarycare.uk",
-          "publicKey": "5Xgf3UO6yZb7gCK3R3GULk8jyNIp7Sr-26YXZfSW71c",
-          "shortId": "13975a8e0bd50e7c",
-          "fingerprint": "edge",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-03 | VLESS-REALITY"
+      "tag": "🇺🇦 UA-01 | SS"
     },
     {
       "protocol": "vless",
@@ -200,7 +203,89 @@
           "multiMode": true
         }
       },
-      "tag": "🇷🇺 RU-01 | VLESS-GRPC-TLS"
+      "tag": "🇷🇺 RU-06 | VLESS-GRPC-TLS"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "16.106.7.232",
+            "port": 20123,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com"
+        }
+      },
+      "tag": "🇭🇰 HK-04 | TROJAN-TLS"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "2.27.23.223",
+            "port": 8443,
+            "users": [
+              {
+                "id": "e50e6851-a29a-45a1-811d-1e9230c1512a",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "se1.slowframe.org",
+          "publicKey": "lQn0k9GCrG7Hh34b8ezAyVjc9KBCxQm3oP0xdxKGy0U",
+          "shortId": "35cb85e41b041622",
+          "fingerprint": "edge",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇸🇪 SE-07 | VLESS-REALITY"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "2.27.23.223",
+            "port": 8443,
+            "users": [
+              {
+                "id": "e50e6851-a29a-45a1-811d-1e9230c1512a",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "se1.slowframe.org",
+          "publicKey": "lQn0k9GCrG7Hh34b8ezAyVjc9KBCxQm3oP0xdxKGy0U",
+          "shortId": "35cb85e41b041622",
+          "fingerprint": "ios",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇸🇪 SE-09 | VLESS-REALITY"
     },
     {
       "protocol": "vless",
@@ -231,69 +316,7 @@
           "spiderX": "/"
         }
       },
-      "tag": "🌐 XX-04 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "2.27.23.223",
-            "port": 8443,
-            "users": [
-              {
-                "id": "e50e6851-a29a-45a1-811d-1e9230c1512a",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "se1.slowframe.org",
-          "publicKey": "lQn0k9GCrG7Hh34b8ezAyVjc9KBCxQm3oP0xdxKGy0U",
-          "shortId": "35cb85e41b041622",
-          "fingerprint": "edge",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-05 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "2.27.23.223",
-            "port": 8443,
-            "users": [
-              {
-                "id": "e50e6851-a29a-45a1-811d-1e9230c1512a",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "se1.slowframe.org",
-          "publicKey": "lQn0k9GCrG7Hh34b8ezAyVjc9KBCxQm3oP0xdxKGy0U",
-          "shortId": "35cb85e41b041622",
-          "fingerprint": "ios",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-06 | VLESS-REALITY"
+      "tag": "🇸🇪 SE-08 | VLESS-REALITY"
     },
     {
       "protocol": "vless",
@@ -324,128 +347,21 @@
           "spiderX": "/"
         }
       },
-      "tag": "🌐 XX-07 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "195.3.223.124",
-            "port": 443,
-            "users": [
-              {
-                "id": "fa081e9f-7574-4e18-8928-31aa5ac923c7",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "tcppl6.lazeroe.com",
-          "publicKey": "drl7nndYdfzZY1aQ0eUAWmNV0nsHig2uDnu9siy9biQ",
-          "shortId": "868419504747f6de",
-          "fingerprint": "firefox",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-08 | VLESS-REALITY"
+      "tag": "🇸🇪 SE-10 | VLESS-REALITY"
     },
     {
       "protocol": "shadowsocks",
       "settings": {
         "servers": [
           {
-            "address": "3.39.252.190",
-            "port": 8443,
+            "address": "57.131.4.13",
+            "port": 8080,
             "method": "chacha20-ietf-poly1305",
-            "password": "7e68e32f-8015-4f37-9082-70e8b0b58043"
+            "password": "mx81glqbtlwuhcjo"
           }
         ]
       },
-      "tag": "🌐 XX-09 | SS"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "84.32.61.133",
-            "port": 443,
-            "users": [
-              {
-                "id": "fa081e9f-7574-4e18-8928-31aa5ac923c7",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "us5.sbcweb.net",
-          "publicKey": "drl7nndYdfzZY1aQ0eUAWmNV0nsHig2uDnu9siy9biQ",
-          "shortId": "868419504747f6de",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-10 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "195.63.128.21",
-            "port": 2443,
-            "users": [
-              {
-                "id": "fa937345-6d3e-4ff4-8127-1a836987a0db",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "germany.cloudhouse1.ru",
-          "publicKey": "q_MJ5Zo2vcnePWq3KY653QUPX8mNSvapLpqXU4NuPho",
-          "shortId": "464db718e17e4107",
-          "fingerprint": "firefox",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-11 | VLESS-REALITY"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "168.138.205.100",
-            "port": 53758,
-            "method": "aes-128-gcm",
-            "password": "Bwlqh7GcFB"
-          }
-        ]
-      },
-      "tag": "🇯🇵 JP-04 | SS"
+      "tag": "🇮🇹 IT-01 | SS"
     },
     {
       "protocol": "vless",
@@ -476,41 +392,7 @@
           "mode": "stream-one"
         }
       },
-      "tag": "🌐 XX-12 | VLESS-XHTTP-TLS"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "api.ferrin.uk",
-            "port": 443,
-            "users": [
-              {
-                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "xhttp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "7d1a74fd.ferrin.uk",
-          "fingerprint": "chrome",
-          "alpn": [
-            "h2"
-          ]
-        },
-        "xhttpSettings": {
-          "path": "/es",
-          "host": "api.ferrin.uk",
-          "mode": "stream-one"
-        }
-      },
-      "tag": "🌐 XX-13 | VLESS-XHTTP-TLS"
+      "tag": "🌐 XX-05 | VLESS-XHTTP-TLS"
     },
     {
       "protocol": "vless",
@@ -544,97 +426,106 @@
           "mode": "stream-one"
         }
       },
-      "tag": "🌐 XX-14 | VLESS-XHTTP-TLS"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "fdat.titun.su",
-            "port": 443,
-            "users": [
-              {
-                "id": "90157e25-cee1-4217-921e-91f300bc1a24",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "banket-restoran.su",
-          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs",
-          "shortId": "428ef87fd47a3a32",
-          "fingerprint": "ios",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-15 | VLESS-REALITY"
+      "tag": "🌐 XX-03 | VLESS-XHTTP-TLS"
     },
     {
       "protocol": "shadowsocks",
       "settings": {
         "servers": [
           {
-            "address": "213.176.92.148",
-            "port": 40647,
-            "method": "aes-256-gcm",
-            "password": "DgMywXKqojHXeuXY8hOJaYGPFcjweCIJeD5cdg/cUUY="
-          }
-        ]
-      },
-      "tag": "🌐 XX-16 | SS"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "jpa.123069.xyz",
+            "address": "168.138.205.100",
             "port": 53758,
             "method": "aes-128-gcm",
             "password": "Bwlqh7GcFB"
           }
         ]
       },
-      "tag": "🇯🇵 JP-05 | SS"
+      "tag": "🇯🇵 JP-03 | SS"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "94.177.253.26",
+            "address": "api.ferrin.uk",
             "port": 443,
             "users": [
               {
-                "id": "fa081e9f-7574-4e18-8928-31aa5ac923c7",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
+                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
+                "encryption": "none"
               }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "uk7.sbcweb.net",
-          "publicKey": "drl7nndYdfzZY1aQ0eUAWmNV0nsHig2uDnu9siy9biQ",
-          "shortId": "868419504747f6de",
+        "network": "xhttp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "7d1a74fd.ferrin.uk",
           "fingerprint": "chrome",
-          "spiderX": "/"
+          "alpn": [
+            "h2"
+          ]
+        },
+        "xhttpSettings": {
+          "path": "/es",
+          "host": "api.ferrin.uk",
+          "mode": "stream-one"
         }
       },
-      "tag": "🇬🇧 GB-01 | VLESS-REALITY"
+      "tag": "🌐 XX-02 | VLESS-XHTTP-TLS"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "208.69.78.158",
+            "port": 443,
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "api.yourultimateprofessionalcareerhub.com"
+        }
+      },
+      "tag": "🇨🇭 CH-02 | TROJAN-TLS"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "cucc.cloudflare.seeck.cn",
+            "port": 443,
+            "users": [
+              {
+                "id": "99c5b713-dedf-4a10-8070-916ff3f49b0e",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "fs.qicai99.com"
+        },
+        "wsSettings": {
+          "path": "/",
+          "headers": {
+            "Host": "fs.qicai99.com"
+          }
+        }
+      },
+      "tag": "🇺🇸 US-91 | VLESS-WS-TLS"
     },
     {
       "protocol": "vless",
@@ -661,68 +552,21 @@
           "fingerprint": "chrome"
         }
       },
-      "tag": "🌐 XX-17 | VLESS-TLS"
+      "tag": "🇸🇬 SG-01 | VLESS-TLS"
     },
     {
-      "protocol": "vless",
+      "protocol": "shadowsocks",
       "settings": {
-        "vnext": [
+        "servers": [
           {
-            "address": "api.ferrin.uk",
-            "port": 443,
-            "users": [
-              {
-                "id": "7d1a74fd-8a38-4a29-863f-5da53a9e557e",
-                "encryption": "none"
-              }
-            ]
+            "address": "jpa.123069.xyz",
+            "port": 53758,
+            "method": "aes-128-gcm",
+            "password": "Bwlqh7GcFB"
           }
         ]
       },
-      "streamSettings": {
-        "network": "xhttp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "7d1a74fd.ferrin.uk"
-        },
-        "xhttpSettings": {
-          "path": "/es/?@MARAMBASHI---MARAMBASHI---MARAMBASHI---MARAMBASHI?ed=2048",
-          "host": "api.ferrin.uk",
-          "mode": "stream-one"
-        }
-      },
-      "tag": "🌐 XX-18 | VLESS-XHTTP-TLS"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "novonl.subv.ru",
-            "port": 443,
-            "users": [
-              {
-                "id": "90157e25-cee1-4217-921e-91f300bc1a24",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "golos.mail.ru",
-          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs",
-          "shortId": "428ef87fd47a3a32",
-          "fingerprint": "qq",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-19 | VLESS-REALITY"
+      "tag": "🇯🇵 JP-20 | SS"
     },
     {
       "protocol": "vless",
@@ -753,20 +597,19 @@
           "spiderX": "/"
         }
       },
-      "tag": "🇺🇸 US-01 | VLESS-REALITY"
+      "tag": "🇺🇸 US-152 | VLESS-REALITY"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "fdat.titun.su",
-            "port": 443,
+            "address": "p1real1.greewebservices.ir",
+            "port": 1230,
             "users": [
               {
-                "id": "90157e25-cee1-4217-921e-91f300bc1a24",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
+                "encryption": "none"
               }
             ]
           }
@@ -777,76 +620,34 @@
         "security": "reality",
         "realitySettings": {
           "show": false,
-          "serverName": "pulse.mail.ru",
-          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs",
-          "shortId": "428ef87fd47a3a32",
-          "fingerprint": "qq",
+          "serverName": "play.googleapis.com",
+          "publicKey": "xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8",
+          "shortId": "9b60d3",
+          "fingerprint": "ios",
           "spiderX": "/"
         }
       },
-      "tag": "🌐 XX-20 | VLESS-REALITY"
+      "tag": "🇩🇪 DE-36 | VLESS-REALITY"
     },
     {
-      "protocol": "vless",
+      "protocol": "trojan",
       "settings": {
-        "vnext": [
+        "servers": [
           {
-            "address": "fdat.titun.su",
-            "port": 443,
-            "users": [
-              {
-                "id": "90157e25-cee1-4217-921e-91f300bc1a24",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
+            "address": "sclass-00.catcat321.com",
+            "port": 20103,
+            "password": "d9064589-74af-432a-9390-5d8a9da281bf"
           }
         ]
       },
       "streamSettings": {
         "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "pulse.mail.ru",
-          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs",
-          "shortId": "428ef87fd47a3a32",
-          "fingerprint": "firefox",
-          "spiderX": "/"
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "hk.catxstar.com"
         }
       },
-      "tag": "🌐 XX-21 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "94.177.253.26",
-            "port": 443,
-            "users": [
-              {
-                "id": "fa081e9f-7574-4e18-8928-31aa5ac923c7",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "uk7.sbcweb.net",
-          "publicKey": "drl7nndYdfzZY1aQ0eUAWmNV0nsHig2uDnu9siy9biQ",
-          "shortId": "868419504747f6de",
-          "fingerprint": "firefox",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🇬🇧 GB-02 | VLESS-REALITY"
+      "tag": "🇭🇰 HK-10 | TROJAN-TLS"
     },
     {
       "protocol": "vless",
@@ -877,14 +678,14 @@
           "spiderX": "/"
         }
       },
-      "tag": "🇺🇸 US-02 | VLESS-REALITY"
+      "tag": "🇺🇸 US-151 | VLESS-REALITY"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "104.18.21.69",
+            "address": "172.64.152.33",
             "port": 443,
             "users": [
               {
@@ -903,25 +704,26 @@
           "fingerprint": "chrome"
         },
         "wsSettings": {
-          "path": "/fp=chrome",
+          "path": "/",
           "headers": {
             "Host": "fs.qicai99.com"
           }
         }
       },
-      "tag": "🌐 XX-22 | VLESS-WS-TLS"
+      "tag": "🇺🇸 US-142 | VLESS-WS-TLS"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "p1real4.greewebservices.ir",
-            "port": 1260,
+            "address": "200.102.180.37",
+            "port": 8443,
             "users": [
               {
-                "id": "b0511969-f769-460b-963b-70c6b84b6967",
-                "encryption": "none"
+                "id": "664f65f4-33b3-43a3-b9e5-68192d1d428e",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
               }
             ]
           }
@@ -932,14 +734,14 @@
         "security": "reality",
         "realitySettings": {
           "show": false,
-          "serverName": "play.googleapis.com",
-          "publicKey": "xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8",
-          "shortId": "9b60d3",
-          "fingerprint": "ios",
+          "serverName": "juniper-canyon.cdn.cachefleet.com",
+          "publicKey": "bGwVs-Re6vNB1tuKqZZ209x7l361FxZdtPHg0yZLa2Q",
+          "shortId": "63c4425dacae86cb",
+          "fingerprint": "firefox",
           "spiderX": "/"
         }
       },
-      "tag": "🇧🇬 BG-01 | VLESS-REALITY"
+      "tag": "🇺🇸 US-130 | VLESS-REALITY"
     },
     {
       "protocol": "vless",
@@ -970,49 +772,18 @@
           "spiderX": "/"
         }
       },
-      "tag": "🇺🇸 US-03 | VLESS-REALITY"
+      "tag": "🇺🇸 US-139 | VLESS-REALITY"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "3.133.112.167",
-            "port": 443,
+            "address": "p1real4.greewebservices.ir",
+            "port": 1260,
             "users": [
               {
-                "id": "4ed6347d-a31c-4d6e-8e50-a1732e755145",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "www.microsoft.com",
-          "publicKey": "94ht0iE2gA8VdlDHGtXeKrPcIK3dckjKSIQYkZ9xnnM",
-          "shortId": "0123456789abcdef",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-23 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "104.21.60.73",
-            "port": 443,
-            "users": [
-              {
-                "id": "99c5b713-dedf-4a10-8070-916ff3f49b0e",
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
                 "encryption": "none"
               }
             ]
@@ -1020,38 +791,30 @@
         ]
       },
       "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "fs.qicai99.com",
-          "fingerprint": "chrome",
-          "alpn": [
-            "h3",
-            "h2",
-            "http/1.1"
-          ]
-        },
-        "wsSettings": {
-          "path": "/?---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---@Fear_Config---",
-          "headers": {
-            "Host": "fs.qicai99.com"
-          }
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "play.googleapis.com",
+          "publicKey": "xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8",
+          "shortId": "9b60d3",
+          "fingerprint": "ios",
+          "spiderX": "/"
         }
       },
-      "tag": "🌐 XX-24 | VLESS-WS-TLS"
+      "tag": "🇧🇬 BG-13 | VLESS-REALITY"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "200.102.180.37",
-            "port": 8443,
+            "address": "p11real1.greewebservices.ir",
+            "port": 1020,
             "users": [
               {
-                "id": "664f65f4-33b3-43a3-b9e5-68192d1d428e",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
+                "encryption": "none"
               }
             ]
           }
@@ -1062,14 +825,14 @@
         "security": "reality",
         "realitySettings": {
           "show": false,
-          "serverName": "juniper-canyon.cdn.cachefleet.com",
-          "publicKey": "bGwVs-Re6vNB1tuKqZZ209x7l361FxZdtPHg0yZLa2Q",
-          "shortId": "63c4425dacae86cb",
-          "fingerprint": "chrome",
+          "serverName": "play.googleapis.com",
+          "publicKey": "xwbp4EcOtus1W5Au4XCJJbCl9jCb4DwGgYQYEwUDqTY",
+          "shortId": "354e34396eaa89ab",
+          "fingerprint": "ios",
           "spiderX": "/"
         }
       },
-      "tag": "🌐 XX-25 | VLESS-REALITY"
+      "tag": "🇧🇬 BG-03 | VLESS-REALITY"
     },
     {
       "protocol": "vless",
@@ -1099,167 +862,15 @@
           "spiderX": "/"
         }
       },
-      "tag": "🇧🇬 BG-02 | VLESS-REALITY"
+      "tag": "🇧🇬 BG-15 | VLESS-REALITY"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "fdat.titun.su",
-            "port": 443,
-            "users": [
-              {
-                "id": "90157e25-cee1-4217-921e-91f300bc1a24",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "banket-restoran.su",
-          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs",
-          "shortId": "428ef87fd47a3a32",
-          "fingerprint": "firefox",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-26 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "84.32.151.166",
-            "port": 443,
-            "users": [
-              {
-                "id": "fa081e9f-7574-4e18-8928-31aa5ac923c7",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "lt3.lazeroe.com",
-          "publicKey": "drl7nndYdfzZY1aQ0eUAWmNV0nsHig2uDnu9siy9biQ",
-          "shortId": "868419504747f6de",
-          "fingerprint": "edge",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-27 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "84.32.151.166",
-            "port": 443,
-            "users": [
-              {
-                "id": "fa081e9f-7574-4e18-8928-31aa5ac923c7",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "lt3.lazeroe.com",
-          "publicKey": "drl7nndYdfzZY1aQ0eUAWmNV0nsHig2uDnu9siy9biQ",
-          "shortId": "868419504747f6de",
-          "fingerprint": "safari",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-28 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "84.32.151.166",
-            "port": 443,
-            "users": [
-              {
-                "id": "fa081e9f-7574-4e18-8928-31aa5ac923c7",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "lt3.lazeroe.com",
-          "publicKey": "drl7nndYdfzZY1aQ0eUAWmNV0nsHig2uDnu9siy9biQ",
-          "shortId": "868419504747f6de",
-          "fingerprint": "ios",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-29 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "195.63.128.21",
-            "port": 20443,
-            "users": [
-              {
-                "id": "fa937345-6d3e-4ff4-8127-1a836987a0db",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "germany.cloudhouse1.ru",
-          "publicKey": "00n0EAgpY0J966ZIr6LzA4bBhezLRoowNmCXjELfy0I",
-          "shortId": "73ca8049b875fe8d",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-30 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "p1real5.greewebservices.ir",
-            "port": 1270,
+            "address": "p1real2.greewebservices.ir",
+            "port": 1240,
             "users": [
               {
                 "id": "b0511969-f769-460b-963b-70c6b84b6967",
@@ -1281,15 +892,105 @@
           "spiderX": "/"
         }
       },
-      "tag": "🇧🇬 BG-03 | VLESS-REALITY"
+      "tag": "🇧🇬 BG-14 | VLESS-REALITY"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "p1real5.greewebservices.ir",
-            "port": 1270,
+            "address": "p1real2.greewebservices.ir",
+            "port": 1240,
+            "users": [
+              {
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "play.googleapis.com",
+          "publicKey": "xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8",
+          "shortId": "9b60d3",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇧🇬 BG-12 | VLESS-REALITY"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "p1real3.greewebservices.ir",
+            "port": 1250,
+            "users": [
+              {
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "play.googleapis.com",
+          "publicKey": "xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8",
+          "shortId": "9b60d3",
+          "fingerprint": "ios",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇧🇬 BG-10 | VLESS-REALITY"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "p11real2.greewebservices.ir",
+            "port": 1030,
+            "users": [
+              {
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "play.googleapis.com",
+          "publicKey": "xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8",
+          "shortId": "9b60d3",
+          "fingerprint": "ios",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇧🇬 BG-08 | VLESS-REALITY"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "p11real2.greewebservices.ir",
+            "port": 1030,
             "users": [
               {
                 "id": "b0511969-f769-460b-963b-70c6b84b6967",
@@ -1318,11 +1019,11 @@
       "settings": {
         "vnext": [
           {
-            "address": "172.67.193.217",
-            "port": 443,
+            "address": "p11real3.greewebservices.ir",
+            "port": 1040,
             "users": [
               {
-                "id": "99c5b713-dedf-4a10-8070-916ff3f49b0e",
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
                 "encryption": "none"
               }
             ]
@@ -1330,25 +1031,219 @@
         ]
       },
       "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "fs.qicai99.com",
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "play.googleapis.com",
+          "publicKey": "xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8",
+          "shortId": "9b60d3",
           "fingerprint": "chrome",
-          "alpn": [
-            "h3",
-            "h2",
-            "http/1.1"
-          ]
-        },
-        "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "fs.qicai99.com"
-          }
+          "spiderX": "/"
         }
       },
-      "tag": "🌐 XX-31 | VLESS-WS-TLS"
+      "tag": "🇧🇬 BG-02 | VLESS-REALITY"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "p1real3.greewebservices.ir",
+            "port": 1250,
+            "users": [
+              {
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "play.googleapis.com",
+          "publicKey": "xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8",
+          "shortId": "9b60d3",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇧🇬 BG-16 | VLESS-REALITY"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "p1real5.greewebservices.ir",
+            "port": 1270,
+            "users": [
+              {
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "play.googleapis.com",
+          "publicKey": "xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8",
+          "shortId": "9b60d3",
+          "fingerprint": "ios",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇧🇬 BG-18 | VLESS-REALITY"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "p1real5.greewebservices.ir",
+            "port": 1270,
+            "users": [
+              {
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "play.googleapis.com",
+          "publicKey": "xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8",
+          "shortId": "9b60d3",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇧🇬 BG-11 | VLESS-REALITY"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "p11real1.greewebservices.ir",
+            "port": 1020,
+            "users": [
+              {
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "play.googleapis.com",
+          "publicKey": "xwbp4EcOtus1W5Au4XCJJbCl9jCb4DwGgYQYEwUDqTY",
+          "shortId": "354e34396eaa89ab",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇧🇬 BG-07 | VLESS-REALITY"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "87.199.205.28",
+            "port": 443,
+            "users": [
+              {
+                "id": "501a2da5-cb22-4a3f-915e-e3b821d1d62d",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "vkvd754.okcdn.ru",
+          "publicKey": "W-9zyiOq287RtXVTZlTFbSDJ0Mx8joyBLJoA7ZE7eBw",
+          "shortId": "dd3519f8d7626e05",
+          "fingerprint": "chrome",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇳🇱 NL-106 | VLESS-REALITY"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "p11real3.greewebservices.ir",
+            "port": 1040,
+            "users": [
+              {
+                "id": "b0511969-f769-460b-963b-70c6b84b6967",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "play.googleapis.com",
+          "publicKey": "xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8",
+          "shortId": "9b60d3",
+          "fingerprint": "ios",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇧🇬 BG-01 | VLESS-REALITY"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "193.108.119.34",
+            "port": 443,
+            "password": "0ab6c98dae3b48e8b9c4a776b6c9c19a"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "cdn.iloverussia2026.com"
+        }
+      },
+      "tag": "🇩🇪 DE-16 | TROJAN-TLS"
     },
     {
       "protocol": "vless",
@@ -1383,14 +1278,14 @@
           }
         }
       },
-      "tag": "🌐 XX-32 | VLESS-WS-TLS"
+      "tag": "🌐 XX-06 | VLESS-WS-TLS"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "104.18.34.33",
+            "address": "104.21.60.73",
             "port": 443,
             "users": [
               {
@@ -1414,18 +1309,18 @@
           }
         }
       },
-      "tag": "🌐 XX-33 | VLESS-WS-TLS"
+      "tag": "🇺🇸 US-83 | VLESS-WS-TLS"
     },
     {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "51.158.206.98",
-            "port": 23576,
+            "address": "xjpp.zjlo.top",
+            "port": 36442,
             "users": [
               {
-                "id": "48ff2b70-e180-582f-8866-d9a2edeed5f5",
+                "id": "b743c868-b35c-4d91-b88b-d9efd7060b5c",
                 "encryption": "none",
                 "flow": "xtls-rprx-vision"
               }
@@ -1435,200 +1330,13 @@
       },
       "streamSettings": {
         "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "fuck.rkn",
-          "publicKey": "1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s",
-          "shortId": "01",
-          "fingerprint": "firefox",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🇳🇱 NL-01 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "172.64.152.33",
-            "port": 443,
-            "users": [
-              {
-                "id": "99c5b713-dedf-4a10-8070-916ff3f49b0e",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "fs.qicai99.com"
-        },
-        "wsSettings": {
-          "path": "/",
-          "headers": {
-            "Host": "fs.qicai99.com"
-          }
+          "serverName": "xjpp.zjlo.top",
+          "fingerprint": "chrome"
         }
       },
-      "tag": "🌐 XX-34 | VLESS-WS-TLS"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "203.23.179.123",
-            "port": 443,
-            "users": [
-              {
-                "id": "fa081e9f-7574-0001-8928-31aa5ac923c7",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "de1-b.sbcweb.net",
-          "publicKey": "drl7nndYdfzZY1aQ0eUAWmNV0nsHig2uDnu9siy9biQ",
-          "shortId": "868419504747f6de",
-          "fingerprint": "edge",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-35 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "v1au.mateflora.com",
-            "port": 443,
-            "users": [
-              {
-                "id": "57beeeb0-03fc-4fc9-94da-7604488a7134",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "www.apple.com",
-          "publicKey": "7GvJVbR6BRhtrc8-rcZvB8qTFUF1LPeM_MmoZ04mBxo",
-          "shortId": "54cca3c1c1c7",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🇦🇺 AU-01 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "203.23.179.123",
-            "port": 443,
-            "users": [
-              {
-                "id": "fa081e9f-7574-0001-8928-31aa5ac923c7",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "de1-b.sbcweb.net",
-          "publicKey": "drl7nndYdfzZY1aQ0eUAWmNV0nsHig2uDnu9siy9biQ",
-          "shortId": "868419504747f6de",
-          "fingerprint": "ios",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-36 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "novonl.subv.ru",
-            "port": 443,
-            "users": [
-              {
-                "id": "90157e25-cee1-4217-921e-91f300bc1a24",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "golos.mail.ru",
-          "publicKey": "1vSZjvhZO01oAEH3b7eebR1qF5dLU1Dq2E7xu8pwGSs",
-          "shortId": "428ef87fd47a3a32",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-37 | VLESS-REALITY"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "mojtun.mlbaz.ir",
-            "port": 555,
-            "method": "chacha20-ietf-poly1305",
-            "password": "60806a2e4c3945f4ba08beade8d71d4e"
-          }
-        ]
-      },
-      "tag": "🇮🇷 IR-01 | SS"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "5.202.11.137",
-            "port": 555,
-            "method": "chacha20-ietf-poly1305",
-            "password": "60806a2e4c3945f4ba08beade8d71d4e"
-          }
-        ]
-      },
-      "tag": "🇮🇷 IR-02 | SS"
+      "tag": "🇸🇬 SG-08 | VLESS-TLS"
     },
     {
       "protocol": "trojan",
@@ -1648,7 +1356,7 @@
           "serverName": "cdn.nextjobopportunityandclaimyouridealrole.com"
         }
       },
-      "tag": "🌐 XX-38 | TROJAN-TLS"
+      "tag": "🇺🇸 US-48 | TROJAN-TLS"
     }
   ]
 }
