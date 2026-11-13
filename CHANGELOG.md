@@ -19,6 +19,14 @@ and is not recorded here.
 - Per-source `tested` and `working` counts in `status.json`.
 - Documentation split into a short README and the guides in `guide/`.
 
+### Fixed
+- The control panel ended whenever the window that started it was closed, and its
+  page then kept showing the last state it had received as if the run were still
+  going. The panel now runs as a background program without a window of its own,
+  has a **Quit panel** button, and its page says **Panel stopped** (and disables its
+  buttons) when the program is gone. A page left open across a restart reloads
+  itself. A crash is recorded in `.local\logs\panel.log`.
+
 ### Changed
 - **Node names** are now `🇩🇪 DE-07 | VLESS-WS-TLS` with small numbers per country,
   replacing `server 🇩🇪 50186`.

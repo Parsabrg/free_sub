@@ -48,7 +48,8 @@ git clone https://github.com/Parsabrg/free_sub.git
 cd free_sub
 ```
 
-Then double-click `panel_windows.bat` and press **Start**.
+Then double-click `panel_windows.bat`. A page opens in your browser: press **Start**.
+The panel itself runs in the background, without a window of its own.
 
 Publishing needs a one-time Git sign-in and GitHub Pages switched on for the
 repository. Both, and the unattended scheduled task, are covered step by step in
@@ -58,7 +59,10 @@ repository. Both, and the unattended scheduled task, are covered step by step in
 
 ![The control panel](guide/images/control-panel.png)
 
-`panel_windows.bat` (or `python app.py`) opens a page at `http://127.0.0.1:8765/`.
+`panel_windows.bat` (or `python app.py`) starts the panel as a background program with
+no window of its own and opens its page at `http://127.0.0.1:8765/`. Closing the
+browser tab, or the brief window the launcher shows, does not stop it. Running the
+launcher again while the panel is up simply opens the page again.
 
 - **Start / Stop.** Start one run, or keep running every 30 minutes while the panel
   is open. Stop ends the run and every Xray process it started.
@@ -69,11 +73,14 @@ repository. Both, and the unattended scheduled task, are covered step by step in
 - **Sources.** Add your own `https://` subscription address, switch any source on
   or off, and see how many configs each one carried and how many worked.
 - **Update program.** Fetches the newest version of this repository.
+- **Quit panel.** Stops any run and the repeat schedule, then ends the panel program.
 - **Log.** The live output of the current run, with a progress bar.
 
 While it repeats, the panel keeps Windows from idle-sleeping. It cannot wake a
-sleeping PC, and closing its window stops everything. The page is served to this
-computer only.
+sleeping PC, and it ends when Windows signs out or restarts. If the page shows
+**Panel stopped**, the program ended (it was quit, killed, or crashed); start it
+again with `panel_windows.bat`. A crash is recorded in `.local\logs\panel.log`. The
+page is served to this computer only.
 
 ## Running without the panel
 

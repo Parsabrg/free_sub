@@ -1,6 +1,10 @@
 import http.client
+import http.server
 import json
 from pathlib import Path
+import re
+import socket
+import subprocess
 import sys
 import tempfile
 import threading
@@ -54,7 +58,8 @@ class PanelTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn(self.panel.token.encode(), page)
         self.assertEqual(self.request('GET', '/', host='evil.example')[0], 403)
-        self.assertEqual(self.request('GET', '/api/state', token=False)[0], 404)
+        self.assertEqual(self.request('GET', '/api/state', token=False)[0], 403)   # a stale page reloads
+        self.assertEqual(self.request('GET', '/api/nothing', token=False)[0], 404)
         self.assertEqual(self.request('POST', '/api/start', {'mode': 'full'}, token=False)[0], 403)
         self.assertEqual(self.request('POST', '/api/start', {'mode': 'full'}, host=f'evil.example:{self.port}')[0], 403)
         self.assertEqual(self.state()['run']['state'], 'idle')
@@ -82,6 +87,26 @@ class PanelTests(unittest.TestCase):
         state = self.state()
         self.assertEqual(state['run']['exit'], 0)
         self.assertTrue(any('[CHECK] 25/100' in line for line in state['log']))
+
+    def test_quit_stops_the_run_and_ends_the_server(self):
+        ended = threading.Event()
+        self.panel.shutdown = ended.set
+        self.script = 'import time; print("started", flush=True); time.sleep(60)'
+        self.request('POST', '/api/start', {'mode': 'auto', 'publish': True, 'repeat': True})
+        self.assertTrue(wait_for(lambda: any('started' in line for line in self.state()['log'])))
+        self.assertEqual(self.request('POST', '/api/quit', {})[0], 200)
+        self.assertTrue(ended.wait(10), 'the web server was never asked to end')
+        self.assertEqual(self.state()['run']['state'], 'idle')
+        self.assertFalse(self.runner.thread.is_alive())
+        self.assertEqual(self.request('POST', '/api/quit', {}, token=False)[0], 403)
+
+    def test_ping_names_the_program_and_a_strange_token_is_only_refused(self):
+        status, body = self.request('GET', '/api/ping', token=False)
+        self.assertEqual((status, json.loads(body)['app']), (200, app.APP_NAME))
+        connection = http.client.HTTPConnection('127.0.0.1', self.port, timeout=10)
+        connection.request('GET', '/api/state', headers={'Host': f'127.0.0.1:{self.port}', 'X-Token': 'caf\u00e9'})
+        self.assertEqual(connection.getresponse().status, 403)
+        connection.close()
 
     def test_stop_kills_a_run_and_ends_the_repeat(self):
         self.script = 'import time; print("started", flush=True); time.sleep(60)'
@@ -161,6 +186,79 @@ class PanelTests(unittest.TestCase):
         self.assertEqual(self.request('POST', '/api/source/remove', {'name': 'Barry'})[0], 400)
         self.assertEqual(self.request('POST', '/api/source/remove', {'name': 'Mine'})[0], 200)
         self.assertNotIn('Mine', {row['name'] for row in self.state()['sources']})
+
+
+
+def free_port():
+    with socket.socket() as sock:
+        sock.bind(('127.0.0.1', 0))
+        return sock.getsockname()[1]
+
+
+class BackgroundPanelTests(unittest.TestCase):
+    """The real launcher, in real processes: the panel must outlive the window that started it."""
+
+    def launcher(self, folder, port):
+        return subprocess.run([sys.executable, str(Path(app.__file__).resolve()), '--root', folder,
+                               '--port', str(port), '--no-browser'], capture_output=True, text=True, timeout=60)
+
+    def quit(self, port):
+        connection = http.client.HTTPConnection('127.0.0.1', port, timeout=10)
+        connection.request('GET', '/')
+        token = re.search(r"TOKEN = '([^']+)'", connection.getresponse().read().decode()).group(1)
+        connection.close()
+        connection = http.client.HTTPConnection('127.0.0.1', port, timeout=10)
+        connection.request('POST', '/api/quit', '{}', {'X-Token': token})
+        status = connection.getresponse().status
+        connection.close()
+        return status
+
+    def test_the_panel_outlives_its_launcher_is_started_once_and_quits(self):
+        port = free_port()
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as folder:
+            self.addCleanup(lambda: app.probe(port)[0] == 'panel' and self.quit(port))
+            first = self.launcher(folder, port)
+            self.assertEqual(first.returncode, 0, first.stderr)
+            self.assertIn('started in the background', first.stdout)
+            self.assertIn('does not stop it', first.stdout)
+            # The launcher has exited; the panel is still there.
+            state, info = app.probe(port)
+            self.assertEqual(state, 'panel')
+            second = self.launcher(folder, port)
+            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertIn('already running', second.stdout)
+            self.assertEqual(app.probe(port)[1]['pid'], info['pid'])
+            self.assertEqual(self.quit(port), 200)
+            self.assertTrue(wait_for(lambda: app.probe(port)[0] == 'free'), 'the panel did not end')
+            log = (Path(folder) / '.local' / 'logs' / 'panel.log').read_text(encoding='utf-8')
+            self.assertIn('panel listening on', log)
+            self.assertTrue(wait_for(lambda: 'panel ended' in (Path(folder) / '.local/logs/panel.log').read_text()))
+
+    def test_another_program_on_the_port_is_reported_not_trampled(self):
+        class Other(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(404); self.end_headers()
+            def log_message(self, *args):
+                pass
+        other = http.server.ThreadingHTTPServer(('127.0.0.1', 0), Other)
+        threading.Thread(target=other.serve_forever, daemon=True).start()
+        self.addCleanup(other.server_close)
+        self.addCleanup(other.shutdown)
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as folder:
+            result = self.launcher(folder, other.server_address[1])
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('used by another program', result.stderr)
+        self.assertEqual(app.probe(other.server_address[1])[0], 'busy')
+
+    def test_a_panel_that_cannot_start_says_where_to_look(self):
+        port = free_port()
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as folder:
+            blocker = socket.socket()
+            blocker.bind(('127.0.0.1', port))      # bound, not listening: refuses, yet the port is taken
+            self.addCleanup(blocker.close)
+            result = self.launcher(folder, port)
+        self.assertEqual(result.returncode, 1)
+        self.assertTrue('could not start' in result.stderr or 'used by another program' in result.stderr, result.stderr)
 
 
 if __name__ == '__main__':
