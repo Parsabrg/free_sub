@@ -126,6 +126,30 @@ class RealXrayEndToEnd(unittest.TestCase):
         # Screening success alone cannot pass the two-transfer publication gate.
         self.assertFalse(run_probe(parse(self.url),BINARY,8,quick=False,local_fixture=fixture).passed)
 
+    def test_027_a_failed_direct_fetch_goes_through_a_verified_node(self):
+        import collector
+        from relay import fallback
+        self.__class__.feed=self.url+'#through-relay\n'
+        origin=f'https://localhost:{self.origin.server_port}'
+        fixture={'ca_file':str(self.cert),'check':(origin+'/generate_204',204)}
+        def reset(url,timeout=20):
+            raise ConnectionResetError()
+        dead=parse(self.url.replace('fixture-secret@','bad-secret@'))
+        self.requests.clear()
+        with patch('collector.direct_get',reset):
+            # No relay: the reset is the result. With one: the dead node is passed over.
+            self.assertEqual(collect({'Fixture':origin+'/feed'})['Fixture'],[])
+            with fallback(BINARY,[dead,parse(self.url)],fixture) as relay:
+                self.assertIsNone(relay.proc)
+                groups=collect({'Fixture':origin+'/feed'})
+                self.assertIsNotNone(relay.proc)
+            self.assertEqual([c.key for c in groups['Fixture']],[parse(self.url).key])
+            self.assertEqual(self.requests,['/generate_204','/feed'])
+            self.assertIsNone(relay.proc)
+            self.assertIsNone(collector.FALLBACK)
+            with fallback(BINARY,[dead],fixture):
+                self.assertEqual(collect({'Fixture':origin+'/feed'})['Fixture'],[])
+
     def test_03_full_pipeline_then_health_and_expiry(self):
         with tempfile.TemporaryDirectory() as folder:
             args=arguments(['--xray',BINARY,'--limit','3','--recheck','3','--max-tests','3','--mode','full','--timeout','8'])

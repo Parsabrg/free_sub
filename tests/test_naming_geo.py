@@ -8,15 +8,15 @@ from unittest.mock import patch
 from urllib.parse import unquote, urlsplit
 
 from collector import SOURCES, parse
-from naming import name_for_position, rename_share_link
+from naming import assign_labels, describe, node_name, rename_share_link
 from geolocation import CountryInfo, country_flag, public_ip, geolocate_hosts, resolve_endpoint
 
 
 class RenameTests(unittest.TestCase):
     def test_vless_preserves_connection(self):
         src = 'vless://12345@example.net:443?type=ws&security=tls&path=%2Fhi#Old%20Name'
-        changed = rename_share_link(src, name_for_position('🇩🇪', 1))
-        self.assertEqual(unquote(urlsplit(changed).fragment), 'server 🇩🇪 1')
+        changed = rename_share_link(src, node_name('🇩🇪', 'DE', 1, parse(src).outbound))
+        self.assertEqual(unquote(urlsplit(changed).fragment), '🇩🇪 DE-01 | VLESS-WS-TLS')
         self.assertEqual(changed.split('#', 1)[0], src.split('#', 1)[0])
         self.assertEqual(parse(changed).key, parse(src).key)
 
@@ -53,14 +53,45 @@ class RenameTests(unittest.TestCase):
         self.assertEqual(decoded['id'], config['id'])
         self.assertEqual(parse(changed).key, parse(src).key)
 
+    def test_names_say_what_was_tested(self):
+        import base64 as b64
+        ss = 'ss://' + b64.urlsafe_b64encode(b'aes-256-gcm:secret').decode().rstrip('=') + '@8.8.8.8:2233'
+        cases = {'vless://id@example.com:443?security=tls': 'VLESS-TLS',
+                 'vless://id@example.com:443?security=tls&type=grpc&serviceName=x': 'VLESS-GRPC-TLS',
+                 'vless://id@1.2.3.4:443?security=reality&sni=a.example&pbk=key&type=xhttp': 'VLESS-XHTTP-REALITY',
+                 'trojan://pw@example.com:443?type=httpupgrade': 'TROJAN-HTTPUPGRADE-TLS', ss: 'SS'}
+        for link, expected in cases.items():
+            self.assertEqual(describe(parse(link).outbound), expected, link)
+
+    def test_numbers_are_small_per_country_and_kept(self):
+        nodes = {}
+        def node(i, code, last_success=1000):
+            c = parse(f'trojan://pw{i}@example.com:443?security=tls')
+            nodes.setdefault(c.key, {'country_code': code, 'last_success': last_success})
+            return c, None
+        a, b, c, d = node(1, 'DE'), node(2, 'DE'), node(3, 'NL'), node(4, None)
+        assign_labels([a, b, c, d], nodes, 1000)
+        label = lambda pair: nodes[pair[0].key]['label']
+        self.assertEqual([label(x) for x in (a, b, c, d)], [['DE', 1], ['DE', 2], ['NL', 1], ['XX', 1]])
+        # a misses one run: its number stays reserved, the newcomer takes the next one.
+        e = node(5, 'DE')
+        assign_labels([b, e], nodes, 1100)
+        self.assertEqual([label(x) for x in (a, b, e)], [['DE', 1], ['DE', 2], ['DE', 3]])
+        assign_labels([a, b, e], nodes, 1200)
+        self.assertEqual(label(a), ['DE', 1])
+        # A day after its last success the number is free again, and a new country renumbers.
+        f = node(6, 'DE', last_success=90000)
+        nodes[b[0].key]['country_code'] = 'FR'
+        assign_labels([b, f], nodes, 1000 + 86400)
+        self.assertEqual([label(x) for x in (a, b, e, f)], [None, ['FR', 1], None, ['DE', 1]])
+
     def test_all_sources_configured(self):
         # EbraSha's repository was deleted (404, 2026-10-26); three live feeds replaced it.
-        self.assertEqual(len(SOURCES), 23)
+        # Epodonios' eight feeds went the same way (404, 2026-11-12); sources.py finds new ones.
+        self.assertEqual(len(SOURCES), 15)
         for name in ['RadikalAll', 'Bahemmat', 'Hamedcode443', 'MorpheusIran']:
             self.assertTrue(SOURCES[name].startswith('https://raw.githubusercontent.com/'), name)
-        # Epodonios' extra feeds, missing from its combined file.
-        for name in [f'EpodoniosSub{n}' for n in range(21, 27)] + ['EpodoniosVless']:
-            self.assertIn('Epodonios/v2ray-configs/main/', SOURCES[name], name)
+        self.assertFalse([name for name in SOURCES if name.startswith('Epodonios')])
         self.assertNotIn('EbraSha', SOURCES)
         for name in ('ALIILAPRO', 'Ermaozi', 'MatinGhanbari'):
             self.assertTrue(SOURCES[name].startswith('https://raw.githubusercontent.com/'), name)
@@ -78,7 +109,9 @@ class GeolocationTests(unittest.TestCase):
         self.assertEqual(country_flag('DE'), '🇩🇪')
         self.assertEqual(country_flag('nl'), '🇳🇱')
         self.assertEqual(country_flag(None), '🌐')
-        self.assertEqual(name_for_position(country_flag('US'), 12), 'server 🇺🇸 12')
+        trojan = parse('trojan://pw@example.com:443?security=tls&type=ws&path=%2Fx').outbound
+        self.assertEqual(node_name(country_flag('US'), 'US', 12, trojan), '🇺🇸 US-12 | TROJAN-WS-TLS')
+        self.assertEqual(node_name(country_flag(None), None, 104, trojan), '🌐 XX-104 | TROJAN-WS-TLS')
 
     def test_private_ip_rejected(self):
         self.assertIsNone(public_ip('127.0.0.1'))

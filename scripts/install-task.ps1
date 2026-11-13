@@ -6,7 +6,17 @@ param(
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
 if ($Uninstall) {
+    if (-not (Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue)) {
+        Write-Host 'No such task is installed; nothing to remove.'
+        exit 0
+    }
+    # End a run in progress too, then remove the task.
+    Stop-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
     Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
+    # Without elevation the removal is refused, and this used to report success anyway.
+    if (Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue) {
+        throw 'The task is still installed. Run this in an Administrator PowerShell window.'
+    }
     Write-Host 'Task removed. Wake timer power settings are unchanged.'
     exit 0
 }

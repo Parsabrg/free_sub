@@ -1,17 +1,21 @@
 """Fetch and safely parse public share-link subscriptions (Python standard library)."""
 from __future__ import annotations
 import base64
+import concurrent.futures as cf
 import hashlib
+import html
 import json
+import urllib.error
 import urllib.parse as up
 import urllib.request
 from dataclasses import dataclass
 
 SOURCES = {
     'Barry': 'https://raw.githubusercontent.com/barry-far/V2ray-Config/main/All_Configs_Sub.txt',
-    'Epodonios': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/All_Configs_Sub.txt',
     'Shadowmere': 'https://shadowmere.xyz/api/b64sub/',
     # Additional public feeds. They are candidate sources, NOT trusted or pre-verified by us.
+    # 2026-11-12: Epodonios/v2ray-configs (eight feeds here) answers 404 like EbraSha before it.
+    # sources.py finds replacements by itself, and finds it again should it come back.
     'Radikal': 'https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/main/verified/configs.txt',
     'Pawdroid': 'https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub',
     'MahdiblandPublic': 'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/Eternity.txt',
@@ -23,15 +27,6 @@ SOURCES = {
     'ALIILAPRO': 'https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/server.txt',
     'Ermaozi': 'https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt',
     'MatinGhanbari': 'https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/v2ray/super-sub.txt',
-    # Epodonios also publishes Sub21-Sub26 and a VLESS split that its All_Configs_Sub.txt leaves out:
-    # 735 configs no other feed has (measured 2026-10-26). Barry's split files add none.
-    'EpodoniosSub21': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub21.txt',
-    'EpodoniosSub22': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub22.txt',
-    'EpodoniosSub23': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub23.txt',
-    'EpodoniosSub24': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub24.txt',
-    'EpodoniosSub25': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub25.txt',
-    'EpodoniosSub26': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub26.txt',
-    'EpodoniosVless': 'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/vless.txt',
     # 2026-10-26: 16 active collectors were screened from Iran on the 6,625 configs they add;
     # only these four had any that worked (7, 6, 1 and 1). The other twelve had none.
     'RadikalAll': 'https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/main/all/configs.txt',
@@ -57,13 +52,31 @@ def b64decode(value: str) -> str:
     value = ''.join(value.split()).replace('-', '+').replace('_', '/')
     return base64.b64decode(value + '=' * (-len(value) % 4), validate=True).decode('utf-8')
 
-def get(url, timeout=20):
+# relay.fallback() sets this for the length of a discovery: get(url, timeout) through a verified node.
+FALLBACK = None
+
+def direct_get(url, timeout=20):
     request = urllib.request.Request(url, headers={'User-Agent': 'LocalXraySubscription/1.0 (+public feeds)'})
     with urllib.request.urlopen(request, timeout=timeout) as response:
         data = response.read(MAX_FETCH + 1)
         if len(data) > MAX_FETCH:
             raise ValueError('Source exceeded 8 MiB limit')
     return data.decode('utf-8-sig')
+
+def get(url, timeout=20):
+    try:
+        return direct_get(url, timeout)
+    except ValueError:
+        raise  # too large or not text: the same through any node
+    except Exception as exc:
+        # An answer from the server is final, unless it refuses this address (403, 429).
+        final = isinstance(exc, urllib.error.HTTPError) and exc.code not in (403, 429)
+        if FALLBACK is None or final:
+            raise
+        try:
+            return FALLBACK(url, timeout)
+        except Exception:
+            raise exc from None  # report what went wrong directly, not the relay's trouble
 
 def links(data):
     # Accept both plain-text share links and Base64-encoded subscription files.
@@ -79,7 +92,8 @@ def links(data):
     for line in data.splitlines():
         line = line.strip().strip('`\ufeff')
         if line.startswith(SCHEMES):
-            result.append(line)
+            # Feeds scraped from web pages carry "&amp;" between parameters.
+            result.append(html.unescape(line) if '&amp;' in line else line)
     return result
 
 def nonempty(q, key, default=''):
@@ -94,8 +108,8 @@ def stream_settings(network, q, tls_mode, sni_default):
     if n not in ('tcp','ws','grpc','httpupgrade','xhttp','splithttp'):
         raise ValueError('Unsupported transport '+n)
     if nonempty(q,'serviceName') and n!='grpc': raise ValueError('serviceName outside gRPC')
-    if n=='tcp' and (nonempty(q,'host') or nonempty(q,'path','/') not in ('','/')):
-        raise ValueError('Unsupported RAW header settings')
+    # RAW reads host/path only for an HTTP header, which parse() rejects: with none they
+    # configure nothing, yet 610 otherwise valid links were rejected for one (measured 2026-11-12).
     cfg = {'network':n, 'security':tls_mode}
     if tls_mode == 'tls':
         tls={'serverName':nonempty(q,'sni',sni_default)}
@@ -132,6 +146,8 @@ def stream_settings(network, q, tls_mode, sni_default):
     return cfg
 
 # Connection-affecting extensions must be implemented or rejected, never silently dropped.
+# One with no value sets nothing: newer v2rayN writes "pcs":"" and "vcn":"" into every
+# VMess link, which rejected 1,170 of them (measured 2026-11-12).
 URL_KEYS = {'security','type','sni','fp','alpn','pbk','sid','spx','path','host',
             'serviceName','mode','flow','encryption','allowInsecure','insecure','headerType'}
 VMESS_KEYS = {'v','ps','add','port','id','aid','scy','net','type','host','path',
@@ -146,7 +162,7 @@ def parse(link, source='unknown'):
         if scheme=='vmess':
             payload=link.split('://',1)[1].split('#',1)[0]
             obj=json.loads(b64decode(payload))
-            if not isinstance(obj,dict) or set(obj)-VMESS_KEYS: return None
+            if not isinstance(obj,dict) or any(obj[k] not in ('',None) for k in set(obj)-VMESS_KEYS): return None
             if any(boolish(obj.get(k,False)) for k in ('allowInsecure','insecure')): return None
             if obj.get('type','none') not in ('','none'): return None
             host=str(obj.get('add','')).strip(); port=int(obj.get('port',0))
@@ -185,7 +201,7 @@ def parse(link, source='unknown'):
             password=up.unquote(u.username or '')
             if not password: return None
             q=up.parse_qs(u.query,keep_blank_values=True)
-            if set(q)-URL_KEYS or any(len(v)!=1 for v in q.values()): return None
+            if any(len(v)!=1 for v in q.values()) or any(q[k][0] for k in set(q)-URL_KEYS): return None
             if nonempty(q,'headerType','none')!='none': return None
             if nonempty(q,'encryption','none')!='none': return None
             if u.password is not None: return None
@@ -212,24 +228,40 @@ def parse(link, source='unknown'):
     except (ValueError,TypeError,AttributeError,KeyError,OverflowError,UnicodeError,json.JSONDecodeError):
         return None
 
-def collect(source_map=SOURCES, per_source=0, stats=None):
+def fetch_source(name, urls, per_source=0):
+    """One source's unique supported candidates; a source may publish several files."""
+    original=[]; errors=[]
+    for url in [urls] if isinstance(urls,str) else list(urls):
+        for attempt in (1,2):
+            try:
+                original.extend(links(get(url)))
+                break
+            except Exception as e:
+                # Resets are common on a filtered network; one more try is cheap.
+                if attempt==2: errors.append(type(e).__name__)
+    seen=set(); group=[]
+    for entry in original:
+        candidate=parse(entry,name)
+        if candidate and candidate.key not in seen:
+            seen.add(candidate.key)
+            group.append(candidate)
+        if per_source and len(group)>=per_source: break
+    error=None if group else (errors[0] if errors else 'NoSupportedLinks')
+    return group,{'raw':len(original),'supported':len(group),'error':error}
+
+
+def collect(source_map=SOURCES, per_source=0, stats=None, workers=8):
     groups={}
-    for name,url in source_map.items():
-        try:
-            raw=get(url)
-            original=links(raw)
-            seen=set(); group=[]
-            for entry in original:
-                candidate=parse(entry,name)
-                if candidate and candidate.key not in seen:
-                    seen.add(candidate.key)
-                    group.append(candidate)
-                if per_source and len(group)>=per_source: break
+    # Fetched side by side: one feed after another took 20 seconds for each dead one.
+    with cf.ThreadPoolExecutor(max_workers=max(1,min(workers,len(source_map) or 1))) as executor:
+        jobs={name:executor.submit(fetch_source,name,urls,per_source) for name,urls in source_map.items()}
+        for name,job in jobs.items():
+            try:
+                group,row=job.result()
+            except Exception as e:
+                group,row=[],{'raw':0,'supported':0,'error':type(e).__name__}
             groups[name]=group
-            if stats is not None: stats[name]={'raw':len(original),'supported':len(group),'error':None if group else 'NoSupportedLinks'}
-            print(f'[SOURCE] {name}: {len(original)} raw, {len(group)} supported unique',flush=True)
-        except Exception as e:
-            groups[name]=[]
-            if stats is not None: stats[name]={'raw':0,'supported':0,'error':type(e).__name__}
-            print(f'[SOURCE] {name}: FAILED ({type(e).__name__})',flush=True)
+            if stats is not None: stats[name]=row
+            if row['error'] and not group: print(f'[SOURCE] {name}: FAILED ({row["error"]})',flush=True)
+            else: print(f'[SOURCE] {name}: {row["raw"]} raw, {row["supported"]} supported unique',flush=True)
     return groups
