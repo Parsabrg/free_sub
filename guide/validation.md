@@ -1,4 +1,10 @@
-# Validation before initial repository push
+# Validation record
+
+Test evidence recorded while the project was developed, oldest first. Each section
+states where it was run. Nothing here is a claim about the availability of public
+proxies; that is measured only on the operator's PC, at run time.
+
+## Before the initial repository push
 
 Date: 2026-10-15. Environment: Linux, Python 3.12.
 
@@ -36,7 +42,7 @@ Physical sleep/wake, firmware support, Windows account credentials, the operator
 ISP and actual Pages deployment still require the one-time setup on the user's
 Windows PC/GitHub account. They have not been represented as tested remotely.
 
-## Windows validation on the operator PC
+## Windows validation on the operator's PC
 
 - Python 3.14.7; official Windows Xray v26.3.27.
 - All 30 tests passed, including all four actual Xray integration tests; no skips.
@@ -52,3 +58,35 @@ Follow-up Windows checks: 31 tests passed after adding a 32-worker default
 and a tested 64-worker upper bound. The unattended PowerShell runner now preserves
 native stderr, exit codes, and durable START/END timestamps. An actual Windows
 PowerShell 5 lock-collision check confirmed exit code 2 and a readable error log.
+
+## 2026-11-13: discovery, relay, control panel, bundled Xray
+
+Environment: Linux, Python 3.13, official Xray v26.3.27 (the Linux binary's SHA-256
+matches the value recorded above).
+
+- **77 tests passed** through `verify.py`, including the real Xray end-to-end
+  tests; 32 of them were added with these changes. GitHub CI passed on Windows and
+  Linux.
+- The relay was exercised with real Xray against the loopback Trojan fixture: a
+  node with a wrong password was passed over and the source arrived through the
+  next one.
+- Feed discovery was run once against GitHub: 171 repositories returned, and
+  reading the 25 most starred gave 13 usable feeds in 13 seconds.
+- The control panel was driven in headless Chromium: start, progress, finish, add
+  and reject a subscription, copy an address, light and dark themes, a 390-pixel
+  width. Stop was exercised on a real full scan of 9,667 candidates with 64
+  workers: the run ended at once and the in-flight workers within about six
+  seconds.
+- The bundled `tools/xray.exe`: the archive's SHA-256 equals the release's own
+  `.dgst` file, and the binary's equals the Windows hash recorded above. On the
+  Windows CI job the official release is downloaded over it and compared with the
+  pinned hash.
+
+Not verified in that environment, and therefore still open:
+
+- whether any found feed has configurations that work from Iran;
+- the relay through a real public node on the operator's network;
+- on Windows: Stop on a real scan, the sleep inhibitor, the scheduled-task notice,
+  the changed uninstall path of `install-task.ps1`, and running the bundled binary
+  (CI parses the PowerShell scripts and runs the panel tests, nothing more).
+

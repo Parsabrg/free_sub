@@ -114,6 +114,29 @@ class PanelTests(unittest.TestCase):
         self.assertIsNone(state['pages'])   # the temporary folder is no clone
         self.assertFalse(state['task'])
 
+    def test_update_pulls_only_while_idle_and_never_shows_the_remote(self):
+        import subprocess
+        from unittest.mock import patch
+        calls = []
+        def pull(command, **kwargs):
+            if command[0] != 'git':   # the scheduled-task query on Windows
+                return subprocess.CompletedProcess(command, 1, stdout='', stderr='')
+            calls.append((command, kwargs['env'].get('GIT_TERMINAL_PROMPT')))
+            return subprocess.CompletedProcess(command, 0, stdout='Updating 1..2\nFast-forward\n app.py | 2 +-\n',
+                                               stderr='From https://token@github.com/owner/free_sub\n')
+        with patch('app.subprocess.run', pull):
+            self.assertEqual(self.request('POST', '/api/update', {})[0], 200)
+        log = '\n'.join(self.state()['log'])
+        self.assertEqual(calls, [(['git', 'pull', '--no-rebase', '--no-edit'], '0')])
+        self.assertIn('Fast-forward', log)
+        self.assertIn('open the panel again', log)
+        self.assertNotIn('token', log)
+        self.script = 'import time; print("started", flush=True); time.sleep(60)'
+        self.request('POST', '/api/start', {'mode': 'health', 'publish': False, 'repeat': False})
+        self.assertTrue(wait_for(lambda: any('started' in line for line in self.state()['log'])))
+        status, body = self.request('POST', '/api/update', {})
+        self.assertEqual((status, json.loads(body)['error']), (400, 'Stop the run before updating'))
+
     def test_a_damaged_source_list_does_not_take_the_panel_down(self):
         (self.root / '.local').mkdir(exist_ok=True)
         (self.root / '.local/sources.json').write_text('{"schema": 99}')
