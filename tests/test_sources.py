@@ -40,6 +40,28 @@ class ParserCoverageTests(unittest.TestCase):
         self.assertEqual(parse(base + '&host=a.example').key, parse(base).key)
         self.assertIsNone(parse(base + '&host=a.example&headerType=http'))
 
+    def test_sources_are_reported_as_they_finish_not_in_list_order(self):
+        import threading
+        quick_done = threading.Event()
+        def get(url, timeout=20):
+            if url.endswith('/slow'):
+                quick_done.wait(10)      # finishes only after the other one has
+                return link(1)
+            quick_done.set()
+            return link(2)
+        out = io.StringIO()
+        with patch('collector.get', get), redirect_stdout(out):
+            stats = {}
+            groups = collect({'Slow': 'https://x.example/slow', 'Quick': 'https://x.example/quick'}, stats=stats)
+        lines = out.getvalue().splitlines()
+        self.assertEqual(lines[0], '[SOURCES] fetching 2 sources')
+        self.assertEqual([line.split(':')[0] for line in lines[1:]], ['[SOURCE] Quick', '[SOURCE] Slow'])
+        # The results themselves keep the order the sources are listed in.
+        self.assertEqual((list(groups), list(stats)), (['Slow', 'Quick'], ['Slow', 'Quick']))
+        with redirect_stdout(io.StringIO()) as nothing:
+            collect({})
+        self.assertEqual(nothing.getvalue(), '')
+
     def test_html_escaped_separators_are_read(self):
         escaped = 'vless://id@example.com:443?security=tls&amp;type=ws&amp;path=%2Fx#n'
         self.assertEqual(links(escaped), ['vless://id@example.com:443?security=tls&type=ws&path=%2Fx#n'])

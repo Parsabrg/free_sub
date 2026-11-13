@@ -116,7 +116,8 @@ Each entry of `nodes`:
 |---|---|
 | `[NETWORK]` | The adapter the tests leave through and the egress country. |
 | `[SKIP]` | The egress country is not Iran; nothing was tested or changed. |
-| `[SOURCE]` | One line per source: links found and supported, or `FAILED`. |
+| `[SOURCES]` | How many sources are about to be fetched. The control panel counts the `[SOURCE]` lines after it for its progress bar. |
+| `[SOURCE]` | One line per source, in the order they finish: links found and supported, or `FAILED`. |
 | `[RELAY]` | Direct fetches failed and a verified node is carrying them. |
 | `[DISCOVER]` | The daily GitHub search and its result. |
 | `[RUN]` | The mode and the number of candidates. |

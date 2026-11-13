@@ -5,6 +5,7 @@
 <title>Free Sub control panel</title>
 <style>
 :root {
+  color-scheme: light dark;
   --bg: #f4f5f7; --panel: #ffffff; --ink: #18202b; --muted: #5f6b7a; --line: #dfe3ea;
   --accent: #0b6bcb; --accent-ink: #ffffff; --good: #18794e; --warn: #a15c00; --bad: #c0362c;
   --chip: #eef1f5; --log-bg: #10151d; --log-ink: #cfd9e6;
@@ -51,6 +52,11 @@ label.check { display: inline-flex; align-items: center; gap: 8px; cursor: point
 .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
 .tile b { display: block; font-size: 26px; line-height: 1.2; font-variant-numeric: tabular-nums; }
 .tile span { color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; min-height: 31px; margin-bottom: 4px; }
+.chips b { font-size: 26px; line-height: 1.2; }
+.chips i { font-style: normal; background: var(--chip); border-radius: 999px; padding: 2px 11px; font-size: 14px; line-height: 1.6;
+  white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chips i em { font-style: normal; font-weight: 700; }
 .tile small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
 .settings { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; margin-top: 14px; }
 .settings label { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; }
@@ -68,14 +74,18 @@ form.add input[type=url] { flex: 3 1 260px; min-width: 0; }
 form.add input[type=text] { flex: 1 1 140px; min-width: 0; }
 .note { color: var(--muted); margin: 0 0 14px; font-size: 14px; }
 .message { min-height: 1.5em; margin: 0 0 8px; font-size: 14px; }
+.scroll, pre { scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
 .scroll { overflow-x: auto; }
-table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 14px; }
+/* Fixed columns: the table always fits its box. Only a narrow screen scrolls it sideways. */
+table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px; }
+@media (max-width: 760px) { table { min-width: 640px; } }
 th, td { text-align: left; padding: 7px 10px; border-top: 1px solid var(--line); vertical-align: middle; }
 th { color: var(--muted); font-weight: 600; border-top: 0; white-space: nowrap; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 tr.group td { background: var(--chip); font-weight: 600; border-top: 0; }
 tr.off td:not(:first-child) { opacity: 0.5; }
-td.where { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+td.where { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+td.name { overflow-wrap: break-word; }
 td button { padding: 2px 10px; font-weight: 500; font-size: 13px; }
 pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius: 8px; padding: 12px; height: 320px; overflow: auto; font: 12.5px/1.5 ui-monospace, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 </style>
@@ -124,7 +134,7 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
     <div class="tile"><b id="t-published">–</b><span>working configs in the last run</span><small id="t-listed"></small></div>
     <div class="tile"><b id="t-health">–</b><span>state of the last run</span></div>
     <div class="tile"><b id="t-age">–</b><span>since the list was updated</span></div>
-    <div class="tile"><b id="t-protocols" style="font-size:16px;line-height:2">–</b><span>protocols</span></div>
+    <div class="tile"><div id="t-protocols" class="chips"><b>–</b></div><span>protocols</span></div>
   </div>
 
   <section id="links" hidden>
@@ -145,6 +155,7 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
       Results are from the last full scan<span id="scan-age"></span>.</p>
     <div class="scroll">
       <table>
+        <colgroup><col style="width:44px"><col style="width:27%"><col style="width:21%"><col style="width:9%"><col style="width:9%"><col style="width:9%"><col></colgroup>
         <thead><tr><th>On</th><th>Name</th><th>Address</th><th class="num">Configs</th><th class="num">Tested</th><th class="num">Working</th><th></th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
@@ -236,7 +247,7 @@ function renderSources(state) {
       toggle.setAttribute('aria-label', 'Use ' + source.name);
       toggle.onchange = () => act('/api/source/enable', {name: source.name, enabled: toggle.checked});
       tr.insertCell().append(toggle);
-      cell(tr, source.name);
+      cell(tr, source.name, 'name');
       cell(tr, source.where, 'where').title = source.where;
       const found = kind === 'found';
       cell(tr, count(found ? source.size : source.supported), 'num');
@@ -283,13 +294,36 @@ function render(state) {
     $('interval').value = state.settings.interval;
     first = false;
   }
-  let step = null;
-  for (let i = state.log.length - 1; i >= 0 && !step; i--) step = state.log[i].match(/\[(CHECK|VERIFY)[^\]]*\] (\d+)\/(\d+); passed=(\d+)/);
-  const showing = run.state === 'running' && step;
-  $('progress').className = 'progress' + (showing ? ' on' : '');
-  if (showing) {
-    $('fill').style.width = (100 * step[2] / Math.max(1, step[3])) + '%';
-    $('progress-text').textContent = `${step[1] === 'CHECK' ? 'Testing' : 'Verifying'} ${count(step[2])} of ${count(step[3])} · ${count(step[4])} passed`;
+  // Progress of the run that is going now: its lines start at the last "Starting a … run".
+  let from = 0;
+  for (let i = state.log.length - 1; i >= 0; i--) if (/ Starting a \w+ run/.test(state.log[i])) { from = i; break; }
+  const mine = state.log.slice(from);
+  const lastMatch = pattern => { for (let i = mine.length - 1; i >= 0; i--) { const m = mine[i].match(pattern); if (m) return {i, m}; } return null; };
+  let phase = null, width = 0;
+  if (run.state === 'running') {
+    const step = lastMatch(/\[(CHECK|VERIFY)[^\]]*\] (\d+)\/(\d+); passed=(\d+)/);
+    const planned = lastMatch(/\[RUN\] mode=\w+; candidates=(\d+)/);
+    const fetching = lastMatch(/\[SOURCES\] fetching (\d+) sources/);
+    const searching = lastMatch(/\[DISCOVER\] searching/);
+    if (step) {
+      width = 100 * step.m[2] / Math.max(1, step.m[3]);
+      phase = `${step.m[1] === 'CHECK' ? 'Testing' : 'Verifying'} ${count(step.m[2])} of ${count(step.m[3])} · ${count(step.m[4])} passed`;
+    } else if (planned) {
+      phase = `Starting ${count(planned.m[1])} tests…`;
+    } else if (searching && (!fetching || searching.i > fetching.i)) {
+      width = 100; phase = 'Searching GitHub for new feeds…';
+    } else if (fetching) {
+      const done = mine.slice(fetching.i + 1).filter(line => line.includes('[SOURCE] ')).length;
+      width = 100 * done / Math.max(1, Number(fetching.m[1]));
+      phase = `Fetching sources: ${done} of ${fetching.m[1]}`;
+    } else {
+      phase = 'Starting up…';
+    }
+  }
+  $('progress').className = 'progress' + (phase !== null ? ' on' : '');
+  if (phase !== null) {
+    $('fill').style.width = width + '%';
+    $('progress-text').textContent = phase;
   }
   const last = state.last;
   $('t-published').textContent = count(last.working);
@@ -301,8 +335,16 @@ function render(state) {
   health.textContent = last.health ? last.health.replaceAll('_', ' ') : '–';
   health.className = last.health === 'ok' ? 'good' : last.health ? 'warn' : '';
   $('t-age').textContent = last.generated ? ago(state.now - last.generated) : '–';
-  const protocols = Object.entries(last.protocols).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(' · ');
-  $('t-protocols').textContent = protocols || '–';
+  const chips = $('t-protocols');
+  chips.textContent = '';
+  const protocols = Object.entries(last.protocols).sort((a, b) => b[1] - a[1]);
+  if (!protocols.length) chips.append(Object.assign(document.createElement('b'), {textContent: '–'}));
+  for (const [name, n] of protocols) {
+    const chip = document.createElement('i'), number = document.createElement('em');
+    number.textContent = count(n);
+    chip.append(name + ' ', number);
+    chips.append(chip);
+  }
   $('task').hidden = !state.task;
   renderLinks(state.pages);
   renderSources(state);

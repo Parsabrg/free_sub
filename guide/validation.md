@@ -64,8 +64,8 @@ PowerShell 5 lock-collision check confirmed exit code 2 and a readable error log
 Environment: Linux, Python 3.13, official Xray v26.3.27 (the Linux binary's SHA-256
 matches the value recorded above).
 
-- **90 tests passed** through `verify.py`, including the real Xray end-to-end
-  tests; 45 of them were added with these changes. The whole suite was also run with
+- **91 tests passed** through `verify.py`, including the real Xray end-to-end
+  tests; 46 of them were added with these changes. The whole suite was also run with
   its temporary folders inside another Git repository that has a different remote,
   the situation that broke the gate on the operator's PC; it passes. GitHub CI passed on Windows and
   Linux.
