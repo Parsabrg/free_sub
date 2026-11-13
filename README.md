@@ -28,6 +28,10 @@ Double-click `panel_windows.bat` (or run `python app.py`) for a page at
 - **Start** runs the same `main.py` as the scheduled task: once, or every 30 minutes
   while the panel stays open. **Stop** ends the run and every Xray process under it;
   the published list and the history stay as the last completed run left them.
+- While it repeats, the panel keeps Windows from idle-sleeping (the display may still
+  turn off). Unlike the scheduled task it cannot wake a sleeping PC, and closing its
+  window stops everything.
+- **Your subscription** lists the published addresses with a Copy button each.
 - **Publish the list to GitHub** can be unticked to test without pushing.
 - **Add subscription** takes any `https://` subscription address. It is tested in full
   on every discovery run, like a built-in feed. Working configs from every source go
@@ -36,9 +40,32 @@ Double-click `panel_windows.bat` (or run `python app.py`) for a page at
   one carried, how many were tested and how many worked in the last full scan.
 
 The page is served to this computer only, and needs the token it was loaded with.
+Starting it a second time opens the panel that is already running.
 The panel and the scheduled task never run at once: the second to start reports
-`[BUSY]` and exits. To use only the panel, remove the task (see the end of this file).
-Without the task nothing runs while the panel is closed.
+`[BUSY]` and exits. The panel shows a notice while the task is installed.
+
+### Moving from the scheduled task to the control panel
+
+1. In an **Administrator** PowerShell window, end and remove the task (this works
+   with any version of this project):
+
+   ```powershell
+   Stop-ScheduledTask -TaskName FreeXraySubscription
+   Unregister-ScheduledTask -TaskName FreeXraySubscription -Confirm:$false
+   ```
+
+2. In the project folder, get the current version. Your node history in `.local\`
+   and the installed Xray in `tools\` are kept:
+
+   ```powershell
+   git pull --no-rebase --no-edit
+   ```
+
+3. Double-click `panel_windows.bat` and press **Start**.
+
+Nothing else needs deleting: the task was the only part installed outside this folder.
+To go back to unattended runs that wake the PC, run `scripts\install-task.ps1` again
+as in the setup below; the panel and the task can also be used side by side.
 
 ## One-time Windows setup
 
@@ -174,6 +201,12 @@ existing timestamps continue to age. No success is invented to fill 300 slots.
   `0` retests every time). In one discovery run on 2026-11-12, 5,127 of 7,439
   screening tests ended in a timeout, and each of those configs was tested again four
   hours later. Published nodes are always tested.
+- When a source cannot be fetched directly (connection reset, timeout, or a 403/429
+  refusal), the fetch is repeated through one of the five best published nodes. The
+  site's HTTPS certificate is still verified on this PC, so the node can fail the
+  fetch but cannot alter it. No node is started while direct fetches work.
+- A discovery in which fewer than half of the listed sources answered is repeated
+  after one hour instead of four.
 - Sources have an 8 MiB fetch limit, are fetched eight at a time, and get one retry.
   No hidden per-source 1,800-node cap on listed sources.
 - Source candidates are balanced and rotated between discovery runs. Previously
@@ -336,7 +369,8 @@ Do not upload these directories or add private subscription sources.
   guarantees a completed update every 30 minutes during a long scan.
 - Source/proxy/GeoIP access may be filtered; existing nodes are still rechecked
   when sources fail. Unknown country does not remove useful nodes by default.
-- To remove the task:
+- To remove the task, in an Administrator PowerShell window (it ends a run in
+  progress, and fails loudly if the task is still there afterwards):
 
   ```powershell
   powershell -NoProfile -File .\scripts\install-task.ps1 -Uninstall

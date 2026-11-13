@@ -6,6 +6,7 @@ A page served on 127.0.0.1 only, by the Python standard library. Runs are the sa
 from __future__ import annotations
 import argparse
 from collections import deque
+from contextlib import ExitStack
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
@@ -19,10 +20,39 @@ import webbrowser
 import collector
 import sources
 from process_guard import ProcessTree
-from state import atomic_write
+from state import atomic_write, keep_awake
 
 ROOT = Path(__file__).resolve().parent
 MODES = ('auto', 'full', 'health')
+TASK = 'FreeXraySubscription'
+
+
+def quiet(command, root=ROOT, timeout=10):
+    """A short helper command's result, or None when it cannot be run."""
+    try:
+        return subprocess.run(command, cwd=root, capture_output=True, text=True, timeout=timeout,
+                              creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def pages_address(remote):
+    """https://owner.github.io/repo/ for a GitHub remote, where the list is published."""
+    remote = (remote or '').strip().removesuffix('.git')
+    for prefix in ('https://github.com/', 'git@github.com:', 'ssh://git@github.com/'):
+        if remote.startswith(prefix):
+            owner, _, repository = remote[len(prefix):].partition('/')
+            if owner and repository and '/' not in repository and '@' not in owner:
+                return f'https://{owner.lower()}.github.io/{repository}/'
+    return None
+
+
+def task_installed():
+    """Whether the unattended scheduled task exists (Windows only)."""
+    if os.name != 'nt':
+        return False
+    result = quiet(['schtasks', '/Query', '/TN', TASK])
+    return bool(result and result.returncode == 0)
 
 
 def run_command(root, mode, publish):
@@ -63,6 +93,20 @@ class Runner:
             tree.close()
 
     def _loop(self, mode, publish, repeat):
+        awake = ExitStack()
+        try:
+            if repeat:
+                # While it repeats, Windows must not idle-sleep between runs: nothing would wake it.
+                try:
+                    awake.enter_context(keep_awake())
+                except OSError:
+                    self.say('Could not keep Windows awake; runs stop while the PC sleeps.')
+            self._rounds(mode, publish, repeat)
+        finally:
+            awake.close()
+            self.status.update(state='idle', next_run=None)
+
+    def _rounds(self, mode, publish, repeat):
         while True:
             began = time.time()
             self.status.update(state='running', mode=mode, started=began, next_run=None)
@@ -81,7 +125,6 @@ class Runner:
             if self.wake.wait(max(0, due - time.time())):
                 self.say('Stopped.')
                 break
-        self.status.update(state='idle', next_run=None)
 
     def _run(self, mode, publish):
         env = dict(os.environ, PYTHONIOENCODING='utf-8', PYTHONUNBUFFERED='1')
@@ -138,6 +181,21 @@ class Panel:
         self.registry_path = self.local / 'sources.json'
         self.edit = threading.Lock()
         self.token = secrets.token_urlsafe(24)
+        remote = quiet(['git', 'remote', 'get-url', 'origin'], self.root)
+        self.pages = pages_address(remote.stdout if remote and remote.returncode == 0 else '')
+        self.task = (0, False)
+
+    def task_active(self):
+        # Asked at most once a minute: the page polls far more often than a task changes.
+        if time.time() - self.task[0] > 60:
+            self.task = (time.time(), task_installed())
+        return self.task[1]
+
+    def registry(self):
+        try:
+            return sources.load(self.registry_path)
+        except ValueError:
+            return sources.empty()
 
     def settings(self):
         saved = read_json(self.local / 'panel.json', {})
@@ -161,7 +219,7 @@ class Panel:
             sources.save(self.registry_path, registry)
 
     def source_rows(self):
-        registry = sources.load(self.registry_path)
+        registry = self.registry()
         last = read_json(self.local / 'source_status.json', {})
         results = last.get('sources', {})
         off = set(registry['off'])
@@ -188,6 +246,7 @@ class Panel:
             protocols[node.get('protocol')] = protocols.get(node.get('protocol'), 0) + 1
         return {'run': dict(self.runner.status), 'log': list(self.runner.log)[-400:], 'settings': self.settings(),
                 'now': time.time(), 'sources': rows, 'discovery': discovery,
+                'pages': self.pages, 'task': self.task_active(),
                 'last': {'published': status.get('published'), 'health': status.get('health'),
                          'mode': status.get('mode'), 'generated': status.get('generated_epoch'),
                          'protocols': protocols}}
@@ -264,7 +323,11 @@ def main(argv=None):
     try:
         server = serve(panel, args.port)
     except OSError:
-        raise SystemExit(f'Port {args.port} is in use: the panel may already be open at http://127.0.0.1:{args.port}/')
+        # Started twice: show the panel that is already running rather than fail.
+        address = f'http://127.0.0.1:{args.port}/'
+        if not args.no_browser:
+            webbrowser.open(address)
+        raise SystemExit(f'Port {args.port} is in use: the panel is probably already open at {address}')
     url = f'http://127.0.0.1:{server.server_address[1]}/'
     print(f'Control panel: {url}\nClose this window (or press Ctrl+C) to stop the panel and any run it started.', flush=True)
     if not args.no_browser:

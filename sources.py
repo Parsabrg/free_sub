@@ -10,7 +10,6 @@ from pathlib import Path
 import re
 import time
 import urllib.parse as up
-import urllib.request
 import collector
 from state import atomic_write
 
@@ -37,6 +36,10 @@ LINK = re.compile(r'https://(?:raw\.githubusercontent\.com/([\w.-]+/[\w.-]+)/|'
 NOT_A_FEED = re.compile(r'\.(png|jpe?g|gif|svg|webp|ico|md|py|sh|ps1|bat|ya?ml|json|exe|zip|apk|html?|css|js)$', re.I)
 
 
+NEW_FEED = {'urls': [], 'size': 0, 'branch': 'main', 'stars': 0, 'seen': 0, 'evaluated': 0, 'runs': 0,
+            'tested': 0, 'working': 0, 'dry': 0, 'last_worked': 0, 'next': 0}
+
+
 def empty():
     return {'schema': 1, 'refreshed': 0, 'manual': {}, 'found': {}, 'off': []}
 
@@ -50,6 +53,10 @@ def load(path):
         raise ValueError('InvalidSources; refusing to overwrite the source list')
     data.setdefault('off', [])
     data.setdefault('refreshed', 0)
+    for row in data['found'].values():
+        # A hand-edited or older entry lacks nothing the run or the panel reads.
+        for field, value in NEW_FEED.items():
+            row.setdefault(field, list(value) if isinstance(value, list) else value)
     return data
 
 
@@ -93,10 +100,8 @@ def set_enabled(registry, name, enabled):
 def github_search(query):
     url = 'https://api.github.com/search/repositories?' + up.urlencode(
         {'q': query, 'sort': 'updated', 'order': 'desc', 'per_page': 100})
-    request = urllib.request.Request(url, headers={'User-Agent': 'LocalXraySubscription/1.0 (+public feeds)',
-                                                   'Accept': 'application/vnd.github+json'})
-    with urllib.request.urlopen(request, timeout=30) as response:
-        return json.loads(response.read(8 * 1024 * 1024))['items']
+    # Through collector.get so that a blocked or rate-limited search can use the relay too.
+    return json.loads(collector.get(url, timeout=30))['items']
 
 
 def feed_urls(readme, repository):
@@ -175,8 +180,7 @@ def refresh(registry, now, fetch=None, search=github_search):
         return False
     found = registry['found']
     for name, info in seen.items():
-        row = found.setdefault(name, {'urls': [], 'size': 0, 'evaluated': 0, 'runs': 0, 'tested': 0,
-                                      'working': 0, 'dry': 0, 'last_worked': 0, 'next': 0})
+        row = found.setdefault(name, dict(NEW_FEED, urls=[]))
         row.update(info, seen=now)
     waiting = sorted((n for n in seen if now - found[n]['evaluated'] >= EVALUATE_SECONDS),
                      key=lambda n: (-found[n]['stars'], n))[:EVALUATE_PER_REFRESH]

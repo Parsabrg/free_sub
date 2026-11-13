@@ -5,6 +5,7 @@ import concurrent.futures as cf
 import hashlib
 import html
 import json
+import urllib.error
 import urllib.parse as up
 import urllib.request
 from dataclasses import dataclass
@@ -51,13 +52,31 @@ def b64decode(value: str) -> str:
     value = ''.join(value.split()).replace('-', '+').replace('_', '/')
     return base64.b64decode(value + '=' * (-len(value) % 4), validate=True).decode('utf-8')
 
-def get(url, timeout=20):
+# relay.fallback() sets this for the length of a discovery: get(url, timeout) through a verified node.
+FALLBACK = None
+
+def direct_get(url, timeout=20):
     request = urllib.request.Request(url, headers={'User-Agent': 'LocalXraySubscription/1.0 (+public feeds)'})
     with urllib.request.urlopen(request, timeout=timeout) as response:
         data = response.read(MAX_FETCH + 1)
         if len(data) > MAX_FETCH:
             raise ValueError('Source exceeded 8 MiB limit')
     return data.decode('utf-8-sig')
+
+def get(url, timeout=20):
+    try:
+        return direct_get(url, timeout)
+    except ValueError:
+        raise  # too large or not text: the same through any node
+    except Exception as exc:
+        # An answer from the server is final, unless it refuses this address (403, 429).
+        final = isinstance(exc, urllib.error.HTTPError) and exc.code not in (403, 429)
+        if FALLBACK is None or final:
+            raise
+        try:
+            return FALLBACK(url, timeout)
+        except Exception:
+            raise exc from None  # report what went wrong directly, not the relay's trouble
 
 def links(data):
     # Accept both plain-text share links and Base64-encoded subscription files.

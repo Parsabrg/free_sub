@@ -82,6 +82,14 @@ class RegistryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             sources.set_enabled(registry, 'Nobody', False)
 
+    def test_an_incomplete_entry_is_filled_in_on_load(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / 'sources.json'
+            path.write_text(json.dumps({'schema': 1, 'manual': {}, 'found': {'a/b': {'urls': ['https://x.example/s']}}}))
+            row = sources.load(path)['found']['a/b']
+            self.assertEqual(row, dict(sources.NEW_FEED, urls=['https://x.example/s']))
+            self.assertEqual(sources.NEW_FEED['urls'], [])
+
     def test_readme_links_stay_inside_their_own_repository(self):
         readme = '''[sub](https://raw.githubusercontent.com/Owner/Repo/main/all.txt) and
         https://github.com/owner/repo/blob/main/split/vless.txt, logo
@@ -173,6 +181,67 @@ class RegistryTests(unittest.TestCase):
                 own, found = registry.collect(1_800_000_000, stats)
             self.assertEqual(([c.host for c in own['Mine']], list(own), found), (['mine.example'], ['Mine'], {}))
             self.assertEqual(stats['Mine']['kind'], 'manual')
+
+
+class FallbackTests(unittest.TestCase):
+    def test_only_a_failed_connection_or_a_refusal_goes_to_the_relay(self):
+        import collector
+        import urllib.error
+        asked = []
+        def relay(url, timeout):
+            asked.append(url)
+            return 'through relay'
+        def answer(error):
+            def direct(url, timeout=20):
+                if error:
+                    raise error
+                return 'direct'
+            return direct
+        http = lambda code: urllib.error.HTTPError('https://x.example', code, 'no', None, None)
+        with patch('collector.FALLBACK', relay):
+            for error, expected in ((None, 'direct'), (ConnectionResetError(), 'through relay'),
+                                    (TimeoutError(), 'through relay'), (http(403), 'through relay'),
+                                    (http(429), 'through relay')):
+                with patch('collector.direct_get', answer(error)):
+                    self.assertEqual(collector.get('https://x.example/feed'), expected, error)
+            for error in (http(404), http(500), ValueError('Source exceeded 8 MiB limit')):
+                with patch('collector.direct_get', answer(error)), self.assertRaises(type(error)):
+                    collector.get('https://x.example/feed')
+        self.assertEqual(len(asked), 4)
+        with patch('collector.direct_get', answer(ConnectionResetError())), self.assertRaises(ConnectionResetError):
+            collector.get('https://x.example/feed')
+        def broken(url, timeout):
+            raise OSError('NoWorkingRelay')
+        with patch('collector.FALLBACK', broken), patch('collector.direct_get', answer(TimeoutError())), \
+                self.assertRaises(TimeoutError):
+            collector.get('https://x.example/feed')
+
+    def test_no_node_means_the_original_failure_stands(self):
+        from relay import Relay
+        relay = Relay(sys.executable, [])
+        with self.assertRaisesRegex(OSError, 'NoWorkingRelay'):
+            relay.get('https://x.example/feed')
+        relay.close()
+
+    def test_a_discovery_that_reached_few_sources_repeats_in_an_hour(self):
+        from state import read_state
+        candidates = [parse(link(1))]
+        probe = lambda c, xray, timeout, **kw: ProbeResult(True, endpoint_ip='8.8.8.8', body_bytes=16384)
+        def collect_fn(reached):
+            def run(stats=None, **kw):
+                for i in range(4):
+                    stats[f'Feed{i}'] = {'raw': 1, 'supported': 1, 'error': None if i < reached else 'ConnectionResetError'}
+                return {'Feed0': candidates, 'Feed1': [], 'Feed2': [], 'Feed3': []}
+            return run
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()) as out:
+            args = args_for()
+            now = 1_800_000_000
+            run_cycle(args, folder, probe, collect_fn(1), lambda *a, **kw: {}, now)
+            history = Path(folder) / '.local/history.json'
+            self.assertEqual(read_state(history)['last_discovery'], now - 3 * 3600)
+            self.assertIn('Only 1 of 4 listed sources answered', out.getvalue())
+            run_cycle(args, folder, probe, collect_fn(2), lambda *a, **kw: {}, now + 3600)
+            self.assertEqual(read_state(history)['last_discovery'], now + 3600)
 
 
 class BudgetTests(unittest.TestCase):

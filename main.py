@@ -4,6 +4,7 @@ import argparse
 import base64
 import copy
 from collections import Counter, deque
+from contextlib import nullcontext
 import concurrent.futures as cf
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -20,6 +21,7 @@ from collector import collect, parse
 from geolocation import geolocate_hosts, country_flag
 from naming import assign_labels, node_name, rename_share_link
 from publishing import publish, validate_outputs
+from relay import fallback
 from sources import Registry
 from state import atomic_write, keep_awake, observe, read_state, reliability, run_lock, save_state, sweep_stale_probe_dirs
 from network import BIND_ENV, physical_interface
@@ -153,20 +155,28 @@ INDEX='''<!doctype html><html lang="en"><meta charset="utf-8">
 <script>fetch('status.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(s=>{const now=Date.now()/1000;const fresh=s.nodes.filter(n=>n.expires_epoch>now).length;const age=Math.max(0,Math.round((now-s.generated_epoch)/60));const e=document.querySelector('#health');e.textContent=`${fresh} unexpired of ${s.published} nodes; last attempt ${age} minutes ago; mode: ${s.mode}; state: ${s.health}.`;if(age>60||s.health!=='ok'||fresh===0)e.className='warning';}).catch(()=>document.querySelector('#health').textContent='Status unavailable; freshness unknown.');</script></html>'''
 
 
-def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolocate_hosts, now=None, registry=None):
+def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolocate_hosts, now=None, registry=None, relay=False):
     root=Path(root); live_clock=now is None; now=time.time() if live_clock else now
     local=root/'.local'; history_path=local/'history.json'
     state=read_state(history_path)
     mode=args.mode
     if mode=='auto':
         mode='full' if now-state.get('last_discovery',0)>=args.discovery_hours*3600 else 'health'
+    # Existing entries are always tested first, including when all sources are unavailable.
+    old=[]
+    for key in state.get('published',[]):
+        row=state['nodes'].get(key,{})
+        candidate=parse(row.get('url',''),row.get('source','history'))
+        if candidate and row.get('verified'): old.append(candidate)
     stats={}; groups={}; found=set(); rested=0
     if mode=='full':
-        groups=collect_fn(stats=stats)
         extra={}
-        if registry is not None:
-            own,extra=registry.collect(now,stats)
-            groups.update(own)
+        # The best published nodes carry a fetch that fails directly; none is started otherwise.
+        with fallback(args.xray,old[:5]) if relay else nullcontext():
+            groups=collect_fn(stats=stats)
+            if registry is not None:
+                own,extra=registry.collect(now,stats)
+                groups.update(own)
         hours=getattr(args,'retry_failed_hours',0)
         for name,group in groups.items():
             awake=[c for c in group if not resting(state['nodes'].get(c.key),now,hours)]
@@ -180,12 +190,6 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
             stats[name]['new']=len(fresh)
             groups[name]=pick(fresh,registry.quota(name,now),state,rng)
             found.add(name)
-    # Existing entries are always tested first, including when all sources are unavailable.
-    old=[]
-    for key in state.get('published',[]):
-        row=state['nodes'].get(key,{})
-        candidate=parse(row.get('url',''),row.get('source','history'))
-        if candidate and row.get('verified'): old.append(candidate)
     remaining=[]
     published_keys={c.key for c in old}
     for key,row in state['nodes'].items():
@@ -253,7 +257,14 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
         if len(diverse)>=args.limit: break
     selected=diverse
     if mode=='full' and any(groups.values()):
-        state['last_discovery']=now
+        # With most listed sources unreachable this was a network problem, not a discovery:
+        # look again in an hour. One run had 3 of 23 feeds and still waited four (2026-11-12).
+        listed=[row for row in stats.values() if row.get('kind')!='found']
+        reached=sum(1 for row in listed if row.get('error') in (None,'NoSupportedLinks'))
+        complete=2*reached>=len(listed)
+        state['last_discovery']=now if complete else now-args.discovery_hours*3600+3600
+        if not complete:
+            print(f'[RUN] Only {reached} of {len(listed)} listed sources answered; discovery repeats in an hour.',flush=True)
     health='ok' if selected else 'degraded'
     if not selected:
         # A whole-run outage may be local. Retain only bounded, explicitly marked old results.
@@ -388,7 +399,7 @@ def main(argv=None):
         removed=sweep_stale_probe_dirs()
         if removed: print(f'[CLEANUP] Removed {removed} stale probe folders from the temp directory.',flush=True)
         registry=Registry(ROOT/'.local'/'sources.json',discover=args.found_sources)
-        run_cycle(args,collect_fn=lambda **kw:collect(registry.builtin(),**kw),registry=registry)
+        run_cycle(args,collect_fn=lambda **kw:collect(registry.builtin(),**kw),registry=registry,relay=True)
         if args.publish:
             publish(ROOT,args.xray,ROOT/'docs')
 

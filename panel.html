@@ -49,6 +49,13 @@ label.check { display: inline-flex; align-items: center; gap: 8px; cursor: point
 .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
 .tile b { display: block; font-size: 26px; line-height: 1.2; font-variant-numeric: tabular-nums; }
 .tile span { color: var(--muted); }
+.notice { margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--chip); border-left: 3px solid var(--warn); font-size: 14px; }
+code { font: 13px ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+.links { display: grid; gap: 8px; }
+.links div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.links span { flex: 0 0 150px; color: var(--muted); }
+.links a { flex: 1 1 240px; min-width: 0; color: var(--accent); overflow-wrap: anywhere; }
+.links button { padding: 3px 12px; font-weight: 500; font-size: 13px; }
 .good { color: var(--good); } .warn { color: var(--warn); } .bad { color: var(--bad); }
 form.add { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
 form.add input[type=url] { flex: 3 1 260px; min-width: 0; }
@@ -84,10 +91,13 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
           <option value="health">Health check only</option>
         </select>
       </label>
-      <label class="check"><input type="checkbox" id="repeat"> Keep running every 30 minutes</label>
+      <label class="check"><input type="checkbox" id="repeat"> Keep running every 30 minutes (keeps this PC awake)</label>
       <label class="check"><input type="checkbox" id="publish"> Publish the list to GitHub</label>
     </div>
     <div id="progress" class="progress"><div class="bar"><i id="fill"></i></div><p id="progress-text"></p></div>
+    <p id="task" class="notice" hidden>The old scheduled task is still installed and also runs every 30 minutes,
+      whether this panel is open or not. To control runs only from here, remove it in an Administrator
+      PowerShell window: <code>Unregister-ScheduledTask -TaskName FreeXraySubscription -Confirm:$false</code></p>
   </section>
 
   <div class="tiles">
@@ -96,6 +106,11 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
     <div class="tile"><b id="t-age">–</b><span>since the list was updated</span></div>
     <div class="tile"><b id="t-protocols" style="font-size:16px;line-height:2">–</b><span>protocols</span></div>
   </div>
+
+  <section id="links" hidden>
+    <h2>Your subscription</h2>
+    <div id="link-rows" class="links"></div>
+  </section>
 
   <section>
     <h2>Sources</h2>
@@ -124,7 +139,28 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
 <script>
 const TOKEN = '__TOKEN__';
 const $ = id => document.getElementById(id);
-let first = true, busy = false;
+let first = true, busy = false, linked = false;
+
+function renderLinks(pages) {
+  if (linked || !pages) return;
+  linked = true;
+  const files = [['v2rayN (desktop)', 'xray.json'], ['v2rayNG (Android)', 'sub.b64'], ['Plain list', 'sub.txt'], ['Status page', '']];
+  for (const [label, file] of files) {
+    const row = document.createElement('div'), name = document.createElement('span'), link = document.createElement('a');
+    name.textContent = label;
+    link.href = pages + file; link.textContent = pages + file; link.target = '_blank'; link.rel = 'noopener';
+    const copy = document.createElement('button');
+    copy.textContent = 'Copy';
+    copy.onclick = async () => {
+      try { await navigator.clipboard.writeText(pages + file); copy.textContent = 'Copied'; }
+      catch (error) { copy.textContent = 'Select and copy'; }
+      setTimeout(() => copy.textContent = 'Copy', 1500);
+    };
+    row.append(name, link, copy);
+    $('link-rows').append(row);
+  }
+  $('links').hidden = false;
+}
 
 async function call(path, body) {
   const options = body === undefined ? {headers: {'X-Token': TOKEN}} :
@@ -233,6 +269,8 @@ function render(state) {
   $('t-age').textContent = last.generated ? ago(state.now - last.generated) : '–';
   const protocols = Object.entries(last.protocols).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(' · ');
   $('t-protocols').textContent = protocols || '–';
+  $('task').hidden = !state.task;
+  renderLinks(state.pages);
   renderSources(state);
   const log = $('log'), pinned = log.scrollTop + log.clientHeight >= log.scrollHeight - 30;
   const text = state.log.join('\n') || 'Nothing has run from this panel yet. Press Start.';

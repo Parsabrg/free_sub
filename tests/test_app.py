@@ -103,6 +103,23 @@ class PanelTests(unittest.TestCase):
         self.request('POST', '/api/stop', {})
         self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
 
+    def test_the_published_address_comes_from_the_git_remote(self):
+        for remote in ('https://github.com/Owner/free_sub.git\n', 'git@github.com:Owner/free_sub.git',
+                       'ssh://git@github.com/Owner/free_sub'):
+            self.assertEqual(app.pages_address(remote), 'https://owner.github.io/free_sub/', remote)
+        for remote in ('', None, 'https://gitlab.com/owner/free_sub.git', 'https://github.com/owner',
+                       'https://token@github.com/owner/free_sub.git', 'https://github.com/owner/a/b'):
+            self.assertIsNone(app.pages_address(remote), remote)
+        state = self.state()
+        self.assertIsNone(state['pages'])   # the temporary folder is no clone
+        self.assertFalse(state['task'])
+
+    def test_a_damaged_source_list_does_not_take_the_panel_down(self):
+        (self.root / '.local').mkdir(exist_ok=True)
+        (self.root / '.local/sources.json').write_text('{"schema": 99}')
+        self.assertEqual({row['kind'] for row in self.state()['sources']}, {'builtin'})
+        self.assertEqual(self.request('POST', '/api/source/add', {'url': 'https://mine.example/sub'})[0], 400)
+
     def test_sources_are_added_switched_off_and_removed(self):
         status, _ = self.request('POST', '/api/source/add', {'url': 'https://mine.example/sub', 'name': 'Mine'})
         self.assertEqual(status, 200)
