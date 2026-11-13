@@ -82,7 +82,9 @@ launcher again while the panel is up simply opens the page again.
 - **Update program.** Pulls the newest version from GitHub. If something changed, the panel
   restarts itself with the new version and the page reloads by itself; a repeating
   schedule that was waiting for its next round carries on. It is refused while a run is active.
-- **Quit panel.** Stops any run and the repeat schedule, then ends the panel program.
+- **Quit panel.** Stops any run and the repeat schedule, ends the panel program and closes
+  its browser tab. A browser lets a page close its own tab only in some cases (it does for
+  the tab the launcher opened); otherwise the page says so and you close the tab yourself.
 - **Log.** The live output of the current run, with a progress bar.
 
 While it repeats, the panel keeps Windows from idle-sleeping. It cannot wake a

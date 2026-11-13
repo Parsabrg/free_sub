@@ -30,6 +30,11 @@ and is not recorded here.
   minutes**. `status.json` records `list_limit`, `working_this_run` and the run
   interval that was actually used.
 
+### Changed (quit)
+- **Quit panel closes its browser tab** when the browser allows it (the tab the launcher
+  opened). When the browser refuses, the page says the panel has quit and that the tab
+  has to be closed by hand.
+
 ### Changed (update)
 - **Update program restarts the panel into the new version** and the page reloads by
   itself, instead of asking you to close and reopen it. It also works between the
