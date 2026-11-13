@@ -10,6 +10,7 @@ import tempfile
 import threading
 import time
 import unittest
+from unittest.mock import patch
 import app
 import sources
 
@@ -229,10 +230,24 @@ class BackgroundPanelTests(unittest.TestCase):
             self.assertIn('already running', second.stdout)
             self.assertEqual(app.probe(port)[1]['pid'], info['pid'])
             self.assertEqual(self.quit(port), 200)
-            self.assertTrue(wait_for(lambda: app.probe(port)[0] == 'free'), 'the panel did not end')
-            log = (Path(folder) / '.local' / 'logs' / 'panel.log').read_text(encoding='utf-8')
-            self.assertIn('panel listening on', log)
-            self.assertTrue(wait_for(lambda: 'panel ended' in (Path(folder) / '.local/logs/panel.log').read_text()))
+            log_path = Path(folder) / '.local' / 'logs' / 'panel.log'
+            report = lambda: f'probe={app.probe(port)} log={log_path.read_text(errors="replace") if log_path.exists() else None!r}'
+            self.assertTrue(wait_for(lambda: app.probe(port)[0] == 'free', 40), 'the panel did not end: ' + report())
+            self.assertIn('panel listening on', log_path.read_text(encoding='utf-8'))
+            self.assertTrue(wait_for(lambda: 'panel ended' in log_path.read_text(encoding='utf-8')), report())
+
+    def test_running_out_of_time_connecting_means_free_but_a_silent_listener_means_busy(self):
+        # Windows is slow to refuse a connection to a closed port: that must not read as "busy".
+        with patch('app.socket.create_connection', side_effect=TimeoutError):
+            self.assertEqual(app.probe(free_port()), ('free', {}))
+        with patch('app.socket.create_connection', side_effect=ConnectionRefusedError):
+            self.assertEqual(app.probe(free_port()), ('free', {}))
+        with patch('app.socket.create_connection', side_effect=OSError('unreachable')):
+            self.assertEqual(app.probe(free_port())[0], 'busy')
+        with socket.socket() as silent:
+            silent.bind(('127.0.0.1', 0))
+            silent.listen(1)
+            self.assertEqual(app.probe(silent.getsockname()[1], timeout=0.5)[0], 'busy')
 
     def test_another_program_on_the_port_is_reported_not_trampled(self):
         class Other(http.server.BaseHTTPRequestHandler):

@@ -13,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import socket
 import subprocess
 import sys
 import threading
@@ -367,22 +368,31 @@ def serve(panel, port=0):
     return ThreadingHTTPServer(('127.0.0.1', port), handler_for(panel, page))
 
 
-def probe(port):
+def probe(port, timeout=3):
     """('panel', info) when this program's panel answers on the port, ('busy', {}) when
     something else does, ('free', {}) when nothing listens."""
     try:
-        connection = http.client.HTTPConnection('127.0.0.1', port, timeout=2)
-        try:
-            connection.request('GET', '/api/ping')
-            response = connection.getresponse()
-            data = json.loads(response.read(1024) or b'{}') if response.status == 200 else {}
-        finally:
-            connection.close()
-        return ('panel', data) if isinstance(data, dict) and data.get('app') == APP_NAME else ('busy', {})
-    except ConnectionRefusedError:
+        # Windows can take about two seconds to refuse a connection to a closed port. Running
+        # out of time while connecting therefore still means that nothing listens: it must not
+        # read as "another program is there", which would stop the panel from ever starting.
+        sock = socket.create_connection(('127.0.0.1', port), timeout=max(timeout, 6))
+    except (ConnectionRefusedError, TimeoutError):
         return 'free', {}
+    except OSError:
+        return 'busy', {}
+    # Something accepted the connection. From here, no answer or a wrong one means "busy".
+    connection = http.client.HTTPConnection('127.0.0.1', port, timeout=timeout)
+    connection.sock = sock
+    sock.settimeout(timeout)
+    try:
+        connection.request('GET', '/api/ping')
+        response = connection.getresponse()
+        data = json.loads(response.read(1024) or b'{}') if response.status == 200 else {}
+        return ('panel', data) if isinstance(data, dict) and data.get('app') == APP_NAME else ('busy', {})
     except (OSError, ValueError, http.client.HTTPException):
         return 'busy', {}
+    finally:
+        connection.close()
 
 
 def background_python():
