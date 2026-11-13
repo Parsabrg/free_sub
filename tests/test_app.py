@@ -26,6 +26,10 @@ def wait_for(condition, seconds=10):
 
 class PanelTests(unittest.TestCase):
     def setUp(self):
+        # Whatever this PC has installed, a panel test starts without the scheduled task.
+        task = patch('app.task_installed', return_value=False)
+        task.start()
+        self.addCleanup(task.stop)
         self.folder = tempfile.TemporaryDirectory()
         self.addCleanup(self.folder.cleanup)
         self.root = Path(self.folder.name)
@@ -181,6 +185,39 @@ class PanelTests(unittest.TestCase):
         state = self.state()
         self.assertIsNone(state['pages'])   # the temporary folder is no clone
         self.assertFalse(state['task'])
+        with patch('app.task_installed', return_value=True):
+            self.panel.task = (0, False)
+            self.assertTrue(self.state()['task'])
+
+    def git(self, folder, *args):
+        return subprocess.run(['git', *args], cwd=folder, check=True, capture_output=True, text=True)
+
+    def test_only_a_folder_that_is_itself_a_clone_gets_its_address_and_its_update(self):
+        # A copy of the project inside another repository (an operator's home folder can be one)
+        # must not take that repository's address, and must never run its `git pull`.
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as outer:
+            self.git(outer, 'init', '-q')
+            self.git(outer, 'remote', 'add', 'origin', 'https://github.com/Other/system_reporter.git')
+            inner = Path(outer) / 'Documents' / 'free_sub'
+            inner.mkdir(parents=True)
+            self.assertFalse(app.clone_root(inner))
+            self.assertTrue(app.clone_root(outer))
+            self.assertIsNone(app.Panel(inner).pages)
+            self.assertEqual(app.Panel(outer).pages, 'https://other.github.io/system_reporter/')
+            self.git(inner, 'init', '-q')
+            self.git(inner, 'remote', 'add', 'origin', 'https://github.com/Owner/free_sub.git')
+            self.assertTrue(app.clone_root(inner))
+            self.assertEqual(app.Panel(inner).pages, 'https://owner.github.io/free_sub/')
+            # Not a clone: Update refuses before any `git pull`.
+            plain = Path(outer) / 'copy'
+            plain.mkdir()
+            panel = app.Panel(plain)
+            real = subprocess.run
+            def guarded(command, **kwargs):
+                self.assertNotEqual(command[:2], ['git', 'pull'], 'git pull must not run')
+                return real(command, **kwargs)
+            with patch('app.subprocess.run', guarded), self.assertRaisesRegex(ValueError, 'only in a Git clone'):
+                panel.update()
 
     def test_update_pulls_only_while_idle_and_never_shows_the_remote(self):
         import subprocess
@@ -192,7 +229,7 @@ class PanelTests(unittest.TestCase):
             calls.append((command, kwargs['env'].get('GIT_TERMINAL_PROMPT')))
             return subprocess.CompletedProcess(command, 0, stdout='Updating 1..2\nFast-forward\n app.py | 2 +-\n',
                                                stderr='From https://token@github.com/owner/free_sub\n')
-        with patch('app.subprocess.run', pull):
+        with patch('app.subprocess.run', pull), patch('app.clone_root', return_value=True):
             self.assertEqual(self.request('POST', '/api/update', {})[0], 200)
         log = '\n'.join(self.state()['log'])
         self.assertEqual(calls, [(['git', 'pull', '--no-rebase', '--no-edit'], '0')])

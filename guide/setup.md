@@ -175,6 +175,8 @@ line in the log until this is done. Nothing is merged or pushed over silently.
 | The page says **Panel stopped** | The panel program ended: it was quit, ended in Task Manager, or crashed. Open `panel_windows.bat` again; an open page reloads itself. A crash is recorded in `.local\logs\panel.log`. A run in progress ended with the panel. |
 | `Port 8765 is used by another program` | Something else holds the port. Start the panel on another one: `python app.py --port 8766`. |
 | `[BUSY] Another run is already active` | The scheduled task or a second window is running. Wait, or remove the task. |
+| `FAIL: …` lines, then `CalledProcessError` | The test gate that runs before every push failed, so nothing was published and the failing test is named just above. Update the program first (a newer version may already fix it); if the same test still fails, send those lines. |
+| `Update program works only in a Git clone` | The folder is not itself a clone (a downloaded ZIP, or a copy inside another repository). Clone the project as in step 1 and run it from there. |
 | `[UPDATE] GitHub has commits this copy lacks` | Update as described above. |
 | `[SKIP] Tests would reach the internet from …` | The PC reaches the internet from outside Iran and no physical adapter bypasses the VPN. Results would describe the VPN's network, so the published list is left as it is. `--allow-non-iran` overrides this. |
 | `[PUBLISH ERROR] … category=authentication` | Run `git push` once interactively as the account that runs the tests. Do not use `SYSTEM`, S4U, or an SSH key that needs a prompt. |

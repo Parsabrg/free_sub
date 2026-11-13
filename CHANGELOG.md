@@ -31,6 +31,12 @@ and is not recorded here.
   interval that was actually used.
 
 ### Fixed
+- The test gate that runs before every push failed on a PC where the project sits
+  inside another Git repository (the panel took that repository's address) or where
+  the scheduled task is installed (a test assumed it was not), which stopped all
+  publishing. The panel now trusts Git only in a folder that is itself a clone, and
+  **Update program** refuses anywhere else rather than updating a different project.
+  The panel tests no longer depend on what else is installed on the machine.
 - The control panel ended whenever the window that started it was closed, and its
   page then kept showing the last state it had received as if the run were still
   going. The panel now runs as a background program without a window of its own,

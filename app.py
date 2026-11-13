@@ -52,6 +52,21 @@ def pages_address(remote):
     return None
 
 
+def clone_root(root):
+    """True when root is itself the top folder of a Git clone. Git also finds a repository
+    in any folder above, so a copy of the project inside another repository (a home folder
+    that is a clone, say) would otherwise be taken for that one: it would show that
+    repository's address and `git pull` would update the wrong project."""
+    result = quiet(['git', 'rev-parse', '--show-toplevel'], root)
+    if not result or result.returncode != 0:
+        return False
+    try:
+        top, here = (os.path.normcase(os.path.realpath(p)) for p in (result.stdout.strip(), root))
+    except (OSError, ValueError):
+        return False
+    return bool(result.stdout.strip()) and top == here
+
+
 def task_installed():
     """Whether the unattended scheduled task exists (Windows only)."""
     if os.name != 'nt':
@@ -214,7 +229,7 @@ class Panel:
         self.registry_path = self.local / 'sources.json'
         self.edit = threading.Lock()
         self.token = secrets.token_urlsafe(24)
-        remote = quiet(['git', 'remote', 'get-url', 'origin'], self.root)
+        remote = quiet(['git', 'remote', 'get-url', 'origin'], self.root) if clone_root(self.root) else None
         self.pages = pages_address(remote.stdout if remote and remote.returncode == 0 else '')
         self.task = (0, False)
         self.shutdown = None   # set by run_server: ends the web server
@@ -261,6 +276,9 @@ class Panel:
         """Bring this copy up to date with GitHub. Never during a run: its files are in use."""
         if self.runner.status['state'] != 'idle':
             raise ValueError('Stop the run before updating')
+        if not clone_root(self.root):
+            raise ValueError('Update program works only in a Git clone of the project. This folder is not one, '
+                             'or Git cannot read it.')
         say = self.runner.say
         say('Checking GitHub for a newer version.')
         try:
