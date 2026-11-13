@@ -47,9 +47,14 @@ class ParserCoverageTests(unittest.TestCase):
             if url.endswith('/slow'):
                 quick_done.wait(10)      # finishes only after the other one has
                 return link(1)
-            quick_done.set()
             return link(2)
-        out = io.StringIO()
+        class Progress(io.StringIO):
+            def write(self, value):
+                count=super().write(value)
+                if value.startswith('[SOURCE] Quick:'):
+                    quick_done.set()
+                return count
+        out = Progress()
         with patch('collector.get', get), redirect_stdout(out):
             stats = {}
             groups = collect({'Slow': 'https://x.example/slow', 'Quick': 'https://x.example/quick'}, stats=stats)

@@ -460,8 +460,10 @@ class BackgroundPanelTests(unittest.TestCase):
             self.assertEqual(response.status, 200)
             self.assertTrue(answer['restarting'], answer['log'])
             # The old program ends and a different one answers on the same port.
-            self.assertTrue(wait_for(lambda: app.probe(port)[0] == 'panel' and app.probe(port)[1]['pid'] != info['pid'], 60),
-                            'no new panel came up')
+            def replacement_ready():
+                status, current = app.probe(port)
+                return status == 'panel' and current['pid'] != info['pid']
+            self.assertTrue(wait_for(replacement_ready, 60), 'no new panel came up')
             self.assertTrue((clone / 'b.txt').exists(), 'the update was not pulled')
             conn = http.client.HTTPConnection('127.0.0.1', port, timeout=60)
             conn.request('GET', '/')

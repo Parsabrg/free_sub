@@ -80,6 +80,34 @@ def write_compact_feed(docs, urls, rows, report):
     (Path(docs)/'sub-compact.b64').write_bytes(base64.b64encode(data)+b'\n')
 
 
+def prepare_legacy_feed(docs):
+    """Keep only entries the current parser can verify against a pre-migration snapshot."""
+    plain=(docs/'sub.txt').read_text(encoding='utf-8').encode('utf-8')
+    encoded=(docs/'sub.b64').read_text(encoding='utf-8').strip()
+    if base64.b64decode(encoded,validate=True)!=plain:
+        raise ValueError('Subscription encodings differ')
+    report=json.loads((docs/'status.json').read_text(encoding='utf-8'))
+    urls=links(plain.decode('utf-8'))
+    outbounds=json.loads((docs/'xray.json').read_text(encoding='utf-8'))['outbounds']
+    if len(urls)!=report['published'] or len(report['nodes'])!=len(urls) or len(outbounds)!=len(urls):
+        raise ValueError('Legacy subscription count mismatch')
+    retained=[]
+    for url,row,outbound in zip(urls,report['nodes'],outbounds):
+        candidate=parse(url)
+        if candidate and candidate.key==row['id'] and dict(candidate.outbound,tag=row['name'])==outbound:
+            retained.append((url,row,outbound))
+    if len(retained)!=len(urls):
+        data=''.join(f'{url}\n' for url,_,_ in retained).encode('utf-8')
+        (docs/'sub.txt').write_bytes(data)
+        (docs/'sub.b64').write_bytes(base64.b64encode(data)+b'\n')
+        (docs/'xray.json').write_text(json.dumps({'outbounds':[o for _,_,o in retained]},ensure_ascii=False)+'\n',encoding='utf-8')
+        report['nodes']=[dict(row,rank=rank) for rank,(_,row,_) in enumerate(retained,1)]
+        report['published']=len(retained)
+        print(f'[PAGES] Skipped {len(urls)-len(retained)} legacy entries that require reverification.',flush=True)
+    write_compact_feed(docs,[url for url,_,_ in retained],report['nodes'],report)
+    (docs/'status.json').write_text(json.dumps(report,ensure_ascii=False)+'\n',encoding='utf-8')
+
+
 def prepare_pages(destination, ref=None):
     """Copy only feed data and render the public page from the deployment code."""
     from public_page import INDEX
@@ -99,11 +127,8 @@ def prepare_pages(destination, ref=None):
                 continue
             data=source.read_bytes()
         (destination/name).write_bytes(data)
-    report=validate_outputs(destination)
-    if 'compact_ids' not in report:
-        urls=links((destination/'sub.txt').read_text(encoding='utf-8'))
-        write_compact_feed(destination,urls,report['nodes'],report)
-        (destination/'status.json').write_text(json.dumps(report,ensure_ascii=False)+'\n',encoding='utf-8')
+    if not ref and not (destination/'sub-compact.b64').exists():
+        prepare_legacy_feed(destination)
     (destination/'index.html').write_text(INDEX,encoding='utf-8')
     validate_outputs(destination)
 

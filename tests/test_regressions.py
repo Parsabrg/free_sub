@@ -258,6 +258,27 @@ class RegressionTests(unittest.TestCase):
             (root/'sub.b64').write_text(base64.b64encode(b'two').decode())
             with self.assertRaises(ValueError): validate_outputs(root)
 
+    def test_legacy_pages_feed_filters_entries_rejected_by_the_new_parser(self):
+        from publishing import prepare_legacy_feed
+        good='trojan://fixture@example.com:443?security=tls'
+        bad='trojan://fixture@example.com:443?security=tls&fp=unsafe'
+        candidate=parse(good)
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            plain=f'{bad}\n{good}\n'.encode()
+            (root/'sub.txt').write_bytes(plain)
+            (root/'sub.b64').write_bytes(base64.b64encode(plain))
+            node={'name':'Fixture','rank':2,'id':candidate.key,'last_success_epoch':10,'expires_epoch':25}
+            (root/'status.json').write_text(json.dumps({'published':2,'generated_epoch':15,
+                'nodes':[dict(node,id='legacy',rank=1),node]}))
+            (root/'xray.json').write_text(json.dumps({'outbounds':[{},dict(candidate.outbound,tag='Fixture')]}))
+            with self.assertRaises(ValueError): validate_outputs(root)
+            prepare_legacy_feed(root)
+            report=validate_outputs(root)
+            self.assertEqual((report['published'],report['nodes'][0]['rank']), (1,1))
+            self.assertEqual(report['compact_ids'],[candidate.key])
+            self.assertEqual((root/'sub.txt').read_text(),good+'\n')
+
     def test_worker_deadline_cleans_process(self):
         import sys
         start=time.monotonic()
