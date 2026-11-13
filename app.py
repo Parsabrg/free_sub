@@ -19,6 +19,7 @@ import subprocess
 import sys
 import threading
 import time
+import traceback
 import webbrowser
 import collector
 import sources
@@ -233,6 +234,9 @@ class Panel:
         self.pages = pages_address(remote.stdout if remote and remote.returncode == 0 else '')
         self.task = (0, False)
         self.shutdown = None   # set by run_server: ends the web server
+        self.port = None       # set by run_server: where a restarted panel must listen again
+        self.restarting = False   # an update was pulled: this program is about to be replaced
+        self.respawn = False
 
     def task_active(self):
         # Asked at most once a minute: the page polls far more often than a task changes.
@@ -272,14 +276,28 @@ class Panel:
         if self.shutdown is not None:
             self.shutdown()
 
+    def resume_schedule(self):
+        """Start the repeating schedule again with the settings last used."""
+        s = self.settings()
+        self.runner.start('auto', s['publish'], True, {'limit': s['limit'], 'interval': s['interval']}, s['interval'] * 60)
+
     def update(self):
-        """Bring this copy up to date with GitHub. Never during a run: its files are in use."""
-        if self.runner.status['state'] != 'idle':
+        """Bring this copy up to date with GitHub and, when something changed, restart the panel
+        so that the new version is the one running. Never during a run: its files are in use.
+        Between two rounds of a repeating schedule nothing runs, so the schedule is paused for
+        the update and carries on in the restarted panel."""
+        state = self.runner.status['state']
+        if state == 'running':
             raise ValueError('Stop the run before updating')
         if not clone_root(self.root):
             raise ValueError('Update program works only in a Git clone of the project. This folder is not one, '
                              'or Git cannot read it.')
         say = self.runner.say
+        waiting = state == 'waiting'
+        if waiting:
+            self.runner.stop()
+            if self.runner.thread is not None:
+                self.runner.thread.join(timeout=10)
         say('Checking GitHub for a newer version.')
         try:
             result = subprocess.run(['git', 'pull', '--no-rebase', '--no-edit'], cwd=self.root, capture_output=True,
@@ -287,17 +305,52 @@ class Panel:
                                     timeout=180, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         except (OSError, subprocess.SubprocessError) as exc:
             say(f'Update could not run ({type(exc).__name__}).')
+            result = None
+        if result is not None:
+            # Only stdout is shown: Git's stderr names the remote, which can hold a credential.
+            for line in result.stdout.splitlines()[-12:]:
+                say('  ' + line)
+        if result is None or result.returncode or 'Already up to date' in result.stdout:
+            if result is not None and result.returncode:
+                say(f'Update failed (exit code {result.returncode}). Run "git pull --no-rebase --no-edit" '
+                    'in this folder to see why.')
+            elif result is not None:
+                say('This is already the newest version.')
+            if waiting:
+                self.resume_schedule()
+                say('The repeat schedule continues.')
             return
-        # Only stdout is shown: Git's stderr names the remote, which can hold a credential.
-        for line in result.stdout.splitlines()[-12:]:
-            say('  ' + line)
-        if result.returncode:
-            say(f'Update failed (exit code {result.returncode}). Run "git pull --no-rebase --no-edit" '
-                'in this folder to see why.')
-        elif 'Already up to date' in result.stdout:
-            say('This is already the newest version.')
-        else:
-            say('Updated. Close this window and open the panel again to load the new version.')
+        version = quiet(['git', 'log', '-1', '--format=%h %s'], self.root)
+        if version and version.returncode == 0 and version.stdout.strip():
+            say('Now at ' + version.stdout.strip())
+        atomic_write(self.local / 'update-restart.json', json.dumps({'at': time.time(), 'resume': waiting}) + '\n')
+        say('Updated. Restarting the panel to load the new version…')
+        self.restarting = True
+
+    def restart(self):
+        """After an update: end this program; run_server then starts the new one in its place."""
+        time.sleep(1.0)   # long enough for the page to be told, and to show "Restarting"
+        self.respawn = True
+        self.quit()
+
+    def after_restart(self):
+        """In the panel that an update started: say so, and carry on with a paused schedule."""
+        marker = self.local / 'update-restart.json'
+        data = read_json(marker, None)
+        if data is None:
+            return
+        try:
+            marker.unlink()
+        except OSError:
+            pass
+        if not isinstance(data, dict) or time.time() - data.get('at', 0) > 600:
+            return   # an old marker is not a request
+        version = quiet(['git', 'log', '-1', '--format=%h %s'], self.root)
+        said = f' to {version.stdout.strip()}' if version and version.returncode == 0 and version.stdout.strip() else ''
+        self.runner.say(f'Updated{said} and restarted.')
+        if data.get('resume'):
+            self.resume_schedule()
+            self.runner.say('The repeat schedule continues.')
 
     def change(self, action, body):
         with self.edit:
@@ -338,7 +391,7 @@ class Panel:
             protocols[node.get('protocol')] = protocols.get(node.get('protocol'), 0) + 1
         return {'run': dict(self.runner.status), 'log': list(self.runner.log)[-400:], 'settings': self.settings(),
                 'now': time.time(), 'sources': rows, 'discovery': discovery,
-                'pages': self.pages, 'task': self.task_active(),
+                'pages': self.pages, 'task': self.task_active(), 'restarting': self.restarting,
                 'last': {'published': status.get('published'), 'health': status.get('health'),
                          # Configs that passed in the last run; the list may hold fewer (a maximum)
                          # or, after an outage, older ones kept within their expiry.
@@ -417,7 +470,12 @@ def handler_for(panel, page):
                     return self.send(404, {'error': 'Not found'})
             except ValueError as exc:
                 return self.send(400, {'error': str(exc)})
+            except Exception:
+                traceback.print_exc()   # to .local/logs/panel.log; the page only hears that it happened
+                return self.send(500, {'error': 'The panel hit an unexpected error. Its log is .local\\logs\\panel.log'})
             self.send(200, panel.snapshot())
+            if self.path == '/api/update' and panel.restarting:
+                threading.Thread(target=panel.restart, daemon=True).start()
     return Handler
 
 
@@ -462,6 +520,27 @@ def background_python():
     return sys.executable
 
 
+def spawn_server(root, port):
+    """Start the panel as a background program with no window of its own. Returns the process
+    and the log it writes to."""
+    root = Path(root)
+    logs = root / '.local' / 'logs'
+    logs.mkdir(parents=True, exist_ok=True)
+    log = logs / 'panel.log'
+    if log.exists() and log.stat().st_size > 512 * 1024:
+        log.replace(logs / 'panel.log.old')
+    command = [background_python(), '-u', str(Path(__file__).resolve()), '--serve', '--no-browser',
+               '--root', str(root), '--port', str(port)]
+    # Its own hidden console on Windows, its own session elsewhere: closing the window
+    # that started it, or the program that started it ending, must not take it down.
+    detach = ({'creationflags': subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP}
+              if os.name == 'nt' else {'start_new_session': True})
+    with log.open('ab') as out:
+        out.write(time.strftime('--- %Y-%m-%d %H:%M:%S panel starting\n').encode())
+        out.flush()
+        return subprocess.Popen(command, cwd=root, stdin=subprocess.DEVNULL, stdout=out, stderr=out, **detach), log
+
+
 def launch(root, port, open_browser):
     """Start the panel as a background program with no window of its own, unless one is
     already running, and open its page. Returns the exit code."""
@@ -472,21 +551,7 @@ def launch(root, port, open_browser):
         print(f'Port {port} is used by another program. Use a free one: python app.py --port {port + 1}', file=sys.stderr)
         return 1
     if state == 'free':
-        logs = root / '.local' / 'logs'
-        logs.mkdir(parents=True, exist_ok=True)
-        log = logs / 'panel.log'
-        if log.exists() and log.stat().st_size > 512 * 1024:
-            log.replace(logs / 'panel.log.old')
-        command = [background_python(), '-u', str(Path(__file__).resolve()), '--serve', '--no-browser',
-                   '--root', str(root), '--port', str(port)]
-        # Its own hidden console on Windows, its own session elsewhere: closing the window
-        # that started it, or this launcher ending, must not take it down.
-        detach = ({'creationflags': subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP}
-                  if os.name == 'nt' else {'start_new_session': True})
-        with log.open('ab') as out:
-            out.write(time.strftime('--- %Y-%m-%d %H:%M:%S panel starting\n').encode())
-            out.flush()
-            child = subprocess.Popen(command, cwd=root, stdin=subprocess.DEVNULL, stdout=out, stderr=out, **detach)
+        child, log = spawn_server(root, port)
         deadline = time.monotonic() + 20
         while probe(port)[0] != 'panel':
             if child.poll() is not None or time.monotonic() > deadline:
@@ -510,8 +575,10 @@ def run_server(root, port, open_browser):
     except OSError as exc:
         raise SystemExit(f'Port {port} is not available ({type(exc).__name__}); a panel may already be running there.')
     panel.shutdown = server.shutdown
-    url = f'http://127.0.0.1:{server.server_address[1]}/'
+    panel.port = server.server_address[1]
+    url = f'http://127.0.0.1:{panel.port}/'
     print(time.strftime('%H:%M:%S ') + f'panel listening on {url}', flush=True)
+    panel.after_restart()
     if open_browser:
         threading.Timer(0.5, webbrowser.open, [url]).start()
         print('Press Ctrl+C, or use "Quit panel" in the page, to stop it and any run it started.', flush=True)
@@ -523,6 +590,13 @@ def run_server(root, port, open_browser):
         panel.runner.stop()
         server.server_close()
         print(time.strftime('%H:%M:%S ') + 'panel ended', flush=True)
+        if panel.respawn:
+            # The port is free now. The new program is read from disk again: it is the updated one.
+            try:
+                spawn_server(root, panel.port)
+                print(time.strftime('%H:%M:%S ') + 'panel restarting', flush=True)
+            except OSError as exc:
+                print(time.strftime('%H:%M:%S ') + f'panel could not restart ({type(exc).__name__})', flush=True)
 
 
 def main(argv=None):

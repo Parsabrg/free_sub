@@ -104,7 +104,7 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
     <div class="controls">
       <button id="start" class="primary">Start</button>
       <button id="stop" class="danger" disabled>Stop</button>
-      <button id="update" title="Get the newest version of this program from GitHub">Update program</button>
+      <button id="update" title="Get the newest version from GitHub and restart the panel with it">Update program</button>
       <label>Mode
         <select id="mode">
           <option value="auto">Automatic: health check, new feeds every 4 hours</option>
@@ -170,7 +170,7 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
 <script>
 const TOKEN = '__TOKEN__';
 const $ = id => document.getElementById(id);
-let first = true, busy = false, linked = false, failures = 0, gone = false, lastState = 'idle';
+let first = true, busy = false, linked = false, failures = 0, gone = false, lastState = 'idle', restartingSince = 0;
 
 function renderLinks(pages) {
   if (linked || !pages) return;
@@ -283,7 +283,7 @@ function render(state) {
                    : run.state === 'waiting' ? `Waiting: next run at ${clock(run.next_run)}` : 'Idle';
   $('start').disabled = busy || run.state !== 'idle';
   $('stop').disabled = busy || run.state === 'idle';
-  $('update').disabled = busy || run.state !== 'idle';
+  $('update').disabled = busy || run.state === 'running';
   $('quit').disabled = false;
   for (const id of ['mode', 'repeat', 'publish', 'limit', 'interval']) $(id).disabled = run.state !== 'idle';
   if (first) {
@@ -348,6 +348,11 @@ function render(state) {
   $('task').hidden = !state.task;
   renderLinks(state.pages);
   renderSources(state);
+  if (state.restarting) {
+    // The update was pulled and the program is being replaced: this page reloads itself when the new one answers.
+    restartingSince = restartingSince || Date.now();
+    offline(RESTARTING, 'Restarting');
+  }
   const log = $('log'), pinned = log.scrollTop + log.clientHeight >= log.scrollHeight - 30;
   const text = state.log.join('\n') || 'Nothing has run from this panel yet. Press Start.';
   if (log.textContent !== text) { log.textContent = text; if (pinned) log.scrollTop = log.scrollHeight; }
@@ -392,6 +397,8 @@ const STOPPED = 'The panel program is no longer running, so this page has stoppe
   'it received last. If its window was closed or it crashed, start it again with panel_windows.bat. A run in ' +
   'progress ended with it. A crash is recorded in .local\\logs\\panel.log.';
 
+const RESTARTING = 'Updated. The panel is restarting with the new version; this page reloads by itself.';
+
 function offline(message, label = 'Panel stopped') {
   const pill = $('pill');
   pill.className = 'pill'; pill.textContent = label;
@@ -420,10 +427,12 @@ async function poll() {
   } catch (error) {
     // 403: the panel was restarted and this page holds the old token. Load the new page.
     if (error.status === 403) { location.reload(); return; }
-    if (++failures >= 2) offline(STOPPED);
+    // While an update is replacing the program, a gap of a few seconds is expected; after 40 it is not.
+    const restarting = restartingSince && Date.now() - restartingSince < 40000;
+    if (++failures >= 2 || restarting) offline(restarting ? RESTARTING : STOPPED, restarting ? 'Restarting' : 'Panel stopped');
   }
   if (state) render(state);
-  setTimeout(poll, failures >= 2 ? 3000 : 1500);
+  setTimeout(poll, restartingSince ? 700 : failures >= 2 ? 3000 : 1500);
 }
 poll();
 </script>

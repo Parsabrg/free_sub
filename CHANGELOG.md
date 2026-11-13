@@ -30,6 +30,14 @@ and is not recorded here.
   minutes**. `status.json` records `list_limit`, `working_this_run` and the run
   interval that was actually used.
 
+### Changed (update)
+- **Update program restarts the panel into the new version** and the page reloads by
+  itself, instead of asking you to close and reopen it. It also works between the
+  rounds of a repeating schedule, which is paused for the update and resumed in the
+  restarted panel. A failed update, or nothing new, changes nothing.
+- The panel answers an unexpected error with a message and a pointer to its log
+  instead of dropping the connection.
+
 ### Changed (progress and layout)
 - The panel's progress bar now covers the whole run: starting up, fetching sources
   (n of N), searching GitHub for new feeds, preparing the tests, then testing. It

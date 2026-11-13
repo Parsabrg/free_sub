@@ -1,5 +1,6 @@
 import http.client
 import http.server
+import io
 import json
 from pathlib import Path
 import re
@@ -104,6 +105,14 @@ class PanelTests(unittest.TestCase):
         self.assertEqual(self.state()['run']['state'], 'idle')
         self.assertFalse(self.runner.thread.is_alive())
         self.assertEqual(self.request('POST', '/api/quit', {}, token=False)[0], 403)
+
+    def test_an_unexpected_error_is_answered_and_the_panel_keeps_serving(self):
+        with patch.object(self.panel, 'update', side_effect=RuntimeError('boom')), patch('sys.stderr', new=io.StringIO()):
+            status, body = self.request('POST', '/api/update', {})
+        self.assertEqual(status, 500)
+        self.assertIn('unexpected error', json.loads(body)['error'])
+        self.assertNotIn('boom', body.decode())      # internals stay in the log
+        self.assertEqual(self.state()['run']['state'], 'idle')
 
     def test_ping_names_the_program_and_a_strange_token_is_only_refused(self):
         status, body = self.request('GET', '/api/ping', token=False)
@@ -226,21 +235,92 @@ class PanelTests(unittest.TestCase):
         def pull(command, **kwargs):
             if command[0] != 'git':   # the scheduled-task query on Windows
                 return subprocess.CompletedProcess(command, 1, stdout='', stderr='')
-            calls.append((command, kwargs['env'].get('GIT_TERMINAL_PROMPT')))
+            calls.append((command, (kwargs.get('env') or {}).get('GIT_TERMINAL_PROMPT')))
             return subprocess.CompletedProcess(command, 0, stdout='Updating 1..2\nFast-forward\n app.py | 2 +-\n',
                                                stderr='From https://token@github.com/owner/free_sub\n')
         with patch('app.subprocess.run', pull), patch('app.clone_root', return_value=True):
             self.assertEqual(self.request('POST', '/api/update', {})[0], 200)
         log = '\n'.join(self.state()['log'])
-        self.assertEqual(calls, [(['git', 'pull', '--no-rebase', '--no-edit'], '0')])
+        self.assertEqual([c for c in calls if c[0][:2] == ['git', 'pull']], [(['git', 'pull', '--no-rebase', '--no-edit'], '0')])
         self.assertIn('Fast-forward', log)
-        self.assertIn('open the panel again', log)
+        self.assertIn('Restarting the panel', log)
         self.assertNotIn('token', log)
         self.script = 'import time; print("started", flush=True); time.sleep(60)'
         self.request('POST', '/api/start', {'mode': 'health', 'publish': False, 'repeat': False})
         self.assertTrue(wait_for(lambda: any('started' in line for line in self.state()['log'])))
         status, body = self.request('POST', '/api/update', {})
         self.assertEqual((status, json.loads(body)['error']), (400, 'Stop the run before updating'))
+
+    def pulled(self, stdout):
+        def pull(command, **kwargs):
+            if command[:2] == ['git', 'pull']:
+                return subprocess.CompletedProcess(command, 0, stdout=stdout, stderr='')
+            return subprocess.CompletedProcess(command, 1, stdout='', stderr='')
+        return pull
+
+    def start_waiting_schedule(self):
+        self.runner.interval = 60
+        self.assertEqual(self.request('POST', '/api/start', {'mode': 'health', 'repeat': True, 'publish': False,
+                                                              'limit': 0, 'interval': 5})[0], 200)
+        self.runner.interval = 60
+        self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'waiting'))
+
+    def test_an_update_between_two_rounds_restarts_the_panel_and_keeps_the_schedule(self):
+        ended = threading.Event()
+        self.panel.shutdown = ended.set
+        self.start_waiting_schedule()
+        with patch('app.subprocess.run', self.pulled('Updating 1..2\nFast-forward\n')), patch('app.clone_root', return_value=True):
+            status, body = self.request('POST', '/api/update', {})
+        self.assertEqual(status, 200)
+        self.assertTrue(json.loads(body)['restarting'])
+        self.assertEqual(self.runner.status['state'], 'idle')           # paused for the update
+        marker = json.loads((self.root / '.local' / 'update-restart.json').read_text())
+        self.assertTrue(marker['resume'])
+        self.assertTrue(ended.wait(10), 'the panel was not asked to end')
+        self.assertTrue(self.panel.respawn)
+
+    def test_an_update_with_nothing_new_leaves_everything_as_it_was(self):
+        self.panel.shutdown = lambda: self.fail('the panel must not restart')
+        self.start_waiting_schedule()
+        with patch('app.subprocess.run', self.pulled('Already up to date.\n')), patch('app.clone_root', return_value=True):
+            self.assertEqual(self.request('POST', '/api/update', {})[0], 200)
+        state = self.state()
+        self.assertFalse(state['restarting'])
+        self.assertIn(state['run']['state'], ('running', 'waiting'))     # the schedule was put back
+        self.assertTrue(any('already the newest version' in line for line in state['log']))
+        self.assertFalse((self.root / '.local' / 'update-restart.json').exists())
+        self.request('POST', '/api/stop', {})
+        self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
+
+    def test_a_failed_update_puts_the_schedule_back_too(self):
+        self.start_waiting_schedule()
+        failed = lambda command, **kw: subprocess.CompletedProcess(command, 1, stdout='', stderr='boom')
+        with patch('app.subprocess.run', failed), patch('app.clone_root', return_value=True):
+            self.assertEqual(self.request('POST', '/api/update', {})[0], 200)
+        self.assertIn(self.state()['run']['state'], ('running', 'waiting'))
+        self.assertFalse(self.state()['restarting'])
+        self.request('POST', '/api/stop', {})
+        self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
+
+    def test_the_restarted_panel_says_so_and_carries_on_but_ignores_an_old_marker(self):
+        marker = self.root / '.local' / 'update-restart.json'
+        marker.parent.mkdir(exist_ok=True)
+        marker.write_text(json.dumps({'at': time.time() - 3600, 'resume': True}))
+        self.panel.after_restart()
+        self.assertFalse(marker.exists())
+        self.assertEqual(self.runner.status['state'], 'idle')
+        self.assertFalse(any('restarted' in line for line in self.runner.log))
+        marker.write_text(json.dumps({'at': time.time(), 'resume': True}))
+        self.runner.interval = 60
+        self.panel.after_restart()
+        self.assertFalse(marker.exists())
+        log = '\n'.join(self.runner.log)
+        self.assertIn('Updated', log)
+        self.assertIn('and restarted.', log)
+        self.assertIn('The repeat schedule continues.', log)
+        self.assertTrue(wait_for(lambda: self.state()['run']['state'] in ('running', 'waiting')))
+        self.request('POST', '/api/stop', {})
+        self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
 
     def test_a_damaged_source_list_does_not_take_the_panel_down(self):
         (self.root / '.local').mkdir(exist_ok=True)
@@ -327,6 +407,59 @@ class BackgroundPanelTests(unittest.TestCase):
             silent.bind(('127.0.0.1', 0))
             silent.listen(1)
             self.assertEqual(app.probe(silent.getsockname()[1], timeout=0.5)[0], 'busy')
+
+    def test_update_in_a_real_clone_replaces_the_panel_with_a_new_process(self):
+        def git(cwd, *args):
+            return subprocess.run(['git', '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', *args],
+                                  cwd=cwd, check=True, capture_output=True, text=True)
+        port = free_port()
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as base:
+            base = Path(base)
+            remote, seed, clone = base / 'remote.git', base / 'seed', base / 'free_sub'
+            git(base, 'init', '-q', '--bare', '-b', 'main', str(remote))
+            seed.mkdir()
+            git(seed, 'init', '-q', '-b', 'main')
+            (seed / 'a.txt').write_text('one')
+            git(seed, 'add', '.'); git(seed, 'commit', '-q', '-m', 'first')
+            git(seed, 'remote', 'add', 'origin', str(remote)); git(seed, 'push', '-q', '-u', 'origin', 'main')
+            git(base, 'clone', '-q', str(remote), str(clone))
+            (seed / 'b.txt').write_text('two')
+            git(seed, 'add', '.'); git(seed, 'commit', '-q', '-m', 'second commit for the update'); git(seed, 'push', '-q')
+            self.addCleanup(lambda: app.probe(port)[0] == 'panel' and self.quit(port))
+            self.assertEqual(self.launcher(str(clone), port).returncode, 0)
+            state, info = app.probe(port)
+            self.assertEqual(state, 'panel')
+            conn = http.client.HTTPConnection('127.0.0.1', port, timeout=60)
+            conn.request('GET', '/')
+            token = re.search(r"TOKEN = '([^']+)'", conn.getresponse().read().decode()).group(1)
+            conn.close()
+            conn = http.client.HTTPConnection('127.0.0.1', port, timeout=120)
+            conn.request('POST', '/api/update', '{}', {'X-Token': token})
+            response = conn.getresponse()
+            answer = json.loads(response.read())
+            conn.close()
+            self.assertEqual(response.status, 200)
+            self.assertTrue(answer['restarting'], answer['log'])
+            # The old program ends and a different one answers on the same port.
+            self.assertTrue(wait_for(lambda: app.probe(port)[0] == 'panel' and app.probe(port)[1]['pid'] != info['pid'], 60),
+                            'no new panel came up')
+            self.assertTrue((clone / 'b.txt').exists(), 'the update was not pulled')
+            conn = http.client.HTTPConnection('127.0.0.1', port, timeout=60)
+            conn.request('GET', '/')
+            fresh = re.search(r"TOKEN = '([^']+)'", conn.getresponse().read().decode()).group(1)
+            conn.close()
+            self.assertNotEqual(fresh, token)    # the open page sees a 403 and reloads itself
+            conn = http.client.HTTPConnection('127.0.0.1', port, timeout=60)
+            conn.request('GET', '/api/state', headers={'X-Token': token})
+            self.assertEqual(conn.getresponse().status, 403)
+            conn.close()
+            conn = http.client.HTTPConnection('127.0.0.1', port, timeout=60)
+            conn.request('GET', '/api/state', headers={'X-Token': fresh})
+            log = '\n'.join(json.loads(conn.getresponse().read())['log'])
+            conn.close()
+            self.assertIn('and restarted.', log)
+            self.assertIn('second commit for the update', log)
+            self.assertFalse((clone / '.local' / 'update-restart.json').exists())
 
     def test_another_program_on_the_port_is_reported_not_trampled(self):
         class Other(http.server.BaseHTTPRequestHandler):

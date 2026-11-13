@@ -79,7 +79,9 @@ launcher again while the panel is up simply opens the page again.
 - **Your subscription.** The published addresses, each with a Copy button.
 - **Sources.** Add your own `https://` subscription address, switch any source on
   or off, and see how many configs each one carried and how many worked.
-- **Update program.** Fetches the newest version of this repository.
+- **Update program.** Pulls the newest version from GitHub. If something changed, the panel
+  restarts itself with the new version and the page reloads by itself; a repeating
+  schedule that was waiting for its next round carries on. It is refused while a run is active.
 - **Quit panel.** Stops any run and the repeat schedule, then ends the panel program.
 - **Log.** The live output of the current run, with a progress bar.
 

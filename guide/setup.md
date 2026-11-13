@@ -157,8 +157,14 @@ folder. To return to unattended runs, install the task again as described above.
 
 ## Updating
 
-Press **Update program** in the control panel while no run is active, then close
-the panel window and open it again. From a terminal:
+Press **Update program** in the control panel. If a newer version was pulled, the panel
+restarts itself and the page reloads by itself, so there is nothing to close or reopen.
+It works while the panel is idle, and also between two rounds of a repeating schedule: the
+schedule is paused for the update and carries on in the restarted panel. It is refused
+while a run is active (stop it first), and when nothing new was found it changes nothing.
+
+A panel older than this feature does not restart itself after its first update: press
+**Quit panel** and open `panel_windows.bat` again once. From a terminal:
 
 ```powershell
 git pull --no-rebase --no-edit
@@ -199,6 +205,8 @@ These stay on the PC and are never committed:
 | `.local\geo_cache*` | Country lookups, cached for 14 days. |
 | `.local\logs\` | Scheduled-task logs, and `panel.log` with the panel's own output and any crash. |
 | `.local\verification.json` | Result of the last pre-push test gate. |
+| `.local\panel.json` | The settings last used in the control panel. |
+| `.local\update-restart.json` | Present for a moment while the panel restarts after an update; says whether to resume a paused schedule. |
 
 Do not upload `.local\`, and do not add private subscription sources.
 
