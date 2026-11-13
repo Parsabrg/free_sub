@@ -95,6 +95,11 @@ matches the value recorded above).
   the same port; the page reloaded itself with a new token; and the new panel's log read
   "Updated to <commit> and restarted" and "The repeat schedule continues". The same flow
   runs as a test with real processes and real Git.
+- Quit panel against a real browser process started with the panel's address on its
+  command line, as an operating-system launch does: the tab (one history entry) closed
+  itself and the panel ended. In a tab that had been navigated (two entries) the browser
+  refused to close it, and the page said so. Chromium only; other browsers apply the
+  same rule but were not tried.
 - The bundled `tools/xray.exe`: the archive's SHA-256 equals the release's own
   `.dgst` file, and the binary's equals the Windows hash recorded above. On the
   Windows CI job the official release is downloaded over it and compared with the

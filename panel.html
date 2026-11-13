@@ -415,7 +415,14 @@ $('quit').onclick = async () => {
   try { await call('/api/quit', {}); }
   catch (error) { alert(error.message); return; }
   gone = true;
-  offline('The panel has quit. You can close this tab. To use it again, open panel_windows.bat.', 'Panel quit');
+  offline('The panel has quit. Closing this tab… To use it again, open panel_windows.bat.', 'Panel quit');
+  // A page may close its own tab only in some cases (a tab with a single history entry, such as the one
+  // the launcher opened). If the browser refuses, say so instead of leaving a page that looks alive.
+  setTimeout(() => {
+    window.close();
+    setTimeout(() => offline('The panel has quit. Your browser keeps this tab open: close it yourself. ' +
+      'To use the panel again, open panel_windows.bat.', 'Panel quit'), 600);
+  }, 500);
 };
 
 async function poll() {
