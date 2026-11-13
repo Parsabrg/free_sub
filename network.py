@@ -79,10 +79,13 @@ def physical_interface():
 
 def pin_endpoint(outbound, addresses):
     node = copy.deepcopy(outbound)
-    protocol = node['protocol']
-    collection = 'vnext' if protocol in ('vless', 'vmess') else 'servers'
-    node['settings'][collection][0]['address'] = addresses[0]
+    outbound_endpoint(node)['address'] = addresses[0]
     return node
+
+
+def outbound_endpoint(outbound):
+    settings = outbound.get('settings') or {}
+    return (settings.get('vnext') or settings.get('servers') or [settings])[0]
 
 
 if __name__ == '__main__':

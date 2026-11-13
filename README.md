@@ -3,8 +3,8 @@
 [![Tests](https://github.com/Parsabrg/free_sub/actions/workflows/ci.yml/badge.svg)](https://github.com/Parsabrg/free_sub/actions/workflows/ci.yml)
 
 Free Sub builds a public proxy subscription that lists only configurations which
-recently carried real traffic. It collects public VLESS, VMess, Trojan and
-Shadowsocks share links, sends HTTPS requests through each one with the official
+recently carried real traffic. It collects public VLESS, VMess, Trojan,
+Shadowsocks, Hysteria 2 and SOCKS5 share links, sends HTTPS traffic through each one with the official
 Xray core on a Windows PC, remembers how reliable each node has been, and publishes
 every working one to GitHub Pages (or the most reliable ones, up to a maximum you set).
 
@@ -16,21 +16,22 @@ Tests run on the operator's own network, so "working" means "working from there"
 |---|---|
 | v2rayN (desktop) | `https://parsabrg.github.io/free_sub/xray.json` |
 | v2rayNG (Android) | `https://parsabrg.github.io/free_sub/sub.b64` |
+| Compact (up to 20 server IPs) | `https://parsabrg.github.io/free_sub/sub-compact.b64` |
 | Other clients, plain share links | `https://parsabrg.github.io/free_sub/sub.txt` |
 | Status page and test report | `https://parsabrg.github.io/free_sub/` and `status.json` |
 
-Use the **Xray core** in your client and refresh about once an hour. Passing an
-Xray test does not establish compatibility with sing-box. The `xray.json` feed
-carries the tested Xray outbounds unchanged and is meant for desktop v2rayN.
+Use the **Xray core** in your client and refresh about once an hour. The `xray.json`
+feed carries the tested Xray outbounds and is meant for desktop v2rayN. Share-link
+imports depend on the app and its bundled core. See the [supported formats](guide/how-it-works.md#parsing).
 
 ## What it does
 
 - **Finds its own sources.** Besides a built-in list of public feeds, it searches
   GitHub daily for recently updated collectors and samples what they publish. You
   can add your own subscription addresses and switch any source off.
-- **Tests with real traffic.** Every candidate runs in its own Xray process and must
-  return certificate-verified HTTPS responses. Unsupported or insecure settings are
-  rejected rather than simplified.
+- **Tests with real traffic.** Final verification and health checks require a
+  certificate-verified HTTPS request and a 128 KiB MP4 range from another site.
+  Each candidate runs in its own Xray process.
 - **Measures your real network.** Test connections are bound to the PC's physical
   network adapter, so a VPN or TUN client can stay on without changing the result.
 - **Keeps what keeps working.** Nodes are ranked by recent reliability, rechecked
@@ -113,8 +114,8 @@ scheduled task: see [guide/setup.md](guide/setup.md#unattended-runs-scheduled-ta
    their effective configuration, not by name.
 3. **Screen** every candidate: a certificate-verified HTTPS request through its own
    Xray process, with a five-second network deadline.
-4. **Verify** the best candidates again in a new process: two transfers to two
-   different sites within 30 seconds.
+4. **Verify** the best candidates again in a new process. Require an HTTPS
+   response and a validated 128 KiB MP4 range from a different site within 30 seconds.
 5. **Select** the working nodes, most reliable first, at most four per server address
    and no more than your maximum if you set one.
 6. **Publish** the list after the test suite, including real Xray end-to-end tests,

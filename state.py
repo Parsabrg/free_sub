@@ -2,6 +2,7 @@
 from __future__ import annotations
 from contextlib import contextmanager
 import ctypes
+from dataclasses import asdict
 import json
 import os
 from pathlib import Path
@@ -23,10 +24,17 @@ def atomic_write(path, text):
 
 def read_state(path):
     if not Path(path).exists():
-        return {'schema':2,'nodes':{},'next_number':1,'published':[],'last_discovery':0}
+        return {'schema':3,'nodes':{},'next_number':1,'published':[],'last_discovery':0}
     data = json.loads(Path(path).read_text(encoding='utf-8'))
-    if data.get('schema') != 2 or not isinstance(data.get('nodes'),dict):
+    if data.get('schema') not in (2,3) or not isinstance(data.get('nodes'),dict):
         raise ValueError('InvalidState; refusing to overwrite private history')
+    if data['schema'] == 2:
+        for row in data['nodes'].values():
+            # Old successes predate the video gate and could have been only a screen.
+            row['last_success'] = 0
+            row.pop('metrics', None)
+            row['verification_history'] = []
+        data['schema'] = 3
     return data
 
 
@@ -85,25 +93,28 @@ def keep_awake():
             setter(0x80000000)
 
 
-def observe(state, candidate, result, now, verified=False):
+def observe(state, candidate, result, now, *, screening=False):
     row = state['nodes'].get(candidate.key)
     if row is None:
         row = {'url':candidate.url, 'source':candidate.source,'number':state['next_number'],
-               'history':[], 'last_success':0,'verified':False,'country_code':None}
+               'history':[], 'verification_history':[], 'last_success':0,
+               'verified':False,'country_code':None}
         state['next_number'] += 1
         state['nodes'][candidate.key] = row
     row.update(url=candidate.url,source=candidate.source,last_seen=now,last_attempt=now,last_error=result.error if not result.passed else '')
-    row['history'] = (row['history']+[{'at':now,'ok':result.passed,'latency_ms':result.latency_ms}])[-48:]
-    if result.passed:
-        from dataclasses import asdict
+    event = {'at':now,'ok':result.passed,'latency_ms':result.latency_ms}
+    row['history'] = (row['history']+[event])[-48:]
+    if not screening:
+        row['verification_history'] = (row['verification_history']+[event])[-48:]
+    if result.passed and not screening:
         row.update(last_success=now,metrics=asdict(result),endpoint_ip=result.endpoint_ip)
-        row['verified'] = row['verified'] or verified
+        row['verified'] = True
     return row
 
 
 def reliability(row, now):
     # Recency-weighted Beta prior: brand-new one-off successes cannot score 100% reliability.
-    events = row.get('history',[])
+    events = row.get('verification_history',[])
     weights = [(0.5**(max(0,now-e['at'])/86400),e['ok']) for e in events]
     return (2+sum(w for w,ok in weights if ok))/(4+sum(w for w,_ in weights))
 

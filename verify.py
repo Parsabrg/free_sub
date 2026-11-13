@@ -34,7 +34,7 @@ def main():
     evidence={'verified_utc_epoch':time.time(),'passed':result.returncode==0,
               'source_sha256':source_fingerprint(ROOT),'xray_binary_sha256':hashlib.sha256(xray.read_bytes()).hexdigest(),
               'elapsed_seconds':round(time.monotonic()-started,2),'output':output,
-              'scope':'Actual Xray core with local Trojan TLS server and trusted HTTPS origin; no public-node availability claim'}
+              'scope':'Actual Xray core with loopback protocol fixtures, trusted HTTPS and MP4 range checks'}
     atomic_write(ROOT/'.local'/'verification.json',json.dumps(evidence,indent=2)+'\n')
     if result.returncode: raise SystemExit(result.returncode)
     print('[VERIFY] Regression and actual Xray end-to-end checks passed.',flush=True)

@@ -13,7 +13,12 @@
 | Option | Default | Meaning |
 |---|---|---|
 | `--mode auto\|full\|health` | `auto` | `full` fetches every source, screens and verifies. `health` rechecks the published and standby nodes. `auto` picks `full` when the last discovery is older than `--discovery-hours`, otherwise `health`. |
-| `--publish` | off | Run the test gate, then commit and push the five files in `docs/`. |
+| `--publish` | off | Run the test gate and push the verified files to the `subscriptions` branch. |
+| `--probe-control PATH` | off | Local file holding a known-good share link for identifying a video mirror outage. |
+| `--video-mirror URL` | built-in mirrors | Override the video origins with up to four public HTTPS MP4 range URLs. Repeat the option for each URL. |
+| `--stream-segments N` | 1 | Transfer up to eight consecutive MP4 ranges and record startup, throughput and stalls. |
+| `--check-udp`, `--check-ipv6` | off | Record separate UDP relay and IPv6 destination checks. |
+| `--youtube-id ID` | off | Measure playback of an embeddable YouTube video with Playwright Chromium. |
 | `--xray PATH` | `tools\xray.exe` | The Xray binary (`tools/xray` on Linux). |
 | `--limit N` | 0 | Most nodes in the published list (1 to 1000). `0` lists every working node. |
 | `--interval-minutes N` | 30 | How often runs are started (1 to 1440), published in `status.json`. The panel or the scheduled task does the scheduling; this option only states it. |
@@ -72,6 +77,7 @@ The published outputs in `docs/`:
 | `sub.txt` | The share links, one per line. |
 | `sub.b64` | The same list, Base64-encoded. |
 | `xray.json` | The tested Xray outbounds, for v2rayN. |
+| `sub-compact.b64` | Up to 20 ranked share links with distinct server IPs, for mobile clients. |
 | `status.json` | The test report described below. |
 | `index.html` | The public status page. |
 
@@ -91,7 +97,7 @@ Top level:
 | `nodes` | One entry per node, in rank order. |
 | `source_status` | Per source, for a `full` run: `raw` links found, `supported` unique configurations, `error`, `tested`, `working`. Found feeds also have `kind: "found"` and `new`, the configurations no listed source carries. Empty for a `health` run. |
 | `unique_selected_for_test` | Candidates tested in this run. |
-| `first_pass`, `second_pass` | Result counts by outcome for the screen and the verification. |
+| `first_pass`, `second_pass` | Result counts by outcome. Screening separates timeouts before Xray readiness from timeouts during the HTTPS test. |
 | `resting_skipped` | Candidates left out because they are resting. |
 | `node_ttl_seconds`, `health_interval_seconds`, `discovery_interval_seconds`, `recommended_client_refresh_seconds` | The schedule in force: node expiry, the run interval, the interval between discoveries, and the advice to clients. |
 | `xray_version`, `workers`, `verification_workers`, `max_tests`, the `*_timeout_seconds` fields | The settings of the run. |
@@ -102,13 +108,16 @@ Each entry of `nodes`:
 | Field | Meaning |
 |---|---|
 | `id` | SHA-256 of the effective Xray configuration. Stable across renames. |
-| `name`, `rank`, `protocol` | As shown in the client; position in the list; `vless`, `vmess`, `trojan` or `ss`. |
+| `name`, `rank`, `protocol` | Client label, position in the list, and protocol identifier (`vless`, `vmess`, `trojan`, `ss`, `hysteria2` or `socks`). |
 | `country_code`, `endpoint_ip` | Country of, and the exact IP used by, the last passing test. |
 | `last_success_epoch`, `expires_epoch` | Last passing test, and when the node should be dropped without another. |
 | `verified_this_run` | Whether the node passed in this run, or is carried over. |
 | `success_rate` | The recency-weighted reliability score, 0 to 1. |
 | `latency_ms`, `jitter_ms` | Median time of the test transfers, and the spread between them. |
-| `body_bytes`, `transfer_kbps_estimate`, `full_size` | Bytes received, a rough rate that includes handshake time, and whether the larger download completed. |
+| `body_bytes`, `transfer_kbps_estimate`, `full_size` | Bytes received, a rough rate that includes handshake time, and whether the required media range completed. |
+| `video_host`, `video_bytes`, `video_ms` | Successful video origin, validated MP4 bytes and transfer time including connection setup. |
+| `stream_segments`, `stream_kbps`, `stream_start_ms`, `stream_stalls`, `stream_error` | Optional consecutive-range results. |
+| `udp`, `ipv6`, `youtube_played`, `youtube_error` | Optional capability results and YouTube diagnostics. A null capability is unmeasured. |
 
 ## Log messages
 
@@ -126,5 +135,5 @@ Each entry of `nodes`:
 | `[DONE]` | Nodes listed and the run's health. |
 | `[PUBLISH]`, `[PUBLISH ERROR]` | The push, or the category of a Git failure. |
 | `[BUSY]` | Another run holds the lock. |
-| `[UPDATE]` | GitHub has a newer version; update before publishing can continue. |
+| `[PROBE]` | The known-good control passed HTTPS while video mirrors failed. |
 | `[ERROR]` | The run failed. Details are deliberately withheld from the log; see `.local\last_run.json`. |

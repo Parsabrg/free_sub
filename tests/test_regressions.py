@@ -10,7 +10,7 @@ import unittest
 from unittest.mock import patch
 from collector import collect, parse
 from network import pin_endpoint, resolve_public
-from process_guard import communicate_bounded
+from process_guard import ProbeDeadline, communicate_bounded
 from publishing import validate_outputs
 from state import read_state, observe, reliability, run_lock
 from xray_test import ProbeResult
@@ -70,14 +70,16 @@ class RegressionTests(unittest.TestCase):
         stalled=[sys.executable, '-u', '-c',
                  "import time; time.sleep(0.4); print('READY',flush=True); time.sleep(30)"]
         start=time.monotonic()
-        with self.assertRaises(subprocess.TimeoutExpired):
+        with self.assertRaises(ProbeDeadline) as failure:
             communicate_bounded(stalled, '', 3, ready_timeout=0.2)
+        self.assertEqual(failure.exception.phase,'network')
         self.assertLess(time.monotonic()-start,2)
 
         startup_stall=[sys.executable, '-c', 'import time; time.sleep(30)']
         start=time.monotonic()
-        with self.assertRaises(subprocess.TimeoutExpired):
+        with self.assertRaises(ProbeDeadline) as failure:
             communicate_bounded(startup_stall, '', 0.2, ready_timeout=0.1)
+        self.assertEqual(failure.exception.phase,'startup')
         self.assertLess(time.monotonic()-start,2)
 
     def test_runner_exception_has_one_lower_concurrency_retry(self):
@@ -119,7 +121,8 @@ class RegressionTests(unittest.TestCase):
 
     def test_strict_url_settings_and_grpc_mode(self):
         base='vless://id@example.com:443?security=tls'
-        self.assertIsNone(parse(base+'&type=xhttp&extra=%7B%7D'))
+        self.assertIsNotNone(parse(base+'&type=xhttp&extra=%7B%7D'))
+        self.assertIsNone(parse(base+'&type=xhttp&extra=%7B%22downloadSettings%22%3A%7B%7D%7D'))
         self.assertIsNone(parse(base+'&headerType=http'))
         self.assertIsNone(parse(base+'&security=none'))
         self.assertIsNone(parse(base+'&allowinsecure=1'))
@@ -165,15 +168,88 @@ class RegressionTests(unittest.TestCase):
             state=read_state(Path(folder)/'history.json')
             c=parse('trojan://pw@example.com:443?security=tls')
             good=ProbeResult(True,latency_ms=10,endpoint_ip='8.8.8.8')
-            row=observe(state,c,good,100,verified=True)
+            row=observe(state,c,good,100)
             number=row['number']
-            observe(state,c,good,200,verified=True)
+            observe(state,c,good,200)
             self.assertEqual(row['number'],number)
             rate=reliability(row,200)
             observe(state,c,ProbeResult(False),300)
             self.assertLess(reliability(row,300),rate)
             self.assertEqual(row['last_success'],200)
             self.assertTrue(row['verified'])
+
+    def test_expired_node_cannot_be_revived_by_screening(self):
+        from types import SimpleNamespace
+        from main import run_cycle
+        first=parse('trojan://first@example.com:443?security=tls')
+        second=parse('trojan://second@example.com:443?security=tls')
+        now=time.time()
+        args=SimpleNamespace(mode='full',xray='unused',max_tests=0,screen_timeout=5,workers=2,
+                             timeout=30,recheck=1,ttl_hours=6,limit=0,require_country=False,
+                             geo_workers=1,xray_version='fixture',discovery_hours=4)
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            path=Path(folder)/'.local/history.json'
+            state=read_state(path)
+            from state import save_state
+            good=ProbeResult(True,endpoint_ip='8.8.8.8')
+            for candidate in (first,second):
+                observe(state,candidate,good,now-7*3600)
+            state['published']=[first.key,second.key]
+            save_state(path,state)
+            def probe(candidate, xray, timeout, *, quick, **kwargs):
+                return good if quick else ProbeResult(False,error='FixtureFailure')
+            report=run_cycle(args,folder,probe,lambda **kw: {'Fixture':[first,second]},lambda *a,**kw: {},now)
+            self.assertEqual((report['health'],report['published']),('expired_or_empty',0))
+            for row in read_state(path)['nodes'].values():
+                self.assertEqual(row['last_success'],now-7*3600)
+
+    def test_old_history_requires_reverification_but_keeps_node_identity(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder)/'history.json'
+            path.write_text(json.dumps({'schema':2,'published':['node'],'nodes':{'node':{
+                'verified':True,'last_success':100,'metrics':{'successes':2},'label':['XX',1]}}}))
+            state=read_state(path)
+            row=state['nodes']['node']
+            self.assertEqual((state['schema'],state['published'],row['label'],row['last_success']),
+                             (3,['node'],['XX',1],0))
+            self.assertNotIn('metrics',row)
+
+    def test_priority_refresh_and_control_outage(self):
+        from main import arguments, run_cycle
+        from types import SimpleNamespace
+        old=parse('trojan://old@old.example:443')
+        new=parse('trojan://new@new.example:443')
+        now=time.time()
+        args=SimpleNamespace(mode='full',xray='unused',max_tests=0,screen_timeout=5,workers=2,
+                             timeout=30,recheck=2,ttl_hours=6,limit=0,require_country=False,
+                             geo_workers=1,xray_version='fixture',discovery_hours=4)
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            root=Path(folder)
+            def probe(candidate,xray,timeout,*,quick,**kwargs):
+                return ProbeResult(True,endpoint_ip='8.8.8.8',video_bytes=131072)
+            geo=lambda *a,**kw: {}
+            run_cycle(args,root,probe,lambda **kw: {'Fixture':[old]},geo,now)
+            events=[]
+            def refresh():
+                report=json.loads((root/'docs/status.json').read_text(encoding='utf-8'))
+                self.assertEqual(report['mode'],'health')
+                self.assertEqual(report['nodes'][0]['last_success_epoch'],now+1800)
+                events.append('refresh')
+            def discovery(**kwargs):
+                events.append('discovery')
+                return {'Fixture':[old,new]}
+            report=run_cycle(args,root,probe,discovery,geo,now+1800,publish_refresh=refresh)
+            self.assertEqual(events,['refresh','discovery'])
+            self.assertEqual(report['published'],2)
+            path=root/'.local/history.json'
+            history=read_state(path)['nodes']
+            args.control_candidate=old
+            def outage(candidate,*a,**kw):
+                self.assertEqual(candidate,old)
+                return ProbeResult(False,error='VideoVerificationFailed',successes=1)
+            report=run_cycle(args,root,outage,discovery,geo,now+3600)
+            self.assertEqual((report['probe_health'],report['published']),('video_unavailable',2))
+            self.assertEqual(read_state(path)['nodes'],history)
 
     def test_output_validator_rejects_bad_encoding(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -218,7 +294,9 @@ class RegressionTests(unittest.TestCase):
             def offline(command,**kwargs):
                 if command[:2]==['git','fetch']:
                     raise subprocess.CalledProcessError(128,command,stderr='Could not resolve host: private-token-fixture')
-                return clean(command,**kwargs)
+                result=clean(command,**kwargs)
+                if command[:2]==['git','ls-remote']: result.stdout='existing-ref'
+                return result
             with patch('publishing.subprocess.run',side_effect=offline),patch('publishing.validate_outputs'),redirect_stderr(io.StringIO()) as errors:
                 with self.assertRaises(subprocess.CalledProcessError): publish(root,'xray',root/'docs')
             self.assertIn('Git fetch exited 128; category=network',errors.getvalue())

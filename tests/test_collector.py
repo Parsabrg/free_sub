@@ -1,7 +1,7 @@
 import base64
 import json
 import unittest
-from collector import parse,links
+from collector import import_candidates,parse,links
 from xray_test import make_config
 
 class ParserTests(unittest.TestCase):
@@ -34,10 +34,36 @@ class ParserTests(unittest.TestCase):
         v='vless://id@host.example:443?security=tls#node\n'
         encoded=base64.b64encode(v.encode()).decode()
         self.assertEqual(links(encoded),[v.strip()])
+    def test_hysteria2_ipv6_ports_and_certificate_pin(self):
+        pin='a1'*32
+        c=parse(f'Hy2://user%3Apass@[2001:db8::1]:443,5000-5002/?sni=example.com&pinSHA256={pin}')
+        self.assertEqual((c.protocol,c.host,c.port),('hysteria2','2001:db8::1',443))
+        stream=c.outbound['streamSettings']
+        self.assertEqual(stream['hysteriaSettings']['auth'],'user:pass')
+        self.assertEqual(stream['tlsSettings']['pinnedPeerCertSha256'],pin)
+        self.assertEqual(stream['finalmask']['quicParams']['udpHop']['ports'],'443,5000-5002')
+        for suffix in (':0',':444-443',':443,99999','?obfs=gecko','?insecure=1'):
+            with self.subTest(suffix=suffix):
+                self.assertIsNone(parse(f'hy2://password@example.com{suffix}'))
+
     def test_no_direct_outbound(self):
         c=parse('vless://id@host.example:443?security=tls')
         config=make_config(c.outbound,1234)
         self.assertEqual([o['protocol'] for o in config['outbounds']],['vless','blackhole'])
         self.assertEqual(config['routing']['rules'][0]['outboundTag'],'candidate')
+
+    def test_private_json_rejects_unsafe_nested_settings(self):
+        outbound={'protocol':'http','settings':{'address':'example.com','port':443},
+                  'streamSettings':{'network':'tcp','security':'tls','tlsSettings':{}}}
+        def read(value):
+            return import_candidates(json.dumps(value))
+        candidate,=read(outbound)
+        self.assertTrue(candidate.raw)
+        self.assertEqual(candidate.url,'')
+        for field,value in (('allowInsecure',True),('certificates',[{'certificateFile':'secret'}]),
+                            ('masterKeyLog','secret')):
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError,'position 1') as exc:
+                read(dict(outbound,streamSettings={'security':'tls','tlsSettings':{field:value}}))
+            self.assertNotIn('secret',str(exc.exception))
 
 if __name__=='__main__': unittest.main()

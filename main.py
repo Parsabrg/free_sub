@@ -5,9 +5,10 @@ import base64
 import copy
 from collections import Counter, deque
 from contextlib import nullcontext
-import concurrent.futures as cf
 from dataclasses import asdict
+import concurrent.futures as cf
 from datetime import datetime, timezone
+from functools import partial
 import html
 import json
 import os
@@ -20,7 +21,8 @@ import time
 from collector import collect, parse
 from geolocation import geolocate_hosts, country_flag
 from naming import assign_labels, node_name, rename_share_link
-from publishing import publish, validate_outputs
+from public_page import INDEX
+from publishing import OUTPUTS, publish, validate_outputs, write_compact_feed
 from relay import fallback
 from sources import Registry
 from state import atomic_write, keep_awake, observe, read_state, reliability, run_lock, save_state, sweep_stale_probe_dirs
@@ -119,7 +121,13 @@ def write_outputs(docs, selected, state, report, now, ttl):
                      'success_rate':round(reliability(row,now),4),'latency_ms':result.latency_ms,
                      'jitter_ms':result.jitter_ms,'body_bytes':result.body_bytes,
                      'transfer_kbps_estimate':result.kbps,'full_size':result.full_size,
+                     'video_host':result.video_host,'video_bytes':result.video_bytes,'video_ms':result.video_ms,
                      'verified_this_run':False})
+        metrics=asdict(result)
+        for key in ('stream_segments','stream_kbps','stream_start_ms','stream_stalls','stream_error',
+                    'udp','ipv6','youtube_played','youtube_error'):
+            if key in metrics:
+                rows[-1][key]=metrics[key]
     # Set membership separately: do not mutate metadata while iterating.
     current=set(report.pop('_verified_keys',[]))
     for row in rows: row['verified_this_run']=row['id'] in current
@@ -138,81 +146,49 @@ def write_outputs(docs, selected, state, report, now, ttl):
     atomic_write(staging/'sub.txt',data)
     atomic_write(staging/'sub.b64',base64.b64encode(data.encode('utf-8')).decode()+'\n')
     atomic_write(staging/'xray.json',json.dumps({'outbounds':outbounds},indent=2,ensure_ascii=False)+'\n')
+    write_compact_feed(staging,urls,rows,report)
     atomic_write(staging/'status.json',json.dumps(report,indent=2,ensure_ascii=False)+'\n')
     atomic_write(staging/'index.html',INDEX)
     validate_outputs(staging)
     # Each replacement is atomic; the Pages deployment publishes one complete Git snapshot.
     docs.mkdir(parents=True,exist_ok=True)
-    for name in ('sub.txt','sub.b64','xray.json','status.json','index.html'):
+    for name in OUTPUTS:
         atomic_write(docs/name,(staging/name).read_text(encoding='utf-8'))
     return report
 
 
-INDEX='''<!doctype html>
-<html lang="en">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free Sub: tested Xray subscription</title>
-<style>
-:root{color-scheme:light dark;--bg:#f4f5f7;--panel:#fff;--ink:#18202b;--muted:#5f6b7a;--line:#dfe3ea;--accent:#0b6bcb;--good:#18794e;--warn:#a15c00;--chip:#eef1f5}
-@media (prefers-color-scheme:dark){:root{--bg:#0f141b;--panel:#171e28;--ink:#e3eaf3;--muted:#93a0b2;--line:#2a3442;--accent:#5aa9f5;--good:#4cc38a;--warn:#f0b35a;--chip:#212b38}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,"Segoe UI",sans-serif}
-main{max-width:760px;margin:0 auto;padding:40px 16px 56px;display:grid;gap:16px}
-main>*{min-width:0}
-h1{font-size:26px;margin:0;letter-spacing:-.01em}
-h2{font-size:13px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-p{margin:0}
-section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
-#health{font-weight:600}
-.good{color:var(--good)}.warn{color:var(--warn)}
-.links{display:grid;gap:10px}
-.links div{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
-.links span{flex:0 0 150px;color:var(--muted)}
-.links a{flex:1 1 220px;min-width:0;color:var(--accent);overflow-wrap:anywhere}
-button{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);padding:3px 12px;cursor:pointer}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips span{background:var(--chip);border-radius:999px;padding:2px 10px;font-size:14px;font-variant-numeric:tabular-nums}
-.notes{color:var(--muted);font-size:14px;display:grid;gap:6px}
-</style>
-<main>
-<header><h1>Free Sub</h1><p>Public proxy configurations, each tested with real HTTPS traffic through the Xray core before it is listed.</p></header>
-<section><h2>Status</h2><p id="health">Loading test status…</p></section>
-<section><h2>Subscription</h2><div class="links" id="links"></div></section>
-<section id="summary" hidden><h2>In the list</h2><div class="chips" id="protocols"></div><div class="chips" id="countries" style="margin-top:8px"></div></section>
-<section class="notes"><p>Use the Xray core in your client and refresh the subscription about once an hour.</p>
-<p>Tests run on the operator’s network; a node can behave differently on yours. A flag shows where the connection endpoint is, which may be a CDN rather than the exit country.</p>
-<p>These are public proxies run by unknown operators. Do not send anything through them that you would not send over an untrusted network.</p></section>
-</main>
-<script>
-const base=location.href.replace(/[^/]*$/,'');
-for(const [label,file] of [['v2rayN (desktop)','xray.json'],['v2rayNG (Android)','sub.b64'],['Plain list','sub.txt'],['Test report','status.json']]){
-  const row=document.createElement('div'),name=document.createElement('span'),link=document.createElement('a'),copy=document.createElement('button');
-  name.textContent=label;link.href=file;link.textContent=base+file;copy.textContent='Copy';
-  copy.onclick=async()=>{try{await navigator.clipboard.writeText(base+file);copy.textContent='Copied'}catch(e){copy.textContent='Select and copy'}setTimeout(()=>copy.textContent='Copy',1500)};
-  row.append(name,link,copy);document.querySelector('#links').append(row);
-}
-function chips(id,counts){const box=document.querySelector(id);for(const [key,n] of Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,12)){const chip=document.createElement('span');chip.textContent=key+' '+n;box.append(chip)}}
-fetch('status.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(s=>{
-  const now=Date.now()/1000,fresh=s.nodes.filter(n=>n.expires_epoch>now),age=Math.max(0,Math.round((now-s.generated_epoch)/60)),e=document.querySelector('#health');
-  e.textContent=`${fresh.length} unexpired of ${s.published} nodes; last attempt ${age} minutes ago; mode: ${s.mode}; state: ${s.health}.`;
-  e.className=(age>60||s.health!=='ok'||fresh.length===0)?'warn':'good';
-  const protocols={},countries={};
-  for(const n of fresh){protocols[n.protocol]=(protocols[n.protocol]||0)+1;const c=n.country_code||'unknown';countries[c]=(countries[c]||0)+1}
-  if(fresh.length){chips('#protocols',protocols);chips('#countries',countries);document.querySelector('#summary').hidden=false}
-}).catch(()=>{const e=document.querySelector('#health');e.textContent='Status unavailable; freshness unknown.';e.className='warn'});
-</script>
-</html>
-'''
-
-
-def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolocate_hosts, now=None, registry=None, relay=False):
+def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolocate_hosts, now=None,
+              registry=None, relay=False, publish_refresh=None):
     root=Path(root); live_clock=now is None; now=time.time() if live_clock else now
     local=root/'.local'; history_path=local/'history.json'
     state=read_state(history_path)
     mode=args.mode
     if mode=='auto':
         mode='full' if now-state.get('last_discovery',0)>=args.discovery_hours*3600 else 'health'
+    control = getattr(args,'control_candidate',None)
+    control_result = None
+    if control is not None:
+        control_result = probe(control,args.xray,args.timeout,quick=False)
+        if control_result.error == 'VideoVerificationFailed':
+            print('[PROBE] Control passed HTTPS but no video mirror returned a valid range.',flush=True)
+            return run_cycle_report(args,root,state,mode,now,[],{}, {},{},0,geo_fn,
+                                    probe_health='video_unavailable',control_error=control_result.error)
+    priority_passed={}
+    if mode=='full' and publish_refresh is not None and state.get('published'):
+        refresh_args=copy.copy(args)
+        refresh_args.mode='health'
+        refresh_args.recheck=min(20,args.recheck)
+        refresh_args.control_candidate=None
+        print('[RUN] Refreshing the current feed before discovery.',flush=True)
+        refreshed=run_cycle(refresh_args,root,probe,collect_fn,geo_fn,now if not live_clock else None)
+        if publish_refresh is not False:
+            publish_refresh()
+        state=read_state(history_path)
+        for verified in refreshed['nodes']:
+            if verified['verified_this_run']:
+                row=state['nodes'][verified['id']]
+                candidate=parse(row['url'],row.get('source','history'))
+                priority_passed[candidate.key]=(candidate,ProbeResult(**row['metrics']))
     # Existing entries are always tested first, including when all sources are unavailable.
     old=[]
     for key in state.get('published',[]):
@@ -244,13 +220,14 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
     remaining=[]
     published_keys={c.key for c in old}
     for key,row in state['nodes'].items():
-        if key in published_keys or not row.get('verified') or now-row.get('last_success',0)>args.ttl_hours*3600:
+        if key in published_keys or not row.get('verified') or (
+                row.get('last_success') and now-row['last_success']>args.ttl_hours*3600):
             continue
         candidate=parse(row.get('url',''),row.get('source','history'))
         if candidate: remaining.append(candidate)
     remaining.sort(key=lambda c:-reliability(state['nodes'][c.key],now))
     exploration=balanced(groups,str(int(now//1800))) if mode=='full' else remaining[:args.recheck]
-    queue=[]; seen=set()
+    queue=[]; seen=set(priority_passed)
     for candidate in old+exploration:
         if candidate.key not in seen:
             queue.append(candidate); seen.add(candidate.key)
@@ -275,7 +252,7 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
             if len(finalists)>=args.recheck: break
         second,second_results,second_counts=test_batch(finalists,args.xray,min(args.workers,16),args.timeout,
                                                        'VERIFY',probe,quick=False)
-        passed={c.key:(c,r) for c,r in second}
+        passed=priority_passed | {c.key:(c,r) for c,r in second}
     else:
         passed={c.key:(c,r) for c,r in first if state['nodes'].get(c.key,{}).get('verified')}
     if live_clock: now=time.time()
@@ -283,16 +260,17 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
     for c in queue:
         result=second_results.get(c.key,first_results[c.key])
         observe(state,c,result,result.completed_epoch if live_clock and result.completed_epoch else now,
-                verified=c.key in passed and mode=='full')
+                screening=mode=='full' and c.key not in second_results)
     passed={key:pair for key,pair in passed.items()
             if now-state['nodes'][key]['last_success']<args.ttl_hours*3600}
-    working_count=len(passed)
     if mode=='full':
         # What each source was worth this run, so a feed can be judged by what works from here.
         # "working" is a pass in the last test a config got this run. Verification takes only
         # the --recheck best-ranked finalists, so a new feed's configs can pass and miss it.
         tested={c.key for c in queue}
         working={c.key for c in queue if second_results.get(c.key,first_results[c.key]).passed}
+        tested.update(priority_passed)
+        working.update(priority_passed)
         for name,group in groups.items():
             keys={c.key for c in group}
             stats.setdefault(name,{}).update(tested=len(keys&tested),working=len(keys&working))
@@ -300,14 +278,6 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
             registry.record({name:(stats[name]['tested'],stats[name]['working']) for name in found},now)
         # Health runs carry no source results; the control panel shows the last discovery's.
         atomic_write(local/'source_status.json',json.dumps({'at':now,'sources':stats},indent=2,ensure_ascii=False)+'\n')
-    selected=sorted(passed.values(),key=lambda pair:rank_key(pair[0],pair[1],state,now))
-    diverse=[]; endpoints=Counter()
-    for c,r in selected:
-        endpoint=(r.endpoint_ip,c.port)
-        if endpoints[endpoint]>=4: continue
-        endpoints[endpoint]+=1; diverse.append((c,r))
-        if args.limit and len(diverse)>=args.limit: break
-    selected=diverse
     if mode=='full' and any(groups.values()):
         # With most listed sources unreachable this was a network problem, not a discovery:
         # look again in an hour. One run had 3 of 23 feeds and still waited four (2026-11-12).
@@ -317,13 +287,29 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
         state['last_discovery']=now if complete else now-args.discovery_hours*3600+3600
         if not complete:
             print(f'[RUN] Only {reached} of {len(listed)} listed sources answered; discovery repeats in an hour.',flush=True)
+    return run_cycle_report(args,root,state,mode,now,queue,passed,first_counts,second_counts,rested,geo_fn,stats,
+                            probe_health=('healthy' if control_result.passed else 'control_failed') if control_result else None,
+                            control_error=control_result.error if control_result else None)
+
+
+def run_cycle_report(args,root,state,mode,now,queue,passed,first_counts,second_counts,rested,geo_fn,stats=None,
+                     *,probe_health=None,control_error=None):
+    local=root/'.local'
+    selected=[]; endpoints=Counter()
+    for c,r in sorted(passed.values(),key=lambda pair:rank_key(pair[0],pair[1],state,now)):
+        endpoint=(r.endpoint_ip,c.port)
+        if endpoints[endpoint]>=4: continue
+        endpoints[endpoint]+=1; selected.append((c,r))
+        if args.limit and len(selected)>=args.limit: break
     health='ok' if selected else 'degraded'
     if not selected:
         # A whole-run outage may be local. Retain only bounded, explicitly marked old results.
         # Never change last_success just because an old node was retained.
-        for c in old:
-            row=state['nodes'][c.key]
-            if now-row['last_success']<args.ttl_hours*3600:
+        for key in state.get('published',[]):
+            row=state['nodes'].get(key,{})
+            if row.get('last_success') and now-row['last_success']<args.ttl_hours*3600:
+                c=parse(row['url'],row.get('source','history'))
+                if c is None or c.key!=key: continue
                 selected.append((c,ProbeResult(**row['metrics'])))
         health='retained_previous' if selected else 'expired_or_empty'
     # Query countries ONLY for IPs actually used by successful probes; no independent hostname lookup.
@@ -342,19 +328,24 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
     if args.require_country:
         selected=[pair for pair in selected if state['nodes'][pair[0].key].get('country_code')]
     report={'mode':mode,'health':health,'tested_on':'operator network; local Xray',
-            'xray_version':args.xray_version,'source_status':stats,'unique_selected_for_test':len(queue),
+            'xray_version':args.xray_version,'source_status':stats or {},'unique_selected_for_test':len(queue),
             'first_pass':first_counts,'second_pass':second_counts,'_verified_keys':list(passed),
-            'list_limit':args.limit or None,'working_this_run':working_count,
+            'list_limit':args.limit or None,'working_this_run':len(passed),
             'health_interval_seconds':int(getattr(args,'interval_minutes',30)*60),
             'discovery_interval_seconds':int(args.discovery_hours*3600),
-            'resting_skipped':rested,'max_tests':args.max_tests,'workers':first_workers,'verification_workers':min(args.workers,16),
-            'first_pass_timeout_seconds':args.timeout,'screen_network_timeout_seconds':screen_timeout,
+            'resting_skipped':rested,'max_tests':args.max_tests,'workers':args.workers if mode=='full' else min(args.workers,16),
+            'verification_workers':min(args.workers,16),'first_pass_timeout_seconds':args.timeout,
+            'screen_network_timeout_seconds':args.screen_timeout if mode=='full' else None,
             'verification_timeout_seconds':args.timeout,
             'failure_reason':None if passed else 'No current verified transfer; previous nodes age normally'}
+    if probe_health:
+        report.update(probe_health=probe_health,probe_control_error=control_error or None)
+    if probe_health=='video_unavailable':
+        report['failure_reason']='Video mirrors failed through the control proxy. Previous verification timestamps were preserved.'
     report=write_outputs(root/'docs',selected,state,report,now,args.ttl_hours*3600)
     state['published']=[c.key for c,r in selected]
     state['last_attempt']=now
-    save_state(history_path,state)
+    save_state(local/'history.json',state)
     atomic_write(local/'last_run.json',json.dumps(report,indent=2,ensure_ascii=False)+'\n')
     print(f'[DONE] {len(selected)} nodes; health={health}',flush=True)
     return report
@@ -386,7 +377,29 @@ def arguments(argv=None):
                     help='Wait before retesting a config that failed three times running; 0 retests every run')
     ap.add_argument('--allow-non-iran',action='store_true',
                     help='Test even when this machine does not reach the internet from Iran (e.g. through a VPN)')
+    ap.add_argument('--probe-control',type=Path,help='Local file containing a known-good proxy share link')
+    ap.add_argument('--video-mirror',action='append',default=[],help='HTTPS MP4 range URL, repeatable')
+    ap.add_argument('--stream-segments',type=int,default=1,choices=range(1,9),metavar='1..8')
+    ap.add_argument('--check-udp',action='store_true',help='Record a separate UDP relay result')
+    ap.add_argument('--check-ipv6',action='store_true',help='Record a separate IPv6 result')
+    ap.add_argument('--youtube-id',help='Measure actual playback of an embeddable YouTube video using Playwright')
     args=ap.parse_args(argv)
+    from xray_test import YOUTUBE_ID, validate_video_mirrors
+    try:
+        args.video_mirror=validate_video_mirrors(args.video_mirror) if args.video_mirror else None
+    except ValueError as exc:
+        ap.error(str(exc))
+    if args.youtube_id and not YOUTUBE_ID.fullmatch(args.youtube_id):
+        ap.error('YouTube video ID must contain 11 letters, digits, underscores or hyphens')
+    args.control_candidate=None
+    if args.probe_control:
+        try:
+            with args.probe_control.expanduser().open(encoding='utf-8-sig') as handle:
+                args.control_candidate=parse(handle.read(16385).strip())
+        except (OSError,UnicodeError):
+            ap.error('Unable to read the control proxy file')
+        if args.control_candidate is None:
+            ap.error('The control file must contain one supported proxy share link')
     if args.recheck is None:
         args.recheck=max(600,args.limit)
     if not (0<=args.limit<=1000 and 1<=args.workers<=64 and 1<=args.geo_workers<=8 and
@@ -459,7 +472,11 @@ def main(argv=None):
         removed=sweep_stale_probe_dirs()
         if removed: print(f'[CLEANUP] Removed {removed} stale probe folders from the temp directory.',flush=True)
         registry=Registry(ROOT/'.local'/'sources.json',discover=args.found_sources)
-        run_cycle(args,collect_fn=lambda **kw:collect(registry.builtin(),**kw),registry=registry,relay=True)
+        probe=partial(run_probe,video_mirrors=args.video_mirror,stream_segments=args.stream_segments,
+                      check_udp=args.check_udp,check_ipv6=args.check_ipv6,youtube_id=args.youtube_id)
+        refresh=partial(publish,ROOT,args.xray,ROOT/'docs') if args.publish else False
+        run_cycle(args,probe=probe,collect_fn=lambda **kw:collect(registry.builtin(),**kw),registry=registry,relay=True,
+                  publish_refresh=refresh)
         if args.publish:
             publish(ROOT,args.xray,ROOT/'docs')
 
@@ -468,11 +485,6 @@ if __name__=='__main__':
     try:
         main()
     except Exception as exc:
-        if str(exc)=='Remote diverged; update the clone before publishing':
-            print('[UPDATE] GitHub has commits this copy lacks (usually a newer version of the program), so '
-                  'nothing was published. Press "Update program" in the panel, or run: '
-                  'git pull --no-rebase --no-edit',file=sys.stderr)
-            sys.exit(2)
         if str(exc)=='Another subscription run is active':
             # Safe to say, and the control panel needs to tell it from a failure.
             print('[BUSY] Another run is already active (the scheduled task, or a second window).',file=sys.stderr)

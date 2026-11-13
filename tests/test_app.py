@@ -2,6 +2,7 @@ import http.client
 import http.server
 import io
 import json
+import os
 from pathlib import Path
 import re
 import socket
@@ -58,6 +59,24 @@ class PanelTests(unittest.TestCase):
 
     def state(self):
         return json.loads(self.request('GET', '/api/state')[1])
+
+    def test_private_test_is_authenticated_and_returns_no_credentials(self):
+        from xray_test import ProbeResult
+        tools=self.root/'tools'
+        tools.mkdir()
+        (tools/('xray.exe' if os.name=='nt' else 'xray')).touch()
+        secret='credential-fixture'
+        body={'text':f'trojan://{secret}@example.com:443\nvless://invalid','udp':True}
+        self.assertEqual(self.request('POST','/api/test',body,token=False)[0],403)
+        with patch('app.physical_interface',return_value='Ethernet'), patch('xray_test.run_probe',
+                return_value=ProbeResult(True,stage='passed',video_bytes=131072,udp=True)) as probe:
+            status,response=self.request('POST','/api/test',body)
+        self.assertEqual(status,200)
+        self.assertNotIn(secret.encode(),response)
+        rows=json.loads(response)['results']
+        self.assertEqual([(row['stage'],row['passed']) for row in rows],[('passed',True),('parse',False)])
+        self.assertEqual(probe.call_args.kwargs['interface'],'Ethernet')
+        self.assertFalse(self.panel.local.exists())
 
     def test_only_this_computers_own_page_can_use_the_panel(self):
         status, page = self.request('GET', '/', token=False)
