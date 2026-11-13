@@ -2,7 +2,11 @@ __pycache__/
 *.py[cod]
 .venv/
 .local/
-tools/
+# Only the pinned Windows Xray and its license are kept; anything else downloaded stays local.
+tools/*
+!tools/xray.exe
+!tools/LICENSE-Xray.txt
+!tools/README.md
 *.log
 local_history.json
 local_geo_cache*

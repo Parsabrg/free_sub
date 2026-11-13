@@ -77,17 +77,20 @@ Python 3.13+ with OpenSSL 3.5+ (python.org's 3.14 has it) is best: its TLS hello
 (measured 1,521 bytes, with a post-quantum key share), so a config that only passes for small-hello
 clients such as curl is rejected here too. Older OpenSSL sends a smaller hello.
 
-1. Clone your dedicated repository and install the pinned official Xray binary:
+1. Clone your dedicated repository. The pinned official Xray binary for Windows x64
+   comes with it (`tools\xray.exe`, 36 MB), so nothing else is downloaded:
 
    ```powershell
    git clone https://github.com/Parsabrg/free_sub.git
    cd free_sub
-   python download_xray.py
    ```
 
-   The installer verifies the SHA-256 digest from the official release API. It
-   fails closed if the digest is missing or mismatched. Review and update the
-   pinned version in `download_xray.py` periodically; it does not silently upgrade.
+   The bundled file is the unmodified v26.3.27 release binary; `tools\README.md`
+   gives its source and SHA-256, and the tests run before every push refuse any other
+   file. On Linux, or to move to another version, run `python download_xray.py`: it
+   verifies the SHA-256 digest from the official release API and fails closed if the
+   digest is missing or mismatched. Review the pinned version periodically; it does
+   not silently upgrade.
 
 2. Configure Git author and authenticate **once**, using Git Credential Manager
    or an SSH key available to the scheduled account. Never put a GitHub token
@@ -336,7 +339,7 @@ maintainers endorse this project or guarantee the proxy operators.
 | [MatinGhanbari](https://github.com/MatinGhanbari/v2ray-configs) | MIT |
 | [hamedcode](https://github.com/hamedcode/port-based-v2ray-configs) | GPL-3.0 |
 | [MohammadBahemmat](https://github.com/MohammadBahemmat/V2ray-Collector), [morpheusadam](https://github.com/morpheusadam/v2ray-config) | No license detected by GitHub; check upstream terms |
-| [XTLS / Xray-core](https://github.com/XTLS/Xray-core) | MPL-2.0; official binary downloaded locally, not committed |
+| [XTLS / Xray-core](https://github.com/XTLS/Xray-core) | MPL-2.0; unmodified official Windows binary and its license in `tools/` |
 
 Feeds found automatically are not in this table and their licenses have not been
 checked by anyone: `status.json` names each one (`gh:owner/repository`) on every
@@ -354,7 +357,8 @@ license. Do not add private or paid subscription credentials.
 `.local/history.json` includes public feed credentials and stays off Git.
 `.local/sources.json` holds your added subscriptions, switched-off sources and the
 record of found feeds; it stays off Git too. Delete it to start discovery afresh.
-`.local/geo_cache*` and `.local/logs/` stay local. `tools/` stays off Git.
+`.local/geo_cache*` and `.local/logs/` stay local. In `tools/` only the Windows
+Xray binary, its license and a note are in Git.
 Do not upload these directories or add private subscription sources.
 
 - Installer requires elevation; a runtime scan does not.
