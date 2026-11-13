@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Sub</title>
+<style>
+:root{color-scheme:light dark;--bg:#f4f5f7;--panel:#fff;--ink:#18202b;--muted:#5f6b7a;--line:#dfe3ea;--accent:#0b6bcb;--good:#18794e;--warn:#a15c00;--chip:#eef1f5}
+@media (prefers-color-scheme:dark){:root{--bg:#0f141b;--panel:#171e28;--ink:#e3eaf3;--muted:#93a0b2;--line:#2a3442;--accent:#5aa9f5;--good:#4cc38a;--warn:#f0b35a;--chip:#212b38}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:40px 16px 56px;display:grid;gap:16px}
+main>*{min-width:0}
+h1{font-size:26px;margin:0;letter-spacing:-.01em}
+h2{font-size:14px;margin:0 0 10px;color:var(--muted)}
+p{margin:0}
+section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.good{color:var(--good)}.warn{color:var(--warn)}
+.links{display:grid;gap:12px}
+.feed{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:8px 0}
+.feed label{font-weight:600}
+.feed a,.feed small{grid-column:1;overflow-wrap:anywhere}
+a[href]{color:var(--accent)}
+.feed small,.notes{color:var(--muted);font-size:14px}
+.feed button{grid-column:2;grid-row:1/3;align-self:center;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);padding:3px 12px;cursor:pointer}
+.feed button:disabled{opacity:.55;cursor:default}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{background:var(--chip);border-radius:999px;padding:2px 10px;font-size:14px;font-variant-numeric:tabular-nums}
+.notes{display:grid;gap:6px}
+</style>
+<main>
+<header><h1>Free Sub</h1><p>Public proxies verified with Xray on the operator’s network.</p></header>
+<section><h2>Subscription</h2><p id="health" role="status">Checking feed freshness…</p><div class="links" id="links"></div><p><a href="status.json">View test report</a></p></section>
+<section id="summary" hidden><h2>Available nodes</h2><div class="chips" id="protocols"></div><div class="chips" id="countries" style="margin-top:8px"></div></section>
+<section class="notes"><p>Use the Xray core in your client and refresh the subscription about once an hour.</p>
+<p>A flag shows where the connection endpoint is, which may be a CDN. Proxy operators can see unencrypted traffic.</p></section>
+</main>
+<script>
+const feeds = [
+  ['Compact mobile feed (up to 20 servers)', 'sub-compact.b64', true],
+  ['v2rayN (desktop)', 'xray.json', false],
+  ['v2rayNG (Android)', 'sub.b64', false],
+  ['Plain list', 'sub.txt', false]
+].map(([label,file,compact]) => {
+  const url = new URL(file, location.href).href;
+  const row = document.createElement('div'), name = document.createElement('label'), link = document.createElement('a');
+  const copy = document.createElement('button'), freshness = document.createElement('small');
+  row.className = 'feed';
+  name.textContent = label;
+  link.textContent = url;
+  copy.textContent = 'Copy';
+  copy.setAttribute('aria-label', 'Copy '+label);
+  copy.disabled = true;
+  copy.onclick = async () => {
+    try { await navigator.clipboard.writeText(url); copy.textContent = 'Copied'; }
+    catch (error) { copy.textContent = 'Select URL'; }
+    setTimeout(() => { copy.textContent = 'Copy'; }, 1500);
+  };
+  row.append(name,link,copy,freshness);
+  document.querySelector('#links').append(row);
+  return {url,link,copy,compact,freshness};
+});
+function chips(id,counts){
+  const box=document.querySelector(id);
+  box.replaceChildren();
+  for(const [key,n] of Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,12)){
+    const chip=document.createElement('span');
+    chip.textContent=key+' '+n;
+    box.append(chip);
+  }
+}
+function updateFeed(feed,nodes,now){
+  const fresh=nodes.filter(node=>node.expires_epoch>now);
+  feed.copy.disabled=!fresh.length;
+  if(fresh.length) feed.link.href=feed.url;
+  else feed.link.removeAttribute('href');
+  const last=Math.max(0,...nodes.map(node=>node.last_success_epoch));
+  const verified=last ? 'Last verified '+new Date(last*1000).toLocaleString() : 'Awaiting verification';
+  feed.freshness.textContent=`${fresh.length} of ${nodes.length} current · ${verified}`;
+}
+async function refresh(){
+  const health=document.querySelector('#health'), summary=document.querySelector('#summary');
+  try {
+    const response=await fetch('status.json',{cache:'no-store'});
+    if(!response.ok) throw new Error();
+    const s=await response.json(), now=Date.now()/1000;
+    const fresh=s.nodes.filter(node=>node.expires_epoch>now), compact=new Set(s.compact_ids || []);
+    const age=Math.max(0,Math.round((now-s.generated_epoch)/60));
+    health.textContent=fresh.length ? `Last check ${age} min ago · ${s.health.replaceAll('_',' ')}` : 'All subscription entries have expired. Wait for the next successful check.';
+    health.className=age>60 || s.health!=='ok' || !fresh.length ? 'warn' : 'good';
+    for(const feed of feeds) updateFeed(feed,feed.compact ? s.nodes.filter(node=>compact.has(node.id)) : s.nodes,now);
+    const protocols=Object.create(null), countries=Object.create(null);
+    for(const node of fresh){
+      protocols[node.protocol]=(protocols[node.protocol] || 0)+1;
+      const country=node.country_code || 'unknown';
+      countries[country]=(countries[country] || 0)+1;
+    }
+    chips('#protocols',protocols);
+    chips('#countries',countries);
+    summary.hidden=!fresh.length;
+  } catch(error) {
+    health.textContent='Feed freshness is unavailable.';
+    health.className='warn';
+    summary.hidden=true;
+    for(const feed of feeds){
+      feed.copy.disabled=true;
+      feed.link.removeAttribute('href');
+      feed.freshness.textContent='';
+    }
+  }
+}
+refresh();
+setInterval(refresh,60000);
+</script>
+</html>
