@@ -30,6 +30,15 @@ and is not recorded here.
   minutes**. `status.json` records `list_limit`, `working_this_run` and the run
   interval that was actually used.
 
+### Changed (progress and layout)
+- The panel's progress bar now covers the whole run: starting up, fetching sources
+  (n of N), searching GitHub for new feeds, preparing the tests, then testing. It
+  showed nothing until the tests began, and the log hid every source that finished
+  after a slow one; sources are now reported as they finish.
+- A new run no longer shows the previous run's last progress.
+- The protocols tile shows one chip per protocol. The sources table has fixed
+  columns that always fit, and scrollbars and form controls follow the dark theme.
+
 ### Fixed
 - The test gate that runs before every push failed on a PC where the project sits
   inside another Git repository (the panel took that repository's address) or where

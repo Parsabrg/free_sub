@@ -251,17 +251,24 @@ def fetch_source(name, urls, per_source=0):
 
 
 def collect(source_map=SOURCES, per_source=0, stats=None, workers=8):
-    groups={}
+    results={}
+    if source_map: print(f'[SOURCES] fetching {len(source_map)} sources',flush=True)
     # Fetched side by side: one feed after another took 20 seconds for each dead one.
     with cf.ThreadPoolExecutor(max_workers=max(1,min(workers,len(source_map) or 1))) as executor:
-        jobs={name:executor.submit(fetch_source,name,urls,per_source) for name,urls in source_map.items()}
-        for name,job in jobs.items():
+        jobs={executor.submit(fetch_source,name,urls,per_source):name for name,urls in source_map.items()}
+        # Reported as each one finishes: waiting in list order let one slow source hide the
+        # lines of all that came after it, so the panel looked stuck.
+        for job in cf.as_completed(jobs):
+            name=jobs[job]
             try:
                 group,row=job.result()
             except Exception as e:
                 group,row=[],{'raw':0,'supported':0,'error':type(e).__name__}
-            groups[name]=group
-            if stats is not None: stats[name]=row
+            results[name]=(group,row)
             if row['error'] and not group: print(f'[SOURCE] {name}: FAILED ({row["error"]})',flush=True)
             else: print(f'[SOURCE] {name}: {row["raw"]} raw, {row["supported"]} supported unique',flush=True)
+    groups={}
+    for name in source_map:   # results keep the order the sources are listed in
+        groups[name],row=results[name]
+        if stats is not None: stats[name]=row
     return groups

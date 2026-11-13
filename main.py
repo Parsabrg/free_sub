@@ -154,7 +154,7 @@ INDEX='''<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Free Sub: tested Xray subscription</title>
 <style>
-:root{--bg:#f4f5f7;--panel:#fff;--ink:#18202b;--muted:#5f6b7a;--line:#dfe3ea;--accent:#0b6bcb;--good:#18794e;--warn:#a15c00;--chip:#eef1f5}
+:root{color-scheme:light dark;--bg:#f4f5f7;--panel:#fff;--ink:#18202b;--muted:#5f6b7a;--line:#dfe3ea;--accent:#0b6bcb;--good:#18794e;--warn:#a15c00;--chip:#eef1f5}
 @media (prefers-color-scheme:dark){:root{--bg:#0f141b;--panel:#171e28;--ink:#e3eaf3;--muted:#93a0b2;--line:#2a3442;--accent:#5aa9f5;--good:#4cc38a;--warn:#f0b35a;--chip:#212b38}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,"Segoe UI",sans-serif}

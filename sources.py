@@ -161,6 +161,7 @@ def refresh(registry, now, fetch=None, search=github_search):
     """Search GitHub for recently pushed collectors and choose files from the new ones.
     Returns False, changing nothing, when no search could be made."""
     fetch = fetch or collector.get
+    print('[DISCOVER] searching GitHub for new feeds', flush=True)
     since = time.strftime('%Y-%m-%d', time.gmtime(now - 2 * 86400))
     builtin = {'/'.join(u.split('/')[3:5]).lower() for u in collector.SOURCES.values()
                if u.startswith('https://raw.githubusercontent.com/')}
