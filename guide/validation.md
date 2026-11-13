@@ -64,8 +64,10 @@ PowerShell 5 lock-collision check confirmed exit code 2 and a readable error log
 Environment: Linux, Python 3.13, official Xray v26.3.27 (the Linux binary's SHA-256
 matches the value recorded above).
 
-- **82 tests passed** through `verify.py`, including the real Xray end-to-end
-  tests; 37 of them were added with these changes. GitHub CI passed on Windows and
+- **90 tests passed** through `verify.py`, including the real Xray end-to-end
+  tests; 45 of them were added with these changes. The whole suite was also run with
+  its temporary folders inside another Git repository that has a different remote,
+  the situation that broke the gate on the operator's PC; it passes. GitHub CI passed on Windows and
   Linux.
 - The relay was exercised with real Xray against the loopback Trojan fixture: a
   node with a wrong password was passed over and the source arrived through the
@@ -83,6 +85,10 @@ matches the value recorded above).
   panel** ends the panel and any run. In a browser, a panel killed with `kill -9`
   turns the open page to "Panel stopped" with its buttons disabled, and the page
   reloads itself when the panel is started again.
+- The panel's two settings in a real browser against a real background panel: the
+  values reach `main.py` as `--limit` and `--interval-minutes`, an out-of-range value
+  is refused with a message next to the fields, the fields lock while a run is active,
+  and the values are remembered across a reload.
 - The bundled `tools/xray.exe`: the archive's SHA-256 equals the release's own
   `.dgst` file, and the binary's equals the Windows hash recorded above. On the
   Windows CI job the official release is downloaded over it and compared with the

@@ -6,7 +6,7 @@ Free Sub builds a public proxy subscription that lists only configurations which
 recently carried real traffic. It collects public VLESS, VMess, Trojan and
 Shadowsocks share links, sends HTTPS requests through each one with the official
 Xray core on a Windows PC, remembers how reliable each node has been, and publishes
-up to 300 working ones to GitHub Pages.
+every working one to GitHub Pages (or the most reliable ones, up to a maximum you set).
 
 Tests run on the operator's own network, so "working" means "working from there".
 
@@ -69,6 +69,13 @@ launcher again while the panel is up simply opens the page again.
 - **Mode.** Automatic (health check each run, new feeds every four hours), a full
   scan now, or a health check only.
 - **Publish the list to GitHub.** Untick it to test without pushing.
+- **Max nodes in the list.** Empty lists every working node. A number lists only that
+  many of the most reliable ones (1 to 1,000).
+- **Run every N minutes.** How often a run starts while the panel keeps running
+  (5 to 1,440). Both settings apply the next time you press Start and are remembered.
+- **Working configs in the last run.** The first tile counts the configs that passed
+  in the last run. Below it, how many are in your list; the two differ when a maximum
+  is set.
 - **Your subscription.** The published addresses, each with a Copy button.
 - **Sources.** Add your own `https://` subscription address, switch any source on
   or off, and see how many configs each one carried and how many worked.
@@ -104,7 +111,8 @@ scheduled task: see [guide/setup.md](guide/setup.md#unattended-runs-scheduled-ta
    Xray process, with a five-second network deadline.
 4. **Verify** the best candidates again in a new process: two transfers to two
    different sites within 30 seconds.
-5. **Select** up to 300 by recent reliability, at most four per server address.
+5. **Select** the working nodes, most reliable first, at most four per server address
+   and no more than your maximum if you set one.
 6. **Publish** the list after the test suite, including real Xray end-to-end tests,
    has passed on the PC.
 

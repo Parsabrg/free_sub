@@ -26,6 +26,10 @@ def wait_for(condition, seconds=10):
 
 class PanelTests(unittest.TestCase):
     def setUp(self):
+        # Whatever this PC has installed, a panel test starts without the scheduled task.
+        task = patch('app.task_installed', return_value=False)
+        task.start()
+        self.addCleanup(task.stop)
         self.folder = tempfile.TemporaryDirectory()
         self.addCleanup(self.folder.cleanup)
         self.root = Path(self.folder.name)
@@ -72,7 +76,7 @@ class PanelTests(unittest.TestCase):
         state = self.state()
         self.assertEqual(state['run']['exit'], 0)
         self.assertTrue(any('[CHECK] 25/100' in line for line in state['log']))
-        self.assertEqual(state['settings'], {'mode': 'full', 'publish': False, 'repeat': False})
+        self.assertEqual(state['settings'], {'mode': 'full', 'publish': False, 'repeat': False, 'limit': 0, 'interval': 30})
         self.assertEqual(self.request('POST', '/api/start', {'mode': 'everything'})[0], 400)
 
     def test_a_run_that_ends_before_it_is_contained_still_counts(self):
@@ -109,6 +113,48 @@ class PanelTests(unittest.TestCase):
         self.assertEqual(connection.getresponse().status, 403)
         connection.close()
 
+    def test_the_maximum_and_the_interval_are_checked_remembered_and_passed_on(self):
+        for bad in ({'limit': -1}, {'limit': 1001}, {'limit': 2.5}, {'limit': True}, {'limit': 'ten'},
+                    {'interval': 4}, {'interval': 1441}, {'interval': None}, {'interval': float('nan')}):
+            status, body = self.request('POST', '/api/start', dict({'mode': 'health'}, **bad))
+            self.assertEqual(status, 400, bad)
+            self.assertIn('must be a whole number from', json.loads(body)['error'])
+        self.assertEqual(self.state()['run']['state'], 'idle')
+        self.assertEqual(app.clean_settings({}), {'limit': 0, 'interval': 30})
+        self.assertEqual(app.clean_settings({'limit': 250.0, 'interval': 60}), {'limit': 250, 'interval': 60})
+        self.assertEqual(self.request('POST', '/api/start', {'mode': 'health', 'repeat': True, 'limit': 250, 'interval': 5})[0], 200)
+        self.assertEqual(self.runner.interval, 5 * 60)
+        self.assertEqual(self.runner.settings, {'limit': 250, 'interval': 5})
+        self.request('POST', '/api/stop', {})
+        self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
+        self.assertEqual({k: self.state()['settings'][k] for k in ('limit', 'interval')}, {'limit': 250, 'interval': 5})
+        # A damaged settings file falls back to the defaults instead of breaking the page.
+        (self.root / '.local' / 'panel.json').write_text('{"limit": -7, "interval": "x", "mode": "full"}')
+        self.assertEqual({k: self.state()['settings'][k] for k in ('limit', 'interval', 'mode')},
+                         {'limit': 0, 'interval': 30, 'mode': 'full'})
+
+    def test_the_tile_counts_what_worked_in_the_last_run_not_what_is_listed(self):
+        docs = self.root / 'docs'
+        docs.mkdir()
+        status = {'published': 300, 'working_this_run': 412, 'list_limit': 300, 'mode': 'health', 'nodes': []}
+        (docs / 'status.json').write_text(json.dumps(status))
+        last = self.state()['last']
+        self.assertEqual((last['working'], last['published'], last['limit'], last['limit_known']), (412, 300, 300, True))
+        # An older report has no such field: the listed count stands in, and the page says nothing of a limit.
+        (docs / 'status.json').write_text(json.dumps({'published': 300, 'mode': 'health', 'nodes': []}))
+        last = self.state()['last']
+        self.assertEqual((last['working'], last['limit_known']), (300, False))
+
+    def test_the_default_command_hands_the_settings_to_main(self):
+        (self.root / 'main.py').write_text('import sys; print("ARGS", *sys.argv[1:], flush=True)')
+        runner = app.Runner(self.root)
+        self.addCleanup(runner.stop)
+        runner.start('full', False, False, {'limit': 0, 'interval': 45}, 45 * 60)
+        self.assertTrue(wait_for(lambda: runner.status['state'] == 'idle' and any('ARGS' in x for x in runner.log)))
+        line = next(x for x in runner.log if 'ARGS' in x)
+        self.assertIn('ARGS --mode full --limit 0 --interval-minutes 45', line)
+        self.assertNotIn('--publish', line)
+
     def test_stop_kills_a_run_and_ends_the_repeat(self):
         self.script = 'import time; print("started", flush=True); time.sleep(60)'
         self.request('POST', '/api/start', {'mode': 'auto', 'publish': True, 'repeat': True})
@@ -139,6 +185,39 @@ class PanelTests(unittest.TestCase):
         state = self.state()
         self.assertIsNone(state['pages'])   # the temporary folder is no clone
         self.assertFalse(state['task'])
+        with patch('app.task_installed', return_value=True):
+            self.panel.task = (0, False)
+            self.assertTrue(self.state()['task'])
+
+    def git(self, folder, *args):
+        return subprocess.run(['git', *args], cwd=folder, check=True, capture_output=True, text=True)
+
+    def test_only_a_folder_that_is_itself_a_clone_gets_its_address_and_its_update(self):
+        # A copy of the project inside another repository (an operator's home folder can be one)
+        # must not take that repository's address, and must never run its `git pull`.
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as outer:
+            self.git(outer, 'init', '-q')
+            self.git(outer, 'remote', 'add', 'origin', 'https://github.com/Other/system_reporter.git')
+            inner = Path(outer) / 'Documents' / 'free_sub'
+            inner.mkdir(parents=True)
+            self.assertFalse(app.clone_root(inner))
+            self.assertTrue(app.clone_root(outer))
+            self.assertIsNone(app.Panel(inner).pages)
+            self.assertEqual(app.Panel(outer).pages, 'https://other.github.io/system_reporter/')
+            self.git(inner, 'init', '-q')
+            self.git(inner, 'remote', 'add', 'origin', 'https://github.com/Owner/free_sub.git')
+            self.assertTrue(app.clone_root(inner))
+            self.assertEqual(app.Panel(inner).pages, 'https://owner.github.io/free_sub/')
+            # Not a clone: Update refuses before any `git pull`.
+            plain = Path(outer) / 'copy'
+            plain.mkdir()
+            panel = app.Panel(plain)
+            real = subprocess.run
+            def guarded(command, **kwargs):
+                self.assertNotEqual(command[:2], ['git', 'pull'], 'git pull must not run')
+                return real(command, **kwargs)
+            with patch('app.subprocess.run', guarded), self.assertRaisesRegex(ValueError, 'only in a Git clone'):
+                panel.update()
 
     def test_update_pulls_only_while_idle_and_never_shows_the_remote(self):
         import subprocess
@@ -150,7 +229,7 @@ class PanelTests(unittest.TestCase):
             calls.append((command, kwargs['env'].get('GIT_TERMINAL_PROMPT')))
             return subprocess.CompletedProcess(command, 0, stdout='Updating 1..2\nFast-forward\n app.py | 2 +-\n',
                                                stderr='From https://token@github.com/owner/free_sub\n')
-        with patch('app.subprocess.run', pull):
+        with patch('app.subprocess.run', pull), patch('app.clone_root', return_value=True):
             self.assertEqual(self.request('POST', '/api/update', {})[0], 200)
         log = '\n'.join(self.state()['log'])
         self.assertEqual(calls, [(['git', 'pull', '--no-rebase', '--no-edit'], '0')])

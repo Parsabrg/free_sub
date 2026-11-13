@@ -127,8 +127,11 @@ def write_outputs(docs, selected, state, report, now, ttl):
                   generated_utc=datetime.fromtimestamp(now,timezone.utc).isoformat(timespec='seconds'),
                   published=len(rows),nodes=rows,
                   flag_definition='IP pinned for the successful proxy connection; may be CDN ingress, not exit',
-                  recommended_client_refresh_seconds=3600,health_interval_seconds=1800,
-                  discovery_interval_seconds=14400,node_ttl_seconds=ttl)
+                  recommended_client_refresh_seconds=3600,node_ttl_seconds=ttl)
+    # run_cycle states what it was started with; these are only the figures of earlier versions.
+    report.setdefault('health_interval_seconds',1800)
+    report.setdefault('discovery_interval_seconds',14400)
+    report.setdefault('list_limit',None)
     data='\n'.join(urls)+('\n' if urls else '')
     staging=docs.parent/'.local'/'output-staging'
     staging.mkdir(parents=True,exist_ok=True)
@@ -283,6 +286,7 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
                 verified=c.key in passed and mode=='full')
     passed={key:pair for key,pair in passed.items()
             if now-state['nodes'][key]['last_success']<args.ttl_hours*3600}
+    working_count=len(passed)
     if mode=='full':
         # What each source was worth this run, so a feed can be judged by what works from here.
         # "working" is a pass in the last test a config got this run. Verification takes only
@@ -302,7 +306,7 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
         endpoint=(r.endpoint_ip,c.port)
         if endpoints[endpoint]>=4: continue
         endpoints[endpoint]+=1; diverse.append((c,r))
-        if len(diverse)>=args.limit: break
+        if args.limit and len(diverse)>=args.limit: break
     selected=diverse
     if mode=='full' and any(groups.values()):
         # With most listed sources unreachable this was a network problem, not a discovery:
@@ -340,6 +344,9 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
     report={'mode':mode,'health':health,'tested_on':'operator network; local Xray',
             'xray_version':args.xray_version,'source_status':stats,'unique_selected_for_test':len(queue),
             'first_pass':first_counts,'second_pass':second_counts,'_verified_keys':list(passed),
+            'list_limit':args.limit or None,'working_this_run':working_count,
+            'health_interval_seconds':int(getattr(args,'interval_minutes',30)*60),
+            'discovery_interval_seconds':int(args.discovery_hours*3600),
             'resting_skipped':rested,'max_tests':args.max_tests,'workers':first_workers,'verification_workers':min(args.workers,16),
             'first_pass_timeout_seconds':args.timeout,'screen_network_timeout_seconds':screen_timeout,
             'verification_timeout_seconds':args.timeout,
@@ -357,14 +364,17 @@ def arguments(argv=None):
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--xray',default=str(ROOT/'tools'/('xray.exe' if os.name=='nt' else 'xray')))
     ap.add_argument('--mode',choices=('auto','full','health'),default='auto')
-    ap.add_argument('--limit',type=int,default=300)
+    ap.add_argument('--limit',type=int,default=0,help='Most nodes in the published list; 0 lists every working node')
     ap.add_argument('--max-tests',type=int,default=0,help='0 means all supported source entries; no per-source truncation')
     ap.add_argument('--workers',type=int,default=64)
     ap.add_argument('--screen-timeout',type=float,default=5,help='Discovery real-delay network deadline after Xray readiness; startup remains bounded by --timeout')
     ap.add_argument('--timeout',type=float,default=30,help='Full verification and health deadline per candidate including DNS and all probes')
     # 600, not 400: 422 to 505 configs passed each screen on 2026-11-12, so 22 to 105 passes a
     # run were never verified or listed. A config with no history ranks below a known one.
-    ap.add_argument('--recheck',type=int,default=600,help='Finalists verified per discovery run; standby nodes per health check')
+    ap.add_argument('--recheck',type=int,default=None,
+                    help='Finalists verified per discovery run; standby nodes per health check (default 600, or --limit if larger)')
+    ap.add_argument('--interval-minutes',type=int,default=30,
+                    help='How often runs are started, as published in status.json; the panel or the scheduled task does the scheduling')
     ap.add_argument('--geo-workers',type=int,default=3)
     ap.add_argument('--require-country',action='store_true',help='Optional; otherwise preserve good nodes with a globe flag')
     ap.add_argument('--discovery-hours',type=float,default=4)
@@ -377,11 +387,13 @@ def arguments(argv=None):
     ap.add_argument('--allow-non-iran',action='store_true',
                     help='Test even when this machine does not reach the internet from Iran (e.g. through a VPN)')
     args=ap.parse_args(argv)
-    if not (1<=args.limit<=300 and 1<=args.workers<=64 and 1<=args.geo_workers<=8 and
+    if args.recheck is None:
+        args.recheck=max(600,args.limit)
+    if not (0<=args.limit<=1000 and 1<=args.workers<=64 and 1<=args.geo_workers<=8 and
             args.max_tests>=0 and 5<=args.timeout<=120 and 1<=args.screen_timeout<=args.timeout and args.recheck>=args.limit and
-            1<=args.discovery_hours<=24 and 1<=args.ttl_hours<=24 and
+            1<=args.discovery_hours<=24 and 1<=args.ttl_hours<=24 and 1<=args.interval_minutes<=1440 and
             0<=args.found_sources<=200 and 0<=args.retry_failed_hours<=168):
-        ap.error('Invalid budget, worker count, deadline, TTL, discovery interval or source count')
+        ap.error('Invalid list size, budget, worker count, deadline, TTL, interval or source count')
     binary=Path(args.xray).expanduser()
     resolved=binary.resolve() if binary.is_file() else shutil.which(args.xray)
     if not resolved: ap.error('Xray missing; run python download_xray.py first')

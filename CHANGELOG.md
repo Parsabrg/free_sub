@@ -19,7 +19,24 @@ and is not recorded here.
 - Per-source `tested` and `working` counts in `status.json`.
 - Documentation split into a short README and the guides in `guide/`.
 
+### Changed (later the same day)
+- **The published list now holds every working node** instead of at most 300. A
+  maximum can still be set, from 1 to 1,000.
+- The control panel's first tile shows how many configs **worked in the last run**,
+  with the number in the list below it.
+
+### Added (later the same day)
+- Two settings in the control panel: **Max nodes in the list** and **Run every N
+  minutes**. `status.json` records `list_limit`, `working_this_run` and the run
+  interval that was actually used.
+
 ### Fixed
+- The test gate that runs before every push failed on a PC where the project sits
+  inside another Git repository (the panel took that repository's address) or where
+  the scheduled task is installed (a test assumed it was not), which stopped all
+  publishing. The panel now trusts Git only in a folder that is itself a clone, and
+  **Update program** refuses anywhere else rather than updating a different project.
+  The panel tests no longer depend on what else is installed on the machine.
 - The control panel ended whenever the window that started it was closed, and its
   page then kept showing the last state it had received as if the run were still
   going. The panel now runs as a background program without a window of its own,
