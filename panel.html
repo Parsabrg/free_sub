@@ -20,6 +20,8 @@
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, "Segoe UI", sans-serif; }
 main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 16px; }
 main > * { min-width: 0; }
+.head-right { display: flex; align-items: center; gap: 10px; }
+button.quiet { padding: 4px 14px; font-weight: 500; font-size: 14px; }
 header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
 h2 { font-size: 15px; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
@@ -76,8 +78,12 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
 <main>
   <header>
     <h1>Free Sub control panel</h1>
-    <span id="pill" class="pill">Connecting…</span>
+    <div class="head-right">
+      <span id="pill" class="pill">Connecting…</span>
+      <button id="quit" class="quiet" title="Stop any run and end the panel program">Quit panel</button>
+    </div>
   </header>
+  <p id="offline" class="notice" role="alert" hidden></p>
 
   <section>
     <h2>Run</h2>
@@ -96,6 +102,8 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
       <label class="check"><input type="checkbox" id="publish"> Publish the list to GitHub</label>
     </div>
     <div id="progress" class="progress"><div class="bar"><i id="fill"></i></div><p id="progress-text"></p></div>
+    <p class="note" style="margin:12px 0 0">The panel runs in the background: closing this tab or any window leaves it
+      running. Use <b>Quit panel</b> (top right) to end it.</p>
     <p id="task" class="notice" hidden>The old scheduled task is still installed and also runs every 30 minutes,
       whether this panel is open or not. To control runs only from here, remove it in an Administrator
       PowerShell window: <code>Unregister-ScheduledTask -TaskName FreeXraySubscription -Confirm:$false</code></p>
@@ -140,7 +148,7 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
 <script>
 const TOKEN = '__TOKEN__';
 const $ = id => document.getElementById(id);
-let first = true, busy = false, linked = false;
+let first = true, busy = false, linked = false, failures = 0, gone = false, lastState = 'idle';
 
 function renderLinks(pages) {
   if (linked || !pages) return;
@@ -168,7 +176,11 @@ async function call(path, body) {
     {method: 'POST', headers: {'X-Token': TOKEN, 'Content-Type': 'application/json'}, body: JSON.stringify(body)};
   const response = await fetch(path, options);
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Request failed');
+  if (!response.ok) {
+    const error = new Error(data.error || 'Request failed');
+    error.status = response.status;
+    throw error;
+  }
   return data;
 }
 
@@ -242,12 +254,15 @@ function renderSources(state) {
 
 function render(state) {
   const run = state.run, pill = $('pill');
+  lastState = run.state;
+  $('offline').hidden = true;
   pill.className = 'pill ' + run.state;
   pill.textContent = run.state === 'running' ? `Running: ${run.mode} run since ${clock(run.started)}`
                    : run.state === 'waiting' ? `Waiting: next run at ${clock(run.next_run)}` : 'Idle';
   $('start').disabled = busy || run.state !== 'idle';
   $('stop').disabled = busy || run.state === 'idle';
   $('update').disabled = busy || run.state !== 'idle';
+  $('quit').disabled = false;
   for (const id of ['mode', 'repeat', 'publish']) $(id).disabled = run.state !== 'idle';
   if (first) {
     $('mode').value = state.settings.mode;
@@ -300,10 +315,42 @@ $('add').onsubmit = async event => {
   if (await act('/api/source/add', {url: $('add-url').value, name: $('add-name').value})) event.target.reset();
 };
 
+const STOPPED = 'The panel program is no longer running, so this page has stopped updating and shows only what ' +
+  'it received last. If its window was closed or it crashed, start it again with panel_windows.bat. A run in ' +
+  'progress ended with it. A crash is recorded in .local\\logs\\panel.log.';
+
+function offline(message, label = 'Panel stopped') {
+  const pill = $('pill');
+  pill.className = 'pill'; pill.textContent = label;
+  $('progress').className = 'progress';
+  for (const id of ['start', 'stop', 'update', 'quit']) $(id).disabled = true;
+  $('offline').textContent = message;
+  $('offline').hidden = false;
+}
+
+$('quit').onclick = async () => {
+  const active = lastState !== 'idle';
+  if (!confirm(active ? 'The run and its repeat schedule will be stopped. Quit the panel?'
+                      : 'Quit the panel? Nothing keeps running afterwards.')) return;
+  try { await call('/api/quit', {}); }
+  catch (error) { alert(error.message); return; }
+  gone = true;
+  offline('The panel has quit. You can close this tab. To use it again, open panel_windows.bat.', 'Panel quit');
+};
+
 async function poll() {
-  try { if (!busy) render(await call('/api/state')); }
-  catch (error) { const pill = $('pill'); pill.className = 'pill'; pill.textContent = 'Panel is not running'; }
-  setTimeout(poll, 1500);
+  if (gone) return;
+  let state = null;
+  try {
+    if (!busy) state = await call('/api/state');
+    failures = 0;
+  } catch (error) {
+    // 403: the panel was restarted and this page holds the old token. Load the new page.
+    if (error.status === 403) { location.reload(); return; }
+    if (++failures >= 2) offline(STOPPED);
+  }
+  if (state) render(state);
+  setTimeout(poll, failures >= 2 ? 3000 : 1500);
 }
 poll();
 </script>

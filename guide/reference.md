@@ -37,7 +37,8 @@ an invalid option; the last log line says which.
 
 | Program | Purpose |
 |---|---|
-| `python app.py [--port 8765] [--no-browser]` | The control panel. `panel_windows.bat` starts it. |
+| `python app.py [--port 8765] [--no-browser]` | Starts the control panel as a background program and opens its page, or just opens the page if a panel already answers on the port. `panel_windows.bat` runs this. |
+| `python app.py --serve` | Runs the panel in the current window instead, for diagnosis. Ctrl+C or **Quit panel** ends it. |
 | `python verify.py --xray PATH` | The complete test gate: regression tests plus real Xray end-to-end tests. Required before a push; never skips the Xray tests. |
 | `python -m unittest discover -s tests -v` | The tests alone. Skips the real Xray tests unless `XRAY_E2E_BINARY` is set. |
 | `python download_xray.py` | Installs the pinned official Xray release for this platform, verifying its digest. Needed on Linux only. |
@@ -56,7 +57,7 @@ an invalid option; the last log line says which.
 | `xray_test.py`, `process_guard.py`, `network.py` | yes | The probe, process containment, endpoint and adapter rules. |
 | `state.py`, `naming.py`, `geolocation.py` | yes | Node history and reliability, names, country flags. |
 | `publishing.py`, `verify.py` | yes | Output validation, the Git push, the pre-push test gate. |
-| `app.py`, `panel.html` | yes | The control panel. |
+| `app.py`, `panel.html` | yes | The control panel: launcher, local web server, page. |
 | `tools/xray.exe` | yes | The pinned official Xray binary for Windows; see `tools/README.md`. |
 | `docs/` | yes | The published outputs, deployed by GitHub Pages. Written by the program only. |
 | `guide/` | yes | This documentation. |

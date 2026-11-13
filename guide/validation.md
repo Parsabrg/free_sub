@@ -64,8 +64,8 @@ PowerShell 5 lock-collision check confirmed exit code 2 and a readable error log
 Environment: Linux, Python 3.13, official Xray v26.3.27 (the Linux binary's SHA-256
 matches the value recorded above).
 
-- **77 tests passed** through `verify.py`, including the real Xray end-to-end
-  tests; 32 of them were added with these changes. GitHub CI passed on Windows and
+- **82 tests passed** through `verify.py`, including the real Xray end-to-end
+  tests; 37 of them were added with these changes. GitHub CI passed on Windows and
   Linux.
 - The relay was exercised with real Xray against the loopback Trojan fixture: a
   node with a wrong password was passed over and the source arrived through the
@@ -77,6 +77,12 @@ matches the value recorded above).
   width. Stop was exercised on a real full scan of 9,667 candidates with 64
   workers: the run ended at once and the in-flight workers within about six
   seconds.
+- The control panel as a background program, in real processes on Linux: the
+  launcher starts the panel and exits, the panel keeps answering, a second launch
+  opens the running one, a port held by another program is reported, and **Quit
+  panel** ends the panel and any run. In a browser, a panel killed with `kill -9`
+  turns the open page to "Panel stopped" with its buttons disabled, and the page
+  reloads itself when the panel is started again.
 - The bundled `tools/xray.exe`: the archive's SHA-256 equals the release's own
   `.dgst` file, and the binary's equals the Windows hash recorded above. On the
   Windows CI job the official release is downloaded over it and compared with the
@@ -86,7 +92,9 @@ Not verified in that environment, and therefore still open:
 
 - whether any found feed has configurations that work from Iran;
 - the relay through a real public node on the operator's network;
-- on Windows: Stop on a real scan, the sleep inhibitor, the scheduled-task notice,
+- on Windows: that the background panel survives closing the window that started
+  it (it is created with `CREATE_NO_WINDOW` and `CREATE_NEW_PROCESS_GROUP`; the
+  Linux equivalent was tested), Stop on a real scan, the sleep inhibitor, the scheduled-task notice,
   the changed uninstall path of `install-task.ps1`, and running the bundled binary
   (CI parses the PowerShell scripts and runs the panel tests, nothing more).
 

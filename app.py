@@ -5,6 +5,7 @@ A page served on 127.0.0.1 only, by the Python standard library. Runs are the sa
 """
 from __future__ import annotations
 import argparse
+import http.client
 from collections import deque
 from contextlib import ExitStack
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -12,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import socket
 import subprocess
 import sys
 import threading
@@ -26,6 +28,7 @@ from state import atomic_write, keep_awake
 ROOT = Path(__file__).resolve().parent
 MODES = ('auto', 'full', 'health')
 TASK = 'FreeXraySubscription'
+APP_NAME = 'free-sub-panel'
 
 
 def quiet(command, root=ROOT, timeout=10):
@@ -185,6 +188,7 @@ class Panel:
         remote = quiet(['git', 'remote', 'get-url', 'origin'], self.root)
         self.pages = pages_address(remote.stdout if remote and remote.returncode == 0 else '')
         self.task = (0, False)
+        self.shutdown = None   # set by run_server: ends the web server
 
     def task_active(self):
         # Asked at most once a minute: the page polls far more often than a task changes.
@@ -207,6 +211,15 @@ class Panel:
         chosen = {'mode': body.get('mode', 'auto'), 'publish': bool(body.get('publish')), 'repeat': bool(body.get('repeat'))}
         self.runner.start(chosen['mode'], chosen['publish'], chosen['repeat'])
         atomic_write(self.local / 'panel.json', json.dumps(chosen) + '\n')
+
+    def quit(self):
+        """End any run and its repeat, then the panel program itself."""
+        self.runner.stop()
+        thread = self.runner.thread
+        if thread is not None:
+            thread.join(timeout=10)
+        if self.shutdown is not None:
+            self.shutdown()
 
     def update(self):
         """Bring this copy up to date with GitHub. Never during a run: its files are in use."""
@@ -290,6 +303,11 @@ def handler_for(panel, page):
             port = self.server.server_address[1]
             return self.headers.get('Host') in (f'127.0.0.1:{port}', f'localhost:{port}')
 
+        def authorized(self):
+            # Encoded: compare_digest refuses a str with non-ASCII characters.
+            return secrets.compare_digest(self.headers.get('X-Token', '').encode('utf-8', 'replace'),
+                                          panel.token.encode())
+
         def send(self, code, body, kind='application/json'):
             data = body if isinstance(body, bytes) else json.dumps(body).encode('utf-8')
             self.send_response(code)
@@ -306,12 +324,17 @@ def handler_for(panel, page):
                 return self.send(403, {'error': 'Open the panel at its 127.0.0.1 address'})
             if self.path == '/':
                 return self.send(200, page.replace('__TOKEN__', panel.token).encode('utf-8'), 'text/html')
-            if self.path == '/api/state' and secrets.compare_digest(self.headers.get('X-Token', ''), panel.token):
+            if self.path == '/api/ping':
+                return self.send(200, {'app': APP_NAME, 'pid': os.getpid()})
+            if self.path == '/api/state':
+                # A 403 tells a page left open across a restart to reload itself.
+                if not self.authorized():
+                    return self.send(403, {'error': 'Reload the panel page'})
                 return self.send(200, panel.snapshot())
             self.send(404, {'error': 'Not found'})
 
         def do_POST(self):
-            if not self.local() or not secrets.compare_digest(self.headers.get('X-Token', ''), panel.token):
+            if not self.local() or not self.authorized():
                 return self.send(403, {'error': 'Reload the panel page'})
             try:
                 length = int(self.headers.get('Content-Length') or 0)
@@ -326,6 +349,10 @@ def handler_for(panel, page):
                     panel.runner.stop()
                 elif self.path == '/api/update':
                     panel.update()
+                elif self.path == '/api/quit':
+                    self.send(200, {'quit': True})
+                    threading.Thread(target=panel.quit, daemon=True).start()
+                    return
                 elif self.path in ('/api/source/add', '/api/source/remove', '/api/source/enable'):
                     panel.change(self.path.rsplit('/', 1)[1], body)
                 else:
@@ -341,24 +368,95 @@ def serve(panel, port=0):
     return ThreadingHTTPServer(('127.0.0.1', port), handler_for(panel, page))
 
 
-def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--port', type=int, default=8765)
-    ap.add_argument('--no-browser', action='store_true')
-    args = ap.parse_args(argv)
-    panel = Panel()
+def probe(port, timeout=3):
+    """('panel', info) when this program's panel answers on the port, ('busy', {}) when
+    something else does, ('free', {}) when nothing listens."""
     try:
-        server = serve(panel, args.port)
+        # Windows can take about two seconds to refuse a connection to a closed port. Running
+        # out of time while connecting therefore still means that nothing listens: it must not
+        # read as "another program is there", which would stop the panel from ever starting.
+        sock = socket.create_connection(('127.0.0.1', port), timeout=max(timeout, 6))
+    except (ConnectionRefusedError, TimeoutError):
+        return 'free', {}
     except OSError:
-        # Started twice: show the panel that is already running rather than fail.
-        address = f'http://127.0.0.1:{args.port}/'
-        if not args.no_browser:
-            webbrowser.open(address)
-        raise SystemExit(f'Port {args.port} is in use: the panel is probably already open at {address}')
+        return 'busy', {}
+    # Something accepted the connection. From here, no answer or a wrong one means "busy".
+    connection = http.client.HTTPConnection('127.0.0.1', port, timeout=timeout)
+    connection.sock = sock
+    sock.settimeout(timeout)
+    try:
+        connection.request('GET', '/api/ping')
+        response = connection.getresponse()
+        data = json.loads(response.read(1024) or b'{}') if response.status == 200 else {}
+        return ('panel', data) if isinstance(data, dict) and data.get('app') == APP_NAME else ('busy', {})
+    except (OSError, ValueError, http.client.HTTPException):
+        return 'busy', {}
+    finally:
+        connection.close()
+
+
+def background_python():
+    """python.exe, even when this launcher runs under pythonw.exe: every program it starts
+    reads and writes through pipes and needs a real standard output."""
+    exe = Path(sys.executable)
+    if exe.name.lower() == 'pythonw.exe' and exe.with_name('python.exe').exists():
+        return str(exe.with_name('python.exe'))
+    return sys.executable
+
+
+def launch(root, port, open_browser):
+    """Start the panel as a background program with no window of its own, unless one is
+    already running, and open its page. Returns the exit code."""
+    root = Path(root)
+    url = f'http://127.0.0.1:{port}/'
+    state, _ = probe(port)
+    if state == 'busy':
+        print(f'Port {port} is used by another program. Use a free one: python app.py --port {port + 1}', file=sys.stderr)
+        return 1
+    if state == 'free':
+        logs = root / '.local' / 'logs'
+        logs.mkdir(parents=True, exist_ok=True)
+        log = logs / 'panel.log'
+        if log.exists() and log.stat().st_size > 512 * 1024:
+            log.replace(logs / 'panel.log.old')
+        command = [background_python(), '-u', str(Path(__file__).resolve()), '--serve', '--no-browser',
+                   '--root', str(root), '--port', str(port)]
+        # Its own hidden console on Windows, its own session elsewhere: closing the window
+        # that started it, or this launcher ending, must not take it down.
+        detach = ({'creationflags': subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP}
+                  if os.name == 'nt' else {'start_new_session': True})
+        with log.open('ab') as out:
+            out.write(time.strftime('--- %Y-%m-%d %H:%M:%S panel starting\n').encode())
+            out.flush()
+            child = subprocess.Popen(command, cwd=root, stdin=subprocess.DEVNULL, stdout=out, stderr=out, **detach)
+        deadline = time.monotonic() + 20
+        while probe(port)[0] != 'panel':
+            if child.poll() is not None or time.monotonic() > deadline:
+                print(f'The panel could not start. Its log: {log}', file=sys.stderr)
+                return 1
+            time.sleep(0.2)
+        print(f'Control panel started in the background: {url}')
+    else:
+        print(f'The control panel is already running: {url}')
+    if open_browser:
+        webbrowser.open(url)
+    print('Closing this window or the browser tab does not stop it. Use "Quit panel" in the page.')
+    return 0
+
+
+def run_server(root, port, open_browser):
+    """Serve the panel in this process until it is quit."""
+    panel = Panel(root)
+    try:
+        server = serve(panel, port)
+    except OSError as exc:
+        raise SystemExit(f'Port {port} is not available ({type(exc).__name__}); a panel may already be running there.')
+    panel.shutdown = server.shutdown
     url = f'http://127.0.0.1:{server.server_address[1]}/'
-    print(f'Control panel: {url}\nClose this window (or press Ctrl+C) to stop the panel and any run it started.', flush=True)
-    if not args.no_browser:
+    print(time.strftime('%H:%M:%S ') + f'panel listening on {url}', flush=True)
+    if open_browser:
         threading.Timer(0.5, webbrowser.open, [url]).start()
+        print('Press Ctrl+C, or use "Quit panel" in the page, to stop it and any run it started.', flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
@@ -366,6 +464,21 @@ def main(argv=None):
     finally:
         panel.runner.stop()
         server.server_close()
+        print(time.strftime('%H:%M:%S ') + 'panel ended', flush=True)
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument('--port', type=int, default=8765)
+    ap.add_argument('--no-browser', action='store_true')
+    ap.add_argument('--serve', action='store_true',
+                    help='Run the panel in this window instead of in the background (for diagnosis)')
+    ap.add_argument('--root', default=str(ROOT), help=argparse.SUPPRESS)
+    args = ap.parse_args(argv)
+    if args.serve:
+        run_server(args.root, args.port, not args.no_browser)
+    else:
+        raise SystemExit(launch(args.root, args.port, not args.no_browser))
 
 
 if __name__ == '__main__':

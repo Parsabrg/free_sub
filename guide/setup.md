@@ -81,14 +81,16 @@ After a successful scan has been pushed, the addresses in the
 
 ## 4. Run it
 
-Double-click `panel_windows.bat` and press **Start**. The
+Double-click `panel_windows.bat` and press **Start** in the page that opens. The
 [README](../README.md#control-panel) describes the panel.
 
-The panel runs only while its window is open and the PC is awake. For runs with
-nobody present, use the scheduled task below. The two can be used side by side:
-they never run at the same time, and the panel shows a notice while the task is
-installed.
-
+The panel runs in the background with no window of its own. It keeps going when
+the browser tab or the launcher window is closed, and ends only with **Quit panel**,
+a Windows sign-out or restart, or a crash. It runs only while the PC is awake;
+while it repeats it keeps Windows from idle-sleeping, but it cannot wake a sleeping
+PC. For runs with nobody present, use the scheduled task below. The two can be used
+side by side: they never run at the same time, and the panel shows a notice while
+the task is installed.
 ## Unattended runs (scheduled task)
 
 The task runs every 30 minutes, wakes the PC from supported sleep on AC power, and
@@ -167,6 +169,8 @@ line in the log until this is done. Nothing is merged or pushed over silently.
 | Symptom | What to do |
 |---|---|
 | `Xray missing; run python download_xray.py first` | `tools\xray.exe` is absent. Run `git pull --no-rebase --no-edit`, or `python download_xray.py`. |
+| The page says **Panel stopped** | The panel program ended: it was quit, ended in Task Manager, or crashed. Open `panel_windows.bat` again; an open page reloads itself. A crash is recorded in `.local\logs\panel.log`. A run in progress ended with the panel. |
+| `Port 8765 is used by another program` | Something else holds the port. Start the panel on another one: `python app.py --port 8766`. |
 | `[BUSY] Another run is already active` | The scheduled task or a second window is running. Wait, or remove the task. |
 | `[UPDATE] GitHub has commits this copy lacks` | Update as described above. |
 | `[SKIP] Tests would reach the internet from …` | The PC reaches the internet from outside Iran and no physical adapter bypasses the VPN. Results would describe the VPN's network, so the published list is left as it is. `--allow-non-iran` overrides this. |
@@ -188,7 +192,7 @@ These stay on the PC and are never committed:
 | `.local\history.json` | Every tested node with its recent results. Contains public feed credentials. |
 | `.local\sources.json` | Your added subscriptions, switched-off sources and the record of found feeds. Delete it to start discovery afresh. |
 | `.local\geo_cache*` | Country lookups, cached for 14 days. |
-| `.local\logs\` | Scheduled-task logs. |
+| `.local\logs\` | Scheduled-task logs, and `panel.log` with the panel's own output and any crash. |
 | `.local\verification.json` | Result of the last pre-push test gate. |
 
 Do not upload `.local\`, and do not add private subscription sources.
