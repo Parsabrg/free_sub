@@ -64,8 +64,8 @@ PowerShell 5 lock-collision check confirmed exit code 2 and a readable error log
 Environment: Linux, Python 3.13, official Xray v26.3.27 (the Linux binary's SHA-256
 matches the value recorded above).
 
-- **91 tests passed** through `verify.py`, including the real Xray end-to-end
-  tests; 46 of them were added with these changes. The whole suite was also run with
+- **97 tests passed** through `verify.py`, including the real Xray end-to-end
+  tests; 52 of them were added with these changes. The whole suite was also run with
   its temporary folders inside another Git repository that has a different remote,
   the situation that broke the gate on the operator's PC; it passes. GitHub CI passed on Windows and
   Linux.
@@ -89,6 +89,12 @@ matches the value recorded above).
   values reach `main.py` as `--limit` and `--interval-minutes`, an out-of-range value
   is refused with a message next to the fields, the fields lock while a run is active,
   and the values are remembered across a reload.
+- Update program, end to end: in a real browser against a real background panel in a
+  real Git clone with a newer commit upstream and a repeating schedule waiting for its
+  next round, the pill went Waiting, Restarting, Waiting; a different process answered on
+  the same port; the page reloaded itself with a new token; and the new panel's log read
+  "Updated to <commit> and restarted" and "The repeat schedule continues". The same flow
+  runs as a test with real processes and real Git.
 - The bundled `tools/xray.exe`: the archive's SHA-256 equals the release's own
   `.dgst` file, and the binary's equals the Windows hash recorded above. On the
   Windows CI job the official release is downloaded over it and compared with the
