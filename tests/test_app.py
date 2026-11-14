@@ -67,7 +67,7 @@ class PanelTests(unittest.TestCase):
         (tools/('xray.exe' if os.name=='nt' else 'xray')).touch()
         secret='credential-fixture'
         body={'text':f'trojan://{secret}@example.com:443\nvless://invalid','udp':True}
-        self.assertEqual(self.request('POST','/api/test',body,token=False)[0],403)
+        self.assertEqual(self.request('POST','/api/test',token=False)[0],403)
         with patch('app.physical_interface',return_value='Ethernet'), patch('xray_test.run_probe',
                 return_value=ProbeResult(True,stage='passed',video_bytes=131072,udp=True)) as probe:
             status,response=self.request('POST','/api/test',body)
@@ -85,7 +85,7 @@ class PanelTests(unittest.TestCase):
         self.assertEqual(self.request('GET', '/', host='evil.example')[0], 403)
         self.assertEqual(self.request('GET', '/api/state', token=False)[0], 403)   # a stale page reloads
         self.assertEqual(self.request('GET', '/api/nothing', token=False)[0], 404)
-        self.assertEqual(self.request('POST', '/api/start', {'mode': 'full'}, token=False)[0], 403)
+        self.assertEqual(self.request('POST', '/api/start', token=False)[0], 403)
         self.assertEqual(self.request('POST', '/api/start', host=f'evil.example:{self.port}')[0], 403)
         self.assertEqual(self.state()['run']['state'], 'idle')
 
@@ -123,7 +123,7 @@ class PanelTests(unittest.TestCase):
         self.assertTrue(ended.wait(10), 'the web server was never asked to end')
         self.assertEqual(self.state()['run']['state'], 'idle')
         self.assertFalse(self.runner.thread.is_alive())
-        self.assertEqual(self.request('POST', '/api/quit', {}, token=False)[0], 403)
+        self.assertEqual(self.request('POST', '/api/quit', token=False)[0], 403)
 
     def test_an_unexpected_error_is_answered_and_the_panel_keeps_serving(self):
         with patch.object(self.panel, 'update', side_effect=RuntimeError('boom')), patch('sys.stderr', new=io.StringIO()):
