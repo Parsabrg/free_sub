@@ -77,6 +77,7 @@ The published outputs in `docs/`:
 | `sub.txt` | The share links, one per line. |
 | `sub.b64` | The same list, Base64-encoded. |
 | `xray.json` | The tested Xray outbounds, for v2rayN. |
+| `xray-pinned.json` | Xray outbounds that dial their verified IP while retaining the TLS and transport settings. |
 | `sub-compact.b64` | Up to 20 ranked share links with distinct server IPs, for mobile clients. |
 | `status.json` | The test report described below. |
 | `index.html` | The public status page. |
@@ -95,7 +96,9 @@ Top level:
 | `working_this_run` | Configs that passed in this run. Equal to `published` unless a maximum is set, or an outage left older nodes listed within their expiry. |
 | `list_limit` | The maximum set for the list, or `null` when every working node is listed. |
 | `nodes` | One entry per node, in rank order. |
-| `source_status` | Per source, for a `full` run: `raw` links found, `supported` unique configurations, `error`, `tested`, `working`. Found feeds also have `kind: "found"` and `new`, the configurations no listed source carries. Empty for a `health` run. |
+| `source_status` | Per-source discovery results. `working` counts uniquely credited full passes, `verified` counts all full passes carried by that source, and `screen_passed` counts quick passes. |
+| `source_retained_24h` | Counts of credited configs with a fresh full pass at least 24 hours after their first credited pass. |
+| `video_mirrors`, `run_comparison` | Per-mirror attempt outcomes and changes from the previous completed run. |
 | `unique_selected_for_test` | Candidates tested in this run. |
 | `first_pass`, `second_pass` | Result counts by outcome. Screening separates timeouts before Xray readiness from timeouts during the HTTPS test. |
 | `resting_skipped` | Candidates left out because they are resting. |

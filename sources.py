@@ -25,6 +25,7 @@ MIN_SUPPORTED = 20                 # smaller feeds are not worth a slot
 # A found feed is unknown until one of its configs works from here. Until then only a
 # sample is tested: 16 collectors screened by hand on 2026-10-26 had 12 with none.
 SAMPLE = 150
+PROMISING = 450
 PROVEN = 1500
 PROVEN_SECONDS = 7 * 86400
 MAX_REST_SECONDS = 7 * 86400
@@ -37,7 +38,7 @@ NOT_A_FEED = re.compile(r'\.(png|jpe?g|gif|svg|webp|ico|md|py|sh|ps1|bat|ya?ml|j
 
 
 NEW_FEED = {'urls': [], 'size': 0, 'branch': 'main', 'stars': 0, 'seen': 0, 'evaluated': 0, 'runs': 0,
-            'tested': 0, 'working': 0, 'dry': 0, 'last_worked': 0, 'next': 0}
+            'tested': 0, 'working': 0, 'verified_at': 0, 'dry': 0, 'last_worked': 0, 'next': 0}
 
 
 def empty():
@@ -208,7 +209,7 @@ class Registry:
     def builtin(self):
         return {n: u for n, u in collector.SOURCES.items() if n not in self.data['off']}
 
-    def collect(self, now, stats):
+    def collect(self, now, stats, retained=None):
         """({name: candidates} of the operator's sources, the same of found feeds due a test)."""
         off = set(self.data['off'])
         manual = {n: row['url'] for n, row in self.data['manual'].items() if n not in off}
@@ -225,31 +226,41 @@ class Registry:
                 self.save()
             due = [(n, row) for n, row in self.data['found'].items()
                    if row['urls'] and row.get('next', 0) <= now and PREFIX + n not in off]
-            # Feeds that worked first, then the newest finds.
-            due.sort(key=lambda item: (-item[1]['last_worked'], -item[1]['evaluated'], -item[1]['stars'], item[0]))
-            wanted = {PREFIX + n: row['urls'] for n, row in due[:self.discover]}
+            retained = retained or {}
+            due.sort(key=lambda item: (-retained.get(PREFIX + item[0], 0), -item[1]['verified_at'],
+                                       -item[1]['evaluated'], -item[1]['stars'], item[0]))
+            selected = due[:self.discover]
+            if self.discover>1 and len(due)>self.discover:
+                # Leave one slot for a fresh or overdue source even when established feeds are due.
+                selected[-1] = min(due[self.discover-1:], key=lambda item: item[1].get('sampled_at',0))
+            wanted = {PREFIX + n: row['urls'] for n, row in selected}
             found = collector.collect(wanted, stats=stats) if wanted else {}
             for name in found:
                 stats[name]['kind'] = 'found'
         return own, found
 
-    def quota(self, name, now):
+    def quota(self, name, now, retained=0):
         row = self.data['found'].get(name.removeprefix(PREFIX), {})
-        return PROVEN if now - row.get('last_worked', 0) < PROVEN_SECONDS else SAMPLE
+        if retained:
+            return PROVEN
+        if row.get('verified_at') and now - row['verified_at'] < PROVEN_SECONDS:
+            return PROMISING
+        return SAMPLE
 
     def record(self, results, now):
-        """results: {name: (tested, working)} for the found feeds tested this run."""
-        for name, (tested, working) in results.items():
+        """Count fully verified contributions. Screen-only passes keep a feed eligible."""
+        for name, (tested, verified, awaiting_verification) in results.items():
             row = self.data['found'].get(name.removeprefix(PREFIX))
             if row is None:
                 continue
-            row['runs'] += 1; row['tested'] += tested; row['working'] += working
-            if working:
-                row.update(dry=0, last_worked=now, next=0)
-            else:
+            row['runs'] += 1; row['tested'] += tested; row['working'] += verified
+            row['sampled_at'] = now
+            if verified:
+                row.update(dry=0, last_worked=now, verified_at=now, next=0)
+            elif not awaiting_verification:
                 # Nothing worked: 8 hours, then 16, 32... up to a week before the next sample.
                 row['dry'] += 1
-                row['next'] = now + min(MAX_REST_SECONDS, 4 * 3600 * 2 ** row['dry'])
+                row['next'] = now + min(MAX_REST_SECONDS, 4 * 3600 * 2 ** min(row['dry'], 6))
         self.save()
 
     def save(self):

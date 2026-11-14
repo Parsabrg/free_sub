@@ -80,6 +80,11 @@ from the `subscriptions` branch. The first successful publish creates that branc
 After a successful scan has been pushed, the addresses in the
 [README](../README.md#subscription-addresses) are live.
 
+To enforce expiry in clients that save a subscription URL, run
+`python serve_feed.py --docs docs --port 8780`. The server filters expired
+configs at request time. It listens on loopback by default. To share it with
+other devices, place it behind an HTTPS reverse proxy on your own server.
+
 ## 4. Run it
 
 Double-click `panel_windows.bat` and press **Start** in the page that opens. The

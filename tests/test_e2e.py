@@ -158,16 +158,20 @@ class RealXrayEndToEnd(unittest.TestCase):
         self.assertFalse(run_probe(parse(self.url),BINARY,8,quick=False,local_fixture=fixture).passed)
 
     def test_026_video_gate_rejects_invalid_responses_and_uses_fallback(self):
-        for path in ('bad-video','bad-range','short-video','html-video'):
+        for path,reason in (('bad-video','invalid_body'),('bad-range','invalid_range'),
+                            ('short-video','invalid_body'),('html-video','invalid_content_type'),
+                            ('missing-video','http_200')):
             with self.subTest(path=path):
                 fixture=dict(self.fixture,video_probes=[f'{self.origin_url}/{path}'])
                 result=run_probe(parse(self.url),BINARY,8,local_fixture=fixture)
                 self.assertFalse(result.passed)
                 self.assertEqual((result.error,result.successes),('VideoVerificationFailed',1))
+                self.assertEqual(list(result.video_attempts),[('localhost',reason)])
         fixture=dict(self.fixture,video_probes=[self.origin_url+'/bad-video',self.origin_url+'/video'])
         result=run_probe(parse(self.url),BINARY,8,local_fixture=fixture)
         self.assertTrue(result.passed,result.error)
         self.assertEqual(result.attempts,3)
+        self.assertEqual(list(result.video_attempts),[('localhost #1','invalid_body'),('localhost #2','pass')])
 
     def test_protocols_and_transports_carry_https_and_video(self):
         uid = '14a2c062-1234-5678-abcd-0123456789ab'
@@ -196,7 +200,8 @@ class RealXrayEndToEnd(unittest.TestCase):
         ]
         for protocol, settings, link, transport, security, query, transport_settings in cases:
             with self.subTest(protocol=protocol,transport=transport,security=security):
-                port=allocate_port()
+                socket_type=socket.SOCK_DGRAM if transport in ('kcp','hysteria') else socket.SOCK_STREAM
+                port=allocate_port(socket_type)
                 if link is None:
                     encoded=base64.b64encode(json.dumps(dict(legacy,port=port)).encode()).decode()
                     url='vmess://'+encoded
@@ -349,6 +354,7 @@ class RealXrayEndToEnd(unittest.TestCase):
             report=run_cycle(args,folder,probe,collector,geo,now)
             self.assertEqual(report['published'],1)
             self.assertTrue(report['nodes'][0]['verified_this_run'])
+            self.assertEqual(report['video_mirrors'],{'localhost':{'pass':1}})
             self.assertEqual(report['nodes'][0]['video_bytes'],VIDEO_BYTES)
             first_url=(Path(folder)/'docs/sub.txt').read_text()
             validate_outputs(Path(folder)/'docs')
@@ -396,6 +402,8 @@ class RealXrayEndToEnd(unittest.TestCase):
             args.mode='health'
             healthy=run_cycle(args,folder,probe,collector,geo,now+1800)
             self.assertEqual(healthy['published'],1)
+            self.assertEqual(healthy['run_comparison']['published_delta'],0)
+            self.assertEqual(healthy['run_comparison']['video_mirrors']['localhost']['pass_rate_delta_pp'],0)
             self.assertEqual((Path(folder)/'docs/sub.txt').read_text(),first_url)
             # Kill proxy access with wrong CA while retaining prior test timestamp honestly.
             wrong=dict(self.fixture,ca_file=str(Path(folder)/'missing-ca.pem'))

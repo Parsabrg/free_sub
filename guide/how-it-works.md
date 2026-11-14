@@ -52,8 +52,10 @@ usable feeds. Whether a found feed has anything that works from the operator's
 network is only known once it has been tested there, so:
 
 - A found feed is tested only on configurations that no listed source carries:
-  150 per run, never-tested ones first, until one of them passes a test.
-- After that it gets up to 1,500 per run for seven days.
+  150 per run, never-tested ones first, until one passes full verification.
+- A verified contribution raises its allowance to 450 for seven days. A source
+  with a currently verified config that passed again at least 24 hours after
+  its first credited pass gets up to 1,500 per run. Each config is credited once.
 - A feed with nothing working waits 8 hours before its next sample, then 16, 32 and
   so on up to a week.
 - At most 40 found feeds are tested per discovery (`--found-sources`; `0` turns
@@ -127,6 +129,11 @@ reliability score. An upgrade rechecks saved nodes against the video gate.
 comes from MDN, with a W3C video as fallback. The video measurement covers a
 bounded transfer and includes connection setup time. It measures whether the node
 can carry video bytes at test time.
+
+`status.json` counts each video request by mirror and outcome, including fallback
+requests. It compares publication counts and mirror pass rates with the previous
+run of the same mode when available. Mirror labels contain hostnames and optional
+ordinals for hosts that have several URLs.
 
 Use `--video-mirror` to supply alternative public HTTPS MP4 origins and
 `--probe-control` with a local file containing a known-good share link. If the
@@ -222,14 +229,21 @@ GitHub CI runs the same loopback-only Xray tests on Windows and Linux and parses
 the PowerShell scripts. It never tests public proxies, registers tasks, wakes
 hardware or publishes results; that stays on the operator's PC.
 
-For a client release smoke test, serve a generated `xray.json` over local HTTP
-and update that subscription in v2rayN **7.25.6**. Import the generated `sub.b64`
-from a local file in v2rayNG **2.3.15**. A SOCKS5 fixture lets you confirm both
-the imported label and the network path. Select the imported profile and request
-an HTTP `204` test path through the client’s SOCKS port. On an Android emulator,
-use `adb reverse` for the host-side fixture ports and `adb forward` for the
-client SOCKS port. Both client releases imported the fixture and returned `204`
-through their running cores.
+Run the compatibility gate before changing Xray or a supported client version.
+CI tests six generated profiles through the pinned core. The interactive gate
+also checks the actual v2rayN **7.25.6** and v2rayNG **2.3.15** import paths.
+Start a separate portable desktop instance and install the pinned Android APK
+on a disposable emulator. Use its serial and the desktop process ID:
+
+```powershell
+python scripts/check_client_release.py --desktop-pid 12345 --android-serial emulator-5554 --output .local/client-release.json
+```
+
+Follow the prompts to import the feeds, share each Android profile as a link,
+and activate each profile. The gate compares desktop outbound settings and Android
+share settings, tests both clients over their running
+core, and writes evidence after all expected responses arrive. The Android
+emulator reaches the host fixtures through its `10.0.2.2` gateway.
 
 ## When things fail
 

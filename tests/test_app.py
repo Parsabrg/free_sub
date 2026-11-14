@@ -86,7 +86,7 @@ class PanelTests(unittest.TestCase):
         self.assertEqual(self.request('GET', '/api/state', token=False)[0], 403)   # a stale page reloads
         self.assertEqual(self.request('GET', '/api/nothing', token=False)[0], 404)
         self.assertEqual(self.request('POST', '/api/start', {'mode': 'full'}, token=False)[0], 403)
-        self.assertEqual(self.request('POST', '/api/start', {'mode': 'full'}, host=f'evil.example:{self.port}')[0], 403)
+        self.assertEqual(self.request('POST', '/api/start', host=f'evil.example:{self.port}')[0], 403)
         self.assertEqual(self.state()['run']['state'], 'idle')
 
     def test_one_run_then_idle_and_settings_are_remembered(self):

@@ -181,7 +181,8 @@ class RegistryTests(unittest.TestCase):
                                    registry=registry)
             self.assertNotIn('gh:dud/feed', report['source_status'])
             self.assertEqual(report['source_status']['gh:good/feed']['tested'], 400)
-            self.assertEqual(registry.quota('gh:good/feed', later), sources.PROVEN)
+            self.assertEqual(registry.quota('gh:good/feed', later), sources.PROMISING)
+            self.assertEqual(registry.quota('gh:good/feed', later, retained=1), sources.PROVEN)
             self.assertEqual(registry.quota('gh:dud/feed', later), sources.SAMPLE)
 
     def test_no_search_answer_changes_nothing_and_discovery_can_be_off(self):
@@ -297,9 +298,31 @@ class BudgetTests(unittest.TestCase):
                 self.assertEqual((report['unique_selected_for_test'], report['resting_skipped']), (6, 0))
             report = run_cycle(args, folder, probe, collect_fn, lambda *a, **kw: {}, now + 12 * 3600)
             self.assertEqual((report['unique_selected_for_test'], report['resting_skipped'], report['published']), (1, 5, 1))
-            self.assertEqual(report['source_status']['Fixture'], {'tested': 1, 'working': 1})
+            self.assertEqual(report['source_status']['Fixture'], {'tested': 1, 'working': 1,
+                'screen_passed':1,'verified':1,'retained_24h':0})
             report = run_cycle(args, folder, probe, collect_fn, lambda *a, **kw: {}, now + 34 * 3600)
             self.assertEqual((report['unique_selected_for_test'], report['resting_skipped']), (6, 0))
+
+    def test_source_credit_is_unique_and_requires_a_later_full_pass(self):
+        now=1_800_000_000
+        shared=parse(link(1),'First')
+        quick_only=parse(link(2),'Second')
+        def probe(c,*args,**options):
+            return ProbeResult(options.get('quick') or c.key==shared.key,endpoint_ip='8.8.8.8')
+        collect_fn=lambda **kw: {'First':[shared],'Second':[shared,quick_only]}
+        geo=lambda *a,**kw: {}
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            args=args_for()
+            full=run_cycle(args,folder,probe,collect_fn,geo,now)
+            self.assertEqual(full['source_status']['First']['working'],1)
+            self.assertEqual(full['source_status']['Second']['working'],0)
+            self.assertEqual(full['source_status']['Second']['screen_passed'],2)
+            self.assertEqual(full['source_retained_24h'],{})
+            args.mode='health'
+            early=run_cycle(args,folder,probe,collect_fn,geo,now+86399)
+            self.assertEqual(early['source_retained_24h'],{})
+            later=run_cycle(args,folder,probe,collect_fn,geo,now+86401)
+            self.assertEqual(later['source_retained_24h'],{'First':1})
 
     def cycle(self, folder, *options):
         candidates = [parse(f'trojan://p{i}@h{i}.example.com:443?security=tls') for i in range(7)]

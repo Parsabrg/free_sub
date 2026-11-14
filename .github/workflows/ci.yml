@@ -24,6 +24,8 @@ jobs:
         with:
           python-version: '3.11'
       - run: python download_xray.py
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Actual Xray traffic through loopback proxy and HTTPS video fixtures
         shell: bash
         run: |
@@ -32,6 +34,9 @@ jobs:
           else
             python verify.py --xray tools/xray
           fi
+      - name: Check generated client fixtures through pinned Xray
+        shell: bash
+        run: python scripts/check_client_release.py --core-only
       - name: Parse PowerShell scripts without executing or registering tasks
         if: runner.os == 'Windows'
         shell: powershell

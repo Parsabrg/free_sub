@@ -5,6 +5,12 @@ from collector import import_candidates,parse,links
 from xray_test import make_config
 
 class ParserTests(unittest.TestCase):
+    def test_v2rayng_socks_export_preserves_credentials(self):
+        credentials=base64.urlsafe_b64encode(b'fixture:secret').decode().rstrip('=')
+        exported=parse(f'socks://{credentials}@127.0.0.1:10808')
+        expected=parse('socks://fixture:secret@127.0.0.1:10808')
+        self.assertEqual(exported.key,expected.key)
+
     def test_vless_reality(self):
         s='vless://a22c18ad-1111-4444-9999-d41e8cd98f00@1.2.3.4:443?type=tcp&security=reality&sni=www.example.org&pbk=abcdefghijklmnopqrstuvwxyz&sid=07&fp=chrome&flow=xtls-rprx-vision#label'
         c=parse(s,'Barry')
@@ -36,13 +42,13 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(links(encoded),[v.strip()])
     def test_hysteria2_ipv6_ports_and_certificate_pin(self):
         pin='a1'*32
-        c=parse(f'Hy2://user%3Apass@[2001:db8::1]:443,5000-5002/?sni=example.com&pinSHA256={pin}')
+        c=parse(f'Hy2://user%3Apass@[2001:db8::1]:443,5000-5002/?security=tls&sni=example.com&pinSHA256={pin}')
         self.assertEqual((c.protocol,c.host,c.port),('hysteria2','2001:db8::1',443))
         stream=c.outbound['streamSettings']
         self.assertEqual(stream['hysteriaSettings']['auth'],'user:pass')
         self.assertEqual(stream['tlsSettings']['pinnedPeerCertSha256'],pin)
         self.assertEqual(stream['finalmask']['quicParams']['udpHop']['ports'],'443,5000-5002')
-        for suffix in (':0',':444-443',':443,99999','?obfs=gecko','?insecure=1'):
+        for suffix in (':0',':444-443',':443,99999','?obfs=gecko','?insecure=1','?security=none'):
             with self.subTest(suffix=suffix):
                 self.assertIsNone(parse(f'hy2://password@example.com{suffix}'))
 
