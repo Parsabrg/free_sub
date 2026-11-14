@@ -103,9 +103,9 @@ function onYouTubeIframeAPIReady() {
 
 
 def run_diagnostics(payload, outbound, mirrors, context):
-    port=allocate_port()
     fixture=payload.get('fixture')
     udp=payload['check_udp']
+    port=allocate_port(also_udp=udp)
     deadline=time.monotonic()+payload['timeout']-2
     output={}
     with tempfile.TemporaryDirectory(prefix='diagnostics-',dir=payload['work_dir'],ignore_cleanup_errors=True) as folder:

@@ -99,12 +99,8 @@ def setup_fixtures(stack, xray, folder):
     now=time.time()
     state=read_state(folder/'history.json')
     for protocol,settings,stream,make_link in xray_cases(xray,folder):
-        if protocol=='hysteria':
-            with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as sock:
-                sock.bind(('127.0.0.1',0))
-                port=sock.getsockname()[1]
-        else:
-            port=allocate_port()
+        socket_type=socket.SOCK_DGRAM if protocol=='hysteria' else socket.SOCK_STREAM
+        port=allocate_port(socket_type)
         tag='fixture-'+protocol
         nonce=secrets.token_hex(16)
         origin=new_origin(stack,folder,nonce)

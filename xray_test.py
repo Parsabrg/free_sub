@@ -256,10 +256,22 @@ def https_get_via_socks(local_port, target, timeout, ssl_context, max_bytes=6553
     finally:
         raw.close()
 
-def allocate_port():
-    with socket.socket() as s:
-        s.bind(('127.0.0.1',0))
-        return s.getsockname()[1]
+def allocate_port(socket_type=socket.SOCK_STREAM, *, also_udp=False):
+    for _ in range(10):
+        with socket.socket(socket.AF_INET,socket_type) as listener:
+            listener.bind(('127.0.0.1',0))
+            port=listener.getsockname()[1]
+            if not also_udp:
+                return port
+            with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as datagram:
+                if os.name=='nt':
+                    datagram.setsockopt(socket.SOL_SOCKET,socket.SO_EXCLUSIVEADDRUSE,1)
+                try:
+                    datagram.bind(('127.0.0.1',port))
+                except OSError:
+                    continue
+            return port
+    raise OSError('No loopback port available for both TCP and UDP')
 
 def check_ready(port, proc, timeout=4.0):
     deadline=time.monotonic()+timeout

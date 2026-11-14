@@ -200,7 +200,8 @@ class RealXrayEndToEnd(unittest.TestCase):
         ]
         for protocol, settings, link, transport, security, query, transport_settings in cases:
             with self.subTest(protocol=protocol,transport=transport,security=security):
-                port=allocate_port()
+                socket_type=socket.SOCK_DGRAM if transport in ('kcp','hysteria') else socket.SOCK_STREAM
+                port=allocate_port(socket_type)
                 if link is None:
                     encoded=base64.b64encode(json.dumps(dict(legacy,port=port)).encode()).decode()
                     url='vmess://'+encoded
