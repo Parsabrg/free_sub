@@ -16,10 +16,14 @@ RELEASE='v26.3.27'
 # and commit tools/xray.exe. The tests refuse a bundled file with any other hash.
 BUNDLED_WINDOWS_SHA256='15c2d007954ac53ba69b80ec91242786b3c0b71d52649165b4ca1d5cc96ef8f1'
 ROOT=Path(__file__).resolve().parent
+RELEASE_API=f'https://api.github.com/repos/XTLS/Xray-core/releases/tags/{RELEASE}'
 
 
 def get(url,limit):
     request=urllib.request.Request(url,headers={'User-Agent':'FreeXraySubscription/3.0'})
+    token=os.environ.get('GITHUB_TOKEN')
+    if token and url==RELEASE_API:
+        request.add_unredirected_header('Authorization',f'Bearer {token}')
     with urllib.request.urlopen(request,timeout=60) as response:
         data=response.read(limit+1)
     if len(data)>limit: raise ValueError('Oversized official release response')
@@ -30,7 +34,7 @@ def install():
     if platform.machine().lower() not in ('x86_64','amd64'):
         raise RuntimeError('This installer supports Windows/Linux x64; install the official platform binary manually')
     name='Xray-windows-64.zip' if os.name=='nt' else 'Xray-linux-64.zip'
-    release=json.loads(get(f'https://api.github.com/repos/XTLS/Xray-core/releases/tags/{RELEASE}',2*1024*1024))
+    release=json.loads(get(RELEASE_API,2*1024*1024))
     asset=next(a for a in release['assets'] if a['name']==name)
     url=asset['browser_download_url']
     if not url.startswith(f'https://github.com/XTLS/Xray-core/releases/download/{RELEASE}/'):
