@@ -14,6 +14,7 @@ import struct
 import subprocess
 import tempfile
 import time
+from collections import Counter
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -54,6 +55,7 @@ class ProbeResult:
     video_bytes: int = 0
     video_ms: float = 0
     video_probe_index: int = -1
+    video_attempts: tuple[tuple[str, str], ...] = ()
     stage: str = ''
     stream_segments: int = 0
     stream_kbps: float = 0
@@ -95,6 +97,44 @@ def validate_video_mirrors(urls):
 
 class SocksError(OSError):
     pass
+
+
+class VideoStatusError(OSError):
+    def __init__(self, status):
+        super().__init__(f'HTTP status {status}')
+        self.status = status
+
+
+class InvalidVideoResponse(ValueError):
+    pass
+
+
+def video_failure_reason(exc):
+    if isinstance(exc, VideoStatusError):
+        return f'http_{exc.status}'
+    if isinstance(exc, InvalidVideoResponse):
+        return str(exc)
+    if isinstance(exc, TimeoutError) or isinstance(exc.__cause__, TimeoutError):
+        return 'timeout'
+    if isinstance(exc, ssl.SSLError):
+        return 'tls_error'
+    if isinstance(exc, http.client.IncompleteRead):
+        return 'invalid_body'
+    if isinstance(exc, OSError):
+        return 'connection_error'
+    return 'request_error'
+
+
+def video_mirror_labels(urls):
+    hosts = [urlsplit(url).hostname for url in urls]
+    totals = Counter(hosts)
+    seen = Counter()
+    labels = []
+    for host in hosts:
+        seen[host] += 1
+        labels.append(f'{host} #{seen[host]}' if totals[host]>1 else host)
+    return labels
+
 
 def recv_exact(sock, num):
     buf=b''
@@ -189,13 +229,18 @@ def https_get_via_socks(local_port, target, timeout, ssl_context, max_bytes=6553
             conn.request('GET',(u.path or '/')+('?' + u.query if u.query else ''), headers=headers)
             secured.settimeout(remaining())
             resp=conn.getresponse()
-            if resp.status!=expected_status: raise OSError(f'HTTP status {resp.status}')
+            if resp.status!=expected_status:
+                if video_range:
+                    raise VideoStatusError(resp.status)
+                raise OSError(f'HTTP status {resp.status}')
             if video_range:
+                if resp.headers.get_content_type() != 'video/mp4':
+                    raise InvalidVideoResponse('invalid_content_type')
                 content_range = re.fullmatch(r'bytes (\d+)-(\d+)/(\d+)', resp.getheader('Content-Range', ''))
-                if (resp.headers.get_content_type() != 'video/mp4' or not content_range
+                if (not content_range
                         or int(content_range[1]) != range_start or int(content_range[2]) != range_start+max_bytes-1
                         or int(content_range[3]) < range_start+max_bytes):
-                    raise ValueError('InvalidVideoRange')
+                    raise InvalidVideoResponse('invalid_range')
             body=bytearray()
             while len(body)<=max_bytes:
                 if resp.isclosed(): break
@@ -203,9 +248,9 @@ def https_get_via_socks(local_port, target, timeout, ssl_context, max_bytes=6553
                 chunk=resp.read1(min(64*1024,max_bytes+1-len(body)))
                 if not chunk: break
                 body.extend(chunk)
-            if len(body)>max_bytes: raise OSError('OversizeBody')
             if video_range and (len(body)!=max_bytes or (range_start==0 and not mp4_contains_media(body))):
-                raise ValueError('InvalidVideoBody')
+                raise InvalidVideoResponse('invalid_body')
+            if len(body)>max_bytes: raise OSError('OversizeBody')
             elapsed=max(time.monotonic()-started, 0.001)
             return bytes(body),elapsed
     finally:
@@ -287,6 +332,7 @@ def run_probe(candidate, xray_bin, timeout=30.0, *, quick=False, screen_timeout=
         try:
             output = communicate_bounded(command,json.dumps(payload),timeout,ready_timeout=screen_timeout)
             result = ProbeResult(**json.loads(output))
+            result.video_attempts = tuple(map(tuple,result.video_attempts))
             result.completed_epoch = time.time()
         except ProbeDeadline as exc:
             error = 'ScreenStartupDeadline' if exc.phase == 'startup' else 'ScreenNetworkDeadline'
@@ -393,17 +439,20 @@ def _probe_worker(payload):
         try:
             outbound = probe_outbound(candidate,address,fixture)
         except (OSError,ValueError,subprocess.SubprocessError) as exc:
-            return ProbeResult(False,error=type(exc).__name__,stage='dns')
+            failures.append(ProbeResult(False,error=type(exc).__name__,stage='dns'))
+            break
         result,network_deadline = _probe_endpoint(payload,outbound,address,probes,videos,context,
                                                    network_deadline,full_deadline,len(addresses)-index)
         if result.passed:
             result.attempts += sum(row.attempts for row in failures)
+            result.video_attempts = tuple(attempt for row in failures for attempt in row.video_attempts) + result.video_attempts
             return result
         failures.append(result)
         if min(network_deadline or full_deadline,full_deadline)-time.monotonic()<0.25:
             break
     best=max(failures,key=lambda row:row.successes)
     best.attempts=sum(row.attempts for row in failures)
+    best.video_attempts=tuple(attempt for row in failures for attempt in row.video_attempts)
     return best
 
 
@@ -413,6 +462,7 @@ def _probe_endpoint(payload,outbound,address,probes,videos,context,network_deadl
     connect_host=(payload.get('fixture') or {}).get('connect_host')
     stage = 'connect'
     video_probe_index=-1
+    video_attempts=[]
     p = allocate_port()
     with tempfile.TemporaryDirectory(prefix='xray-check-',dir=payload.get('work_dir'),ignore_cleanup_errors=True) as tmp:
         cfg = Path(tmp)/'config.json'
@@ -450,22 +500,29 @@ def _probe_endpoint(payload,outbound,address,probes,videos,context,network_deadl
             if successes and not quick:
                 last_error = 'VideoVerificationFailed'
                 stage = 'video'
-                video_timeout=min(8,budget/(remaining_addresses*len(videos))) if videos else 1
-                for index,url in enumerate(videos):
-                    if not payload.get('fixture') and urlsplit(url).hostname==urlsplit(successes[0][0]).hostname:
+                for index,(url, label) in enumerate(zip(videos,video_mirror_labels(videos))):
+                    mirror=urlsplit(url).hostname
+                    if not payload.get('fixture') and mirror==urlsplit(successes[0][0]).hostname:
                         continue
+                    remaining=min(network_deadline or full_deadline,full_deadline)-time.monotonic()
+                    if remaining<0.1:
+                        break
+                    video_timeout=min(8,remaining/(remaining_addresses*(len(videos)-index)))
                     attempts += 1
                     try:
                         body, elapsed = https_get_via_socks(p,url,video_timeout,context,
                                                            max_bytes=VIDEO_BYTES,video_range=True,connect_host=connect_host)
-                        successes.append((url, len(body), elapsed))
-                        video_probe_index=index
-                        break
-                    except (OSError, ValueError, http.client.HTTPException):
+                    except (OSError, ValueError, http.client.HTTPException) as exc:
+                        video_attempts.append((label,video_failure_reason(exc)))
                         continue
+                    video_attempts.append((label,'pass'))
+                    successes.append((url, len(body), elapsed))
+                    video_probe_index=index
+                    break
             if len(successes)<(1 if quick else 2):
                 return (ProbeResult(False,error=last_error or 'NoSuccessfulHTTPSProbe',stage=stage,
-                                    attempts=attempts,successes=len(successes),endpoint_ip=address),network_deadline)
+                                    attempts=attempts,successes=len(successes),endpoint_ip=address,
+                                    video_attempts=tuple(video_attempts)),network_deadline)
             times = [t*1000 for _,_,t in successes]
             transferred = sum(n for _,n,_ in successes)
             elapsed = sum(t for _,_,t in successes)
@@ -477,7 +534,8 @@ def _probe_endpoint(payload,outbound,address,probes,videos,context,network_deadl
                                jitter_ms=round(max(times)-min(times),1),
                                probe_hosts=hosts,video_host='' if quick else hosts[-1],
                                video_bytes=0 if quick else successes[-1][1],
-                               video_ms=0 if quick else round(times[-1],1),video_probe_index=video_probe_index),network_deadline)
+                               video_ms=0 if quick else round(times[-1],1),video_probe_index=video_probe_index,
+                               video_attempts=tuple(video_attempts)),network_deadline)
         finally:
             if proc is not None:
                 proc.terminate()

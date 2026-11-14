@@ -403,16 +403,17 @@ class Panel:
         registry = self.registry()
         last = read_json(self.local / 'source_status.json', {})
         results = last.get('sources', {})
+        retained = read_json(self.local / 'last_run.json', {}).get('source_retained_24h', {})
         off = set(registry['off'])
         def row(name, kind, where, **more):
             result = results.get(name, {})
             return dict(name=name, kind=kind, where=where, enabled=name not in off,
                         supported=result.get('supported'), tested=result.get('tested'),
-                        working=result.get('working'), error=result.get('error'), **more)
+                        working=result.get('working'), retained=retained.get(name,0), error=result.get('error'), **more)
         rows = [row(name, 'manual', entry['url']) for name, entry in registry['manual'].items()]
         rows += [row(name, 'builtin', url) for name, url in collector.SOURCES.items()]
         found = [(name, entry) for name, entry in registry['found'].items() if entry['urls']]
-        found.sort(key=lambda item: (-item[1]['working'], -item[1]['last_worked'], item[0].lower()))
+        found.sort(key=lambda item: (-retained.get(sources.PREFIX + item[0],0), -item[1]['verified_at'], item[0].lower()))
         rows += [row(sources.PREFIX + name, 'found', 'https://github.com/' + name, runs=entry['runs'],
                      all_tested=entry['tested'], all_working=entry['working'], next=entry['next'],
                      size=entry['size']) for name, entry in found]

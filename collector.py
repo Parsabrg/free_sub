@@ -275,7 +275,8 @@ def parse(link, source='unknown'):
             outbound={'protocol':'shadowsocks','settings':{'servers':[{'address':host,'port':port,'method':method.lower(),'password':password}]}}
         elif scheme in ('hysteria2','hy2'):
             u=up.urlsplit(link); host=u.hostname or ''; port, hopping=hysteria_port(u)
-            q=link_query(u,{'sni','insecure','pinSHA256','obfs','obfs-password'})
+            q=link_query(u,{'security','sni','insecure','pinSHA256','obfs','obfs-password'})
+            if nonempty(q,'security','tls')!='tls': return None
             if nonempty(q,'pinSHA256'): q['pcs']=q['pinSHA256']
             stream=stream_settings('tcp',q,'tls',host)
             stream['tlsSettings']['alpn']=['h3']
@@ -295,7 +296,16 @@ def parse(link, source='unknown'):
             settings={'address':host,'port':port}
             if u.username is not None:
                 if not u.username: return None
-                settings.update({'user':up.unquote(u.username),'pass':up.unquote(u.password or '')})
+                user,password=up.unquote(u.username),up.unquote(u.password or '')
+                if scheme=='socks' and u.password is None:
+                    # v2rayNG shares SOCKS credentials as Base64 user:password.
+                    try:
+                        decoded_user,separator,decoded_password=b64decode(user).partition(':')
+                    except (ValueError,UnicodeError):
+                        separator=''
+                    if separator and decoded_user:
+                        user,password=decoded_user,decoded_password
+                settings.update({'user':user,'pass':password})
             outbound={'protocol':'socks','settings':settings}
             sec=nonempty(q,'security','none')
             if sec not in ('tls','none'): return None

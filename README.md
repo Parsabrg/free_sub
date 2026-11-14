@@ -15,6 +15,7 @@ Tests run on the operator's own network, so "working" means "working from there"
 | Client | Address |
 |---|---|
 | v2rayN (desktop) | `https://parsabrg.github.io/free_sub/xray.json` |
+| v2rayN (verified IPs) | `https://parsabrg.github.io/free_sub/xray-pinned.json` |
 | v2rayNG (Android) | `https://parsabrg.github.io/free_sub/sub.b64` |
 | Compact (up to 20 server IPs) | `https://parsabrg.github.io/free_sub/sub-compact.b64` |
 | Other clients, plain share links | `https://parsabrg.github.io/free_sub/sub.txt` |

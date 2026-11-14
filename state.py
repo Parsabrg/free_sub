@@ -119,6 +119,16 @@ def reliability(row, now):
     return (2+sum(w for w,ok in weights if ok))/(4+sum(w for w,_ in weights))
 
 
+def retained_by_source(state, now, freshness):
+    counts = {}
+    for row in state['nodes'].values():
+        source = row.get('verified_source')
+        if (source and row['last_success'] >= row['first_source_success'] + 86400
+                and now - row['last_success'] < freshness):
+            counts[source] = counts.get(source, 0) + 1
+    return counts
+
+
 def sweep_stale_probe_dirs(base=None, max_age_seconds=3600, now=None):
     """Remove probe folders an earlier run could not (a locked file at the moment
     it ended). Only this project's own prefixes, and only when older than an hour,

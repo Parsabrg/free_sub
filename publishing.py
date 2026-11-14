@@ -9,8 +9,10 @@ import subprocess
 import sys
 import tempfile
 from collector import links, parse
+from network import pin_endpoint, public_address
 
-OUTPUTS = ('sub.txt','sub.b64','xray.json','status.json','index.html','sub-compact.b64')
+PINNED_FEED = 'xray-pinned.json'
+OUTPUTS = ('sub.txt','sub.b64','xray.json','status.json','index.html','sub-compact.b64',PINNED_FEED)
 FEED_BRANCH = 'subscriptions'
 SNAPSHOT_WORKFLOW = '.github/workflows/subscription-snapshot.yml'
 COMPACT_LIMIT = 20
@@ -27,6 +29,10 @@ def source_fingerprint(root):
 
 
 def validate_outputs(docs):
+    return read_snapshot(docs)[0]
+
+
+def read_snapshot(docs):
     docs=Path(docs)
     plain=(docs/'sub.txt').read_text(encoding='utf-8').encode('utf-8')
     encoded=(docs/'sub.b64').read_text(encoding='utf-8').strip()
@@ -40,15 +46,14 @@ def validate_outputs(docs):
     outbounds=json.loads((docs/'xray.json').read_text(encoding='utf-8'))['outbounds']
     if len(outbounds)!=len(urls):
         raise ValueError('Xray subscription count mismatch')
-    for url,row in zip(urls,report['nodes']):
+    for url,row,outbound in zip(urls,report['nodes'],outbounds):
         c=parse(url)
         if c is None or c.key in seen or c.key!=row['id']:
             raise ValueError('Invalid or mismatched published configuration')
         if row['last_success_epoch']>row['expires_epoch'] or row['expires_epoch']<=report['generated_epoch']:
             raise ValueError('Expired node in publication')
         seen.add(c.key)
-    for url,row,outbound in zip(urls,report['nodes'],outbounds):
-        expected=dict(parse(url).outbound,tag=row['name'])
+        expected=dict(c.outbound,tag=row['name'])
         if outbound!=expected:
             raise ValueError('Xray export differs from tested configuration')
     compact = docs/'sub-compact.b64'
@@ -58,7 +63,13 @@ def validate_outputs(docs):
             raise ValueError('Compact subscription IDs differ')
         if base64.b64decode(compact.read_text(encoding='utf-8').strip(),validate=True)!=expected_data:
             raise ValueError('Compact subscription differs from the verified feed')
-    return report
+    pinned = docs/PINNED_FEED
+    if 'pinned_ids' in report or pinned.exists():
+        ids, expected = pinned_selection(outbounds,report['nodes'])
+        if (report.get('pinned_ids')!=ids or not pinned.is_file()
+                or json.loads(pinned.read_text(encoding='utf-8'))!=expected):
+            raise ValueError('Pinned Xray export differs from verified endpoints')
+    return report,urls,outbounds
 
 
 def compact_selection(urls, rows):
@@ -78,6 +89,21 @@ def compact_selection(urls, rows):
 def write_compact_feed(docs, urls, rows, report):
     report['compact_ids'], data = compact_selection(urls,rows)
     (Path(docs)/'sub-compact.b64').write_bytes(base64.b64encode(data)+b'\n')
+
+
+def pinned_selection(outbounds, rows):
+    selected=[]
+    for outbound,row in zip(outbounds,rows):
+        address=row.get('endpoint_ip')
+        if isinstance(address,str) and public_address(address) and row.get('video_bytes',0)>0:
+            # Use the same address substitution as the probe. Transport and TLS settings stay intact.
+            selected.append((row['id'],pin_endpoint(outbound,[address])))
+    return [key for key,_ in selected], {'outbounds':[outbound for _,outbound in selected]}
+
+
+def write_pinned_feed(docs, outbounds, rows, report):
+    report['pinned_ids'], pinned = pinned_selection(outbounds,rows)
+    (Path(docs)/PINNED_FEED).write_text(json.dumps(pinned,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 
 
 def prepare_legacy_feed(docs):
@@ -114,21 +140,28 @@ def prepare_pages(destination, ref=None):
 
     destination=Path(destination)
     destination.mkdir(parents=True,exist_ok=True)
-    for name in ('sub.txt','sub.b64','xray.json','status.json','sub-compact.b64'):
+    optional={'sub-compact.b64',PINNED_FEED}
+    for name in OUTPUTS:
+        if name=='index.html':
+            continue
         if ref:
             result=subprocess.run(['git','show',f'{ref}:docs/{name}'],capture_output=True)
-            if name=='sub-compact.b64' and result.returncode:
+            if name in optional and result.returncode:
                 continue
             result.check_returncode()
             data=result.stdout
         else:
             source=Path('docs')/name
-            if name=='sub-compact.b64' and not source.is_file():
+            if name in optional and not source.is_file():
                 continue
             data=source.read_bytes()
         (destination/name).write_bytes(data)
     if not ref and not (destination/'sub-compact.b64').exists():
         prepare_legacy_feed(destination)
+    report,_,outbounds=read_snapshot(destination)
+    if 'pinned_ids' not in report:
+        write_pinned_feed(destination,outbounds,report['nodes'],report)
+        (destination/'status.json').write_text(json.dumps(report,ensure_ascii=False)+'\n',encoding='utf-8')
     (destination/'index.html').write_text(INDEX,encoding='utf-8')
     validate_outputs(destination)
 

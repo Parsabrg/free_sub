@@ -22,10 +22,11 @@ from collector import collect, parse
 from geolocation import geolocate_hosts, country_flag
 from naming import assign_labels, node_name, rename_share_link
 from public_page import INDEX
-from publishing import OUTPUTS, publish, validate_outputs, write_compact_feed
+from publishing import OUTPUTS, publish, validate_outputs, write_compact_feed, write_pinned_feed
 from relay import fallback
+from run_diagnostics_report import count_video_attempts, merge_video_counts, compare_runs, read_previous_report
 from sources import Registry
-from state import atomic_write, keep_awake, observe, read_state, reliability, run_lock, save_state, sweep_stale_probe_dirs
+from state import atomic_write, keep_awake, observe, read_state, reliability, retained_by_source, run_lock, save_state, sweep_stale_probe_dirs
 from network import BIND_ENV, physical_interface
 from xray_test import ProbeResult, run_probe
 
@@ -101,7 +102,7 @@ def test_batch(nodes, xray, workers, timeout, label, probe=run_probe, quick=Fals
     return found,results,dict(counts)
 
 
-def write_outputs(docs, selected, state, report, now, ttl):
+def write_outputs(docs, selected, state, report, now, ttl, previous=None):
     docs=Path(docs)
     rows=[]; urls=[]; outbounds=[]
     assign_labels(selected,state['nodes'],now)
@@ -147,6 +148,10 @@ def write_outputs(docs, selected, state, report, now, ttl):
     atomic_write(staging/'sub.b64',base64.b64encode(data.encode('utf-8')).decode()+'\n')
     atomic_write(staging/'xray.json',json.dumps({'outbounds':outbounds},indent=2,ensure_ascii=False)+'\n')
     write_compact_feed(staging,urls,rows,report)
+    write_pinned_feed(staging,outbounds,rows,report)
+    comparison=compare_runs(report,previous or {})
+    if comparison:
+        report['run_comparison']=comparison
     atomic_write(staging/'status.json',json.dumps(report,indent=2,ensure_ascii=False)+'\n')
     atomic_write(staging/'index.html',INDEX)
     validate_outputs(staging)
@@ -165,6 +170,7 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
     mode=args.mode
     if mode=='auto':
         mode='full' if now-state.get('last_discovery',0)>=args.discovery_hours*3600 else 'health'
+    previous=read_previous_report(local/f'last_{mode}_run.json') or read_previous_report(local/'last_run.json')
     control = getattr(args,'control_candidate',None)
     control_result = None
     if control is not None:
@@ -172,8 +178,9 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
         if control_result.error == 'VideoVerificationFailed':
             print('[PROBE] Control passed HTTPS but no video mirror returned a valid range.',flush=True)
             return run_cycle_report(args,root,state,mode,now,[],{}, {},{},0,geo_fn,
-                                    probe_health='video_unavailable',control_error=control_result.error)
+                                    probe_health='video_unavailable',control_result=control_result,previous=previous)
     priority_passed={}
+    priority_mirrors={}
     if mode=='full' and publish_refresh is not None and state.get('published'):
         refresh_args=copy.copy(args)
         refresh_args.mode='health'
@@ -181,6 +188,7 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
         refresh_args.control_candidate=None
         print('[RUN] Refreshing the current feed before discovery.',flush=True)
         refreshed=run_cycle(refresh_args,root,probe,collect_fn,geo_fn,now if not live_clock else None)
+        priority_mirrors=refreshed.get('video_mirrors',{})
         if publish_refresh is not False:
             publish_refresh()
         state=read_state(history_path)
@@ -196,14 +204,19 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
         candidate=parse(row.get('url',''),row.get('source','history'))
         if candidate and row.get('verified'): old.append(candidate)
     stats={}; groups={}; found=set(); rested=0
+    source_order={}
+    retained=retained_by_source(state,now,args.ttl_hours*3600)
     if mode=='full':
         extra={}
         # The best published nodes carry a fetch that fails directly; none is started otherwise.
         with fallback(args.xray,old[:5]) if relay else nullcontext():
             groups=collect_fn(stats=stats)
             if registry is not None:
-                own,extra=registry.collect(now,stats)
+                own,extra=registry.collect(now,stats,retained)
                 groups.update(own)
+        for name,group in groups.items():
+            for candidate in group:
+                source_order.setdefault(candidate.key,name)
         hours=getattr(args,'retry_failed_hours',0)
         for name,group in groups.items():
             awake=[c for c in group if not resting(state['nodes'].get(c.key),now,hours)]
@@ -215,7 +228,9 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
             fresh=[c for c in group if c.key not in carried
                    and not resting(state['nodes'].get(c.key),now,hours)]
             stats[name]['new']=len(fresh)
-            groups[name]=pick(fresh,registry.quota(name,now),state,rng)
+            groups[name]=pick(fresh,registry.quota(name,now,retained.get(name,0)),state,rng)
+            for candidate in groups[name]:
+                source_order.setdefault(candidate.key,name)
             found.add(name)
     remaining=[]
     published_keys={c.key for c in old}
@@ -264,18 +279,27 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
     passed={key:pair for key,pair in passed.items()
             if now-state['nodes'][key]['last_success']<args.ttl_hours*3600}
     if mode=='full':
-        # What each source was worth this run, so a feed can be judged by what works from here.
-        # "working" is a pass in the last test a config got this run. Verification takes only
-        # the --recheck best-ranked finalists, so a new feed's configs can pass and miss it.
-        tested={c.key for c in queue}
-        working={c.key for c in queue if second_results.get(c.key,first_results[c.key]).passed}
-        tested.update(priority_passed)
-        working.update(priority_passed)
+        verified=Counter()
+        tested=set(first_results)|set(priority_passed)
+        screened={c.key for c,_ in first}
+        awaiting_verification=screened-set(second_results)
+        for key in passed:
+            row=state['nodes'][key]
+            name=row.get('verified_source') or source_order.get(key)
+            if name is None:
+                continue
+            if 'verified_source' not in row:
+                row.update(verified_source=name,first_source_success=row['last_success'])
+            verified[name]+=1
+        retained=retained_by_source(state,now,args.ttl_hours*3600)
         for name,group in groups.items():
             keys={c.key for c in group}
-            stats.setdefault(name,{}).update(tested=len(keys&tested),working=len(keys&working))
+            stats.setdefault(name,{}).update(tested=len(keys&tested),working=verified[name],
+                screen_passed=len(keys&screened),verified=len(keys&passed.keys()),retained_24h=retained.get(name,0))
         if registry is not None:
-            registry.record({name:(stats[name]['tested'],stats[name]['working']) for name in found},now)
+            registry.record({name:(stats[name]['tested'],stats[name]['working'],
+                any(c.key in awaiting_verification or c.key in passed
+                    for c in groups[name])) for name in found if stats[name]['tested']},now)
         # Health runs carry no source results; the control panel shows the last discovery's.
         atomic_write(local/'source_status.json',json.dumps({'at':now,'sources':stats},indent=2,ensure_ascii=False)+'\n')
     if mode=='full' and any(groups.values()):
@@ -289,11 +313,13 @@ def run_cycle(args, root=ROOT, probe=run_probe, collect_fn=collect, geo_fn=geolo
             print(f'[RUN] Only {reached} of {len(listed)} listed sources answered; discovery repeats in an hour.',flush=True)
     return run_cycle_report(args,root,state,mode,now,queue,passed,first_counts,second_counts,rested,geo_fn,stats,
                             probe_health=('healthy' if control_result.passed else 'control_failed') if control_result else None,
-                            control_error=control_result.error if control_result else None)
+                            control_result=control_result,previous=previous,
+                            video_mirrors=merge_video_counts(priority_mirrors,count_video_attempts(
+                                (second_results if mode=='full' else first_results).values())))
 
 
 def run_cycle_report(args,root,state,mode,now,queue,passed,first_counts,second_counts,rested,geo_fn,stats=None,
-                     *,probe_health=None,control_error=None):
+                     *,probe_health=None,control_result=None,previous=None,video_mirrors=None):
     local=root/'.local'
     selected=[]; endpoints=Counter()
     for c,r in sorted(passed.values(),key=lambda pair:rank_key(pair[0],pair[1],state,now)):
@@ -328,6 +354,7 @@ def run_cycle_report(args,root,state,mode,now,queue,passed,first_counts,second_c
     if args.require_country:
         selected=[pair for pair in selected if state['nodes'][pair[0].key].get('country_code')]
     report={'mode':mode,'health':health,'tested_on':'operator network; local Xray',
+            'source_retained_24h':retained_by_source(state,now,args.ttl_hours*3600),
             'xray_version':args.xray_version,'source_status':stats or {},'unique_selected_for_test':len(queue),
             'first_pass':first_counts,'second_pass':second_counts,'_verified_keys':list(passed),
             'list_limit':args.limit or None,'working_this_run':len(passed),
@@ -339,14 +366,17 @@ def run_cycle_report(args,root,state,mode,now,queue,passed,first_counts,second_c
             'verification_timeout_seconds':args.timeout,
             'failure_reason':None if passed else 'No current verified transfer; previous nodes age normally'}
     if probe_health:
-        report.update(probe_health=probe_health,probe_control_error=control_error or None)
+        report.update(probe_health=probe_health,probe_control_error=control_result.error or None,
+                      probe_control_video_mirrors=count_video_attempts([control_result]))
+    report['video_mirrors']=video_mirrors or {}
     if probe_health=='video_unavailable':
         report['failure_reason']='Video mirrors failed through the control proxy. Previous verification timestamps were preserved.'
-    report=write_outputs(root/'docs',selected,state,report,now,args.ttl_hours*3600)
+    report=write_outputs(root/'docs',selected,state,report,now,args.ttl_hours*3600,previous)
     state['published']=[c.key for c,r in selected]
     state['last_attempt']=now
     save_state(local/'history.json',state)
     atomic_write(local/'last_run.json',json.dumps(report,indent=2,ensure_ascii=False)+'\n')
+    atomic_write(local/f'last_{mode}_run.json',json.dumps(report,indent=2,ensure_ascii=False)+'\n')
     print(f'[DONE] {len(selected)} nodes; health={health}',flush=True)
     return report
 

@@ -304,9 +304,10 @@ function renderSources(state) {
       cell(tr, source.where, 'where').title = source.where;
       const found = kind === 'found';
       cell(tr, count(found ? source.size : source.supported), 'num');
-      cell(tr, count(found ? source.all_tested : source.tested), 'num');
-      const working = cell(tr, count(found ? source.all_working : source.working), 'num');
-      if ((found ? source.all_working : source.working) > 0) working.classList.add('good');
+      cell(tr, count(source.tested), 'num');
+      const working = cell(tr, count(source.working), 'num');
+      if (source.working > 0) working.classList.add('good');
+      working.title = `${source.retained} uniquely credited configs verified again after at least 24 hours`;
       const last = tr.insertCell();
       if (kind === 'manual') {
         const remove = document.createElement('button');
