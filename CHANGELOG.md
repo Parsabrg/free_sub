@@ -3,6 +3,16 @@
 Changes to the program. The published subscription itself changes every 30 minutes
 and is not recorded here.
 
+## 2026-11-16
+
+### Fixed
+- **No Xray left behind.** `main.py` and `verify.py` now hold their whole process tree in
+  a Windows job, so a run that is killed (Task Scheduler's time limit, a crash, taskkill)
+  takes its relay, egress check and test fixtures with it. Probe workers were already
+  contained. A run also ends, at its start, any Xray of this clone's binary whose owner
+  is gone (`[CLEANUP]`).
+- `.localun.lock` no longer grows by one byte every run.
+
 ## 2026-11-13
 
 ### Added

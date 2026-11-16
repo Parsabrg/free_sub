@@ -1,10 +1,105 @@
 """Kill a probe worker AND its Xray descendants when its deadline expires."""
 from __future__ import annotations
 import os
+from pathlib import Path
 import signal
 import subprocess
 import threading
 import time
+
+
+def _kill_on_close_job(process_handle):
+    """A Windows job holding process_handle whose processes, and every descendant
+    they start, die when the returned job handle closes. Returns (job, kernel32)."""
+    import ctypes
+    from ctypes import wintypes as w
+    class BASIC(ctypes.Structure):
+        _fields_ = [('PerProcessUserTimeLimit', ctypes.c_longlong),
+                    ('PerJobUserTimeLimit', ctypes.c_longlong), ('LimitFlags', w.DWORD),
+                    ('MinimumWorkingSetSize', ctypes.c_size_t), ('MaximumWorkingSetSize', ctypes.c_size_t),
+                    ('ActiveProcessLimit', w.DWORD), ('Affinity', ctypes.c_size_t),
+                    ('PriorityClass', w.DWORD), ('SchedulingClass', w.DWORD)]
+    class IO(ctypes.Structure):
+        _fields_ = [(k, ctypes.c_ulonglong) for k in ('ReadOperationCount','WriteOperationCount',
+                     'OtherOperationCount','ReadTransferCount','WriteTransferCount','OtherTransferCount')]
+    class EXTENDED(ctypes.Structure):
+        _fields_ = [('BasicLimitInformation', BASIC), ('IoInfo', IO),
+                    ('ProcessMemoryLimit', ctypes.c_size_t), ('JobMemoryLimit', ctypes.c_size_t),
+                    ('PeakProcessMemoryUsed', ctypes.c_size_t), ('PeakJobMemoryUsed', ctypes.c_size_t)]
+    kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+    kernel.CreateJobObjectW.argtypes = [ctypes.c_void_p, w.LPCWSTR]
+    kernel.CreateJobObjectW.restype = w.HANDLE
+    kernel.SetInformationJobObject.argtypes = [w.HANDLE, ctypes.c_int, ctypes.c_void_p, w.DWORD]
+    kernel.SetInformationJobObject.restype = w.BOOL
+    kernel.AssignProcessToJobObject.argtypes = [w.HANDLE, w.HANDLE]
+    kernel.AssignProcessToJobObject.restype = w.BOOL
+    kernel.CloseHandle.argtypes = [w.HANDLE]
+    kernel.CloseHandle.restype = w.BOOL
+    handle = kernel.CreateJobObjectW(None, None)
+    if not handle:
+        raise OSError('Cannot create probe job')
+    info = EXTENDED()
+    info.BasicLimitInformation.LimitFlags = 0x2000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+    if not kernel.SetInformationJobObject(handle, 9, ctypes.byref(info), ctypes.sizeof(info)) or not kernel.AssignProcessToJobObject(handle, process_handle):
+        kernel.CloseHandle(handle)
+        raise OSError('Cannot contain probe process tree')
+    return handle, kernel
+
+
+_SELF_JOB = None
+
+
+def contain_self():
+    """Every process this one starts, and theirs, ends when this one ends, however it
+    ends: a crash, Task Scheduler's time limit, taskkill. Without it a run killed while
+    its source relay, egress check or verify.py was up left that Xray running."""
+    global _SELF_JOB
+    if os.name != 'nt' or _SELF_JOB is not None:
+        return
+    import ctypes
+    try:
+        # The handle is held, never closed: Windows closes it as this process exits.
+        _SELF_JOB = _kill_on_close_job(ctypes.c_void_p(-1))  # GetCurrentProcess()
+    except OSError:
+        pass   # Still runs; only the after-death cleanup is lost.
+
+
+def stray_xray(rows, binary):
+    """PIDs of processes running [binary] whose parent is gone: left behind by a run
+    that was killed before contain_self existed, or by a hand-run test. rows are
+    (pid, parent_pid, created, path); a parent created after its child is a reused PID."""
+    target = os.path.normcase(str(Path(binary).resolve()))
+    created = {pid: when for pid, _, when, _ in rows}
+    return [pid for pid, parent, when, path in rows
+            if path and os.path.normcase(path) == target
+            and not (parent in created and created[parent] <= when)]
+
+
+def kill_stray_xray(binary):
+    """Ends Xray processes of [binary] that no live process owns. Returns how many."""
+    if os.name != 'nt':
+        return 0
+    script = ("Get-CimInstance Win32_Process|?{$_.CreationDate}|%{'{0}|{1}|{2}|{3}' -f "
+              "$_.ProcessId,$_.ParentProcessId,$_.CreationDate.ToFileTimeUtc(),$_.ExecutablePath}")
+    try:
+        out = subprocess.run(['powershell', '-NoProfile', '-NonInteractive', '-Command', script],
+                             capture_output=True, text=True, timeout=30,
+                             creationflags=subprocess.CREATE_NO_WINDOW).stdout
+    except (OSError, subprocess.SubprocessError):
+        return 0
+    rows = []
+    for line in out.splitlines():
+        parts = line.split('|', 3)
+        if len(parts) == 4 and all(p.isdigit() for p in parts[:3]):
+            rows.append((int(parts[0]), int(parts[1]), int(parts[2]), parts[3]))
+    killed = 0
+    for pid in stray_xray(rows, binary):
+        try:
+            os.kill(pid, signal.SIGTERM)   # TerminateProcess on Windows
+            killed += 1
+        except OSError:
+            pass
+    return killed
 
 
 class ProcessTree:
@@ -13,41 +108,12 @@ class ProcessTree:
         self.job = None
         if os.name != 'nt':
             return
-        import ctypes
         from ctypes import wintypes as w
-        class BASIC(ctypes.Structure):
-            _fields_ = [('PerProcessUserTimeLimit', ctypes.c_longlong),
-                        ('PerJobUserTimeLimit', ctypes.c_longlong), ('LimitFlags', w.DWORD),
-                        ('MinimumWorkingSetSize', ctypes.c_size_t), ('MaximumWorkingSetSize', ctypes.c_size_t),
-                        ('ActiveProcessLimit', w.DWORD), ('Affinity', ctypes.c_size_t),
-                        ('PriorityClass', w.DWORD), ('SchedulingClass', w.DWORD)]
-        class IO(ctypes.Structure):
-            _fields_ = [(k, ctypes.c_ulonglong) for k in ('ReadOperationCount','WriteOperationCount',
-                         'OtherOperationCount','ReadTransferCount','WriteTransferCount','OtherTransferCount')]
-        class EXTENDED(ctypes.Structure):
-            _fields_ = [('BasicLimitInformation', BASIC), ('IoInfo', IO),
-                        ('ProcessMemoryLimit', ctypes.c_size_t), ('JobMemoryLimit', ctypes.c_size_t),
-                        ('PeakProcessMemoryUsed', ctypes.c_size_t), ('PeakJobMemoryUsed', ctypes.c_size_t)]
-        kernel = ctypes.WinDLL('kernel32', use_last_error=True)
-        kernel.CreateJobObjectW.argtypes = [ctypes.c_void_p, w.LPCWSTR]
-        kernel.CreateJobObjectW.restype = w.HANDLE
-        kernel.SetInformationJobObject.argtypes = [w.HANDLE, ctypes.c_int, ctypes.c_void_p, w.DWORD]
-        kernel.SetInformationJobObject.restype = w.BOOL
-        kernel.AssignProcessToJobObject.argtypes = [w.HANDLE, w.HANDLE]
-        kernel.AssignProcessToJobObject.restype = w.BOOL
-        kernel.CloseHandle.argtypes = [w.HANDLE]
-        kernel.CloseHandle.restype = w.BOOL
-        handle = kernel.CreateJobObjectW(None, None)
-        if not handle:
+        try:
+            self.job, self.kernel = _kill_on_close_job(w.HANDLE(int(proc._handle)))
+        except OSError:
             proc.kill()
-            raise OSError('Cannot create probe job')
-        info = EXTENDED()
-        info.BasicLimitInformation.LimitFlags = 0x2000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
-        if not kernel.SetInformationJobObject(handle, 9, ctypes.byref(info), ctypes.sizeof(info)) or not kernel.AssignProcessToJobObject(handle, w.HANDLE(int(proc._handle))):
-            kernel.CloseHandle(handle)
-            proc.kill()
-            raise OSError('Cannot contain probe process tree')
-        self.job, self.kernel = handle, kernel
+            raise
 
     def close(self):
         if self.job:
