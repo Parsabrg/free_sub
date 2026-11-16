@@ -26,7 +26,7 @@ import collector
 import sources
 from network import physical_interface
 from publishing import noninteractive_env
-from process_guard import ProcessTree
+from process_guard import PROBE_MB, ProcessTree, auto_workers, machine
 from state import atomic_write, keep_awake
 
 ROOT = Path(__file__).resolve().parent
@@ -83,11 +83,12 @@ def task_installed():
 SETTINGS = {
     'limit': (0, 1000, 0, 'Maximum nodes in the list'),
     'interval': (5, 1440, 30, 'Run interval in minutes'),
+    'workers': (0, 64, 0, 'Parallel tests'),   # 0: sized to this PC
 }
 
 
 def clean_settings(body):
-    """The three numeric settings from a request, or ValueError naming the one that is wrong."""
+    """The numeric settings from a request, or ValueError naming the one that is wrong."""
     result = {}
     for key, (low, high, default, label) in SETTINGS.items():
         value = body.get(key, default)
@@ -101,7 +102,8 @@ def clean_settings(body):
 def run_command(root, mode, publish, settings=None):
     command = [sys.executable, '-u', str(Path(root) / 'main.py'), '--mode', mode]
     if settings:
-        command += ['--limit', str(settings['limit']), '--interval-minutes', str(settings['interval'])]
+        command += ['--limit', str(settings['limit']), '--interval-minutes', str(settings['interval']),
+                    '--workers', str(settings.get('workers', 0))]
     return command + (['--publish'] if publish else [])
 
 
@@ -229,6 +231,9 @@ class Panel:
         self.root = Path(root)
         self.local = self.root / '.local'
         self.runner = runner or Runner(self.root)
+        ram, threads = machine()
+        self.machine = {'ram_mb': ram, 'threads': threads, 'auto_workers': auto_workers(ram, threads),
+                        'probe_mb': PROBE_MB}
         self.registry_path = self.local / 'sources.json'
         self.edit = threading.Lock()
         self.test_lock = threading.Lock()
@@ -315,7 +320,7 @@ class Panel:
     def resume_schedule(self):
         """Start the repeating schedule again with the settings last used."""
         s = self.settings()
-        self.runner.start('auto', s['publish'], True, {'limit': s['limit'], 'interval': s['interval']}, s['interval'] * 60)
+        self.runner.start('auto', s['publish'], True, {key: s[key] for key in SETTINGS}, s['interval'] * 60)
 
     def update(self):
         """Bring this copy up to date with GitHub and, when something changed, restart the panel
@@ -429,6 +434,7 @@ class Panel:
         return {'run': dict(self.runner.status), 'log': list(self.runner.log)[-400:], 'settings': self.settings(),
                 'now': time.time(), 'sources': rows, 'discovery': discovery,
                 'pages': self.pages, 'task': self.task_active(), 'restarting': self.restarting,
+                'machine': self.machine,
                 'last': {'published': status.get('published'), 'health': status.get('health'),
                          # Configs that passed in the last run; the list may hold fewer (a maximum)
                          # or, after an outage, older ones kept within their expiry.

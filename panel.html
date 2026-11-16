@@ -118,9 +118,11 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
     <div class="settings">
       <label>Max nodes in the list <input type="number" id="limit" min="1" max="1000" step="1" placeholder="all working"></label>
       <label>Run every <input type="number" id="interval" min="5" max="1440" step="1"> minutes</label>
+      <label>Parallel tests <input type="number" id="workers" min="1" max="64" step="1" placeholder="automatic"></label>
     </div>
-    <p class="note" style="margin:8px 0 0">Leave the maximum empty to list every working node. Both apply the next
+    <p class="note" style="margin:8px 0 0">Leave the maximum empty to list every working node. These apply the next
       time you press Start.</p>
+    <p class="note" id="workers-help" style="margin:4px 0 0"></p>
     <p id="run-message" class="message" role="status"></p>
     <div id="progress" class="progress"><div class="bar"><i id="fill"></i></div><p id="progress-text"></p></div>
     <p class="note" style="margin:12px 0 0">The panel runs in the background: closing this tab or any window leaves it
@@ -339,13 +341,23 @@ function render(state) {
   $('stop').disabled = busy || run.state === 'idle';
   $('update').disabled = busy || run.state === 'running';
   $('quit').disabled = false;
-  for (const id of ['mode', 'repeat', 'publish', 'limit', 'interval']) $(id).disabled = run.state !== 'idle';
+  for (const id of ['mode', 'repeat', 'publish', 'limit', 'interval', 'workers']) $(id).disabled = run.state !== 'idle';
   if (first) {
     $('mode').value = state.settings.mode;
     $('repeat').checked = state.settings.repeat;
     $('publish').checked = state.settings.publish;
     $('limit').value = state.settings.limit || '';
     $('interval').value = state.settings.interval;
+    $('workers').value = state.settings.workers || '';
+    const m = state.machine;
+    if (m) {
+      const ram = m.ram_mb ? `${(m.ram_mb / 1024).toFixed(0)} GB of RAM and ` : '';
+      $('workers').placeholder = `automatic (${m.auto_workers})`;
+      $('workers-help').textContent = `Parallel tests: this PC has ${ram}${m.threads} processor threads, so automatic `
+        + `runs ${m.auto_workers} at once. Each test uses about ${m.probe_mb} MB while it runs. More finishes a full scan `
+        + `sooner. Fewer leaves more room for other programs and can be fairer on a slow or shared connection. `
+        + `Health checks use at most 16.`;
+    }
     first = false;
   }
   // Progress of the run that is going now: its lines start at the last "Starting a … run".
@@ -429,16 +441,18 @@ function whole(id) { const text = $(id).value.trim(); return text === '' ? null 
 
 $('start').onclick = () => {
   // An empty maximum means every working node (0 to the program).
-  const limit = whole('limit') ?? 0, interval = whole('interval');
+  const limit = whole('limit') ?? 0, interval = whole('interval'), workers = whole('workers') ?? 0;
   const problem = !Number.isInteger(limit) || limit < 0 || limit > 1000
       ? ['limit', 'Max nodes: enter a whole number from 1 to 1000, or leave it empty to list every working node.']
     : !Number.isInteger(interval) || interval < 5 || interval > 1440
-      ? ['interval', 'Run every: enter a whole number of minutes from 5 to 1440.'] : null;
+      ? ['interval', 'Run every: enter a whole number of minutes from 5 to 1440.']
+    : !Number.isInteger(workers) || workers < 0 || workers > 64
+      ? ['workers', 'Parallel tests: enter a whole number from 1 to 64, or leave it empty for automatic.'] : null;
   if (problem) {
     $('run-message').textContent = problem[1]; $('run-message').className = 'message bad'; $(problem[0]).focus();
     return;
   }
-  act('/api/start', {mode: $('mode').value, repeat: $('repeat').checked, publish: $('publish').checked, limit, interval}, 'run-message');
+  act('/api/start', {mode: $('mode').value, repeat: $('repeat').checked, publish: $('publish').checked, limit, interval, workers}, 'run-message');
 };
 $('stop').onclick = () => act('/api/stop', {}, 'run-message');
 $('update').onclick = () => act('/api/update', {}, 'run-message');
