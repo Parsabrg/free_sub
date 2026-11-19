@@ -193,3 +193,38 @@ def communicate_bounded(command, payload, timeout, *, ready_timeout=None):
         for stream in (proc.stdin,proc.stdout,proc.stderr):
             if stream is not None:
                 stream.close()
+
+
+# One probe at its peak: a Python worker (~17 MB), its Xray (~21 MB) and the short DNS
+# helper. Measured on Windows 11, Xray 26.3.27.
+PROBE_MB = 45
+
+
+def machine():
+    """(total RAM in MB, logical processors) of this PC; RAM is None if unknown."""
+    ram = None
+    try:
+        if os.name == 'nt':
+            import ctypes
+            class STATUS(ctypes.Structure):
+                _fields_ = [('dwLength', ctypes.c_ulong), ('dwMemoryLoad', ctypes.c_ulong),
+                            ('ullTotalPhys', ctypes.c_ulonglong)] + [
+                           (k, ctypes.c_ulonglong) for k in ('ullAvailPhys', 'ullTotalPageFile', 'ullAvailPageFile',
+                                                             'ullTotalVirtual', 'ullAvailVirtual', 'ullAvailExtendedVirtual')]
+            status = STATUS(dwLength=ctypes.sizeof(STATUS))
+            if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status)):
+                ram = status.ullTotalPhys // 2**20
+        else:
+            ram = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') // 2**20
+    except (OSError, ValueError, AttributeError):
+        pass
+    return ram, os.cpu_count() or 1
+
+
+def auto_workers(ram_mb=None, threads=None):
+    """Parallel tests for this PC: at most a quarter of its RAM and four tests per
+    logical processor (they mostly wait on the network), from 4 to 64."""
+    if ram_mb is None and threads is None:
+        ram_mb, threads = machine()
+    by_ram = (ram_mb or 4096) // 4 // PROBE_MB
+    return max(4, min(64, by_ram, (threads or 1) * 4))

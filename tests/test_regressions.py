@@ -23,7 +23,9 @@ class RegressionTests(unittest.TestCase):
         version = subprocess.CompletedProcess([], 0, stdout='Xray fixture')
         with patch('main.subprocess.run', return_value=version):
             defaults=arguments(['--xray', sys.executable])
-            self.assertEqual((defaults.workers, defaults.max_tests, defaults.screen_timeout, defaults.timeout), (64, 0, 5, 30))
+            from process_guard import auto_workers
+            self.assertEqual((defaults.workers, defaults.max_tests, defaults.screen_timeout, defaults.timeout), (auto_workers(), 0, 5, 30))
+            self.assertEqual((auto_workers(4096, 4), auto_workers(2048, 2), auto_workers(65536, 32)), (16, 8, 64))
             self.assertEqual(arguments(['--xray', sys.executable, '--workers', '64']).workers, 64)
             with self.assertRaises(SystemExit), patch('sys.stderr', new=io.StringIO()):
                 arguments(['--xray', sys.executable, '--workers', '65'])
