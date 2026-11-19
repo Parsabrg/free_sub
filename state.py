@@ -52,9 +52,10 @@ def save_state(path, state):
 def run_lock(path):
     Path(path).parent.mkdir(parents=True,exist_ok=True)
     with open(path, 'a+b') as lock:
-        lock.seek(0)
-        lock.write(b'0')
-        lock.flush()
+        # Append mode writes at the end whatever the position: write the byte to lock once.
+        if not lock.seek(0, 2):
+            lock.write(b'0')
+            lock.flush()
         lock.seek(0)
         try:
             if os.name == 'nt':

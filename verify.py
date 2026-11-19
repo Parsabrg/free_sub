@@ -8,6 +8,7 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+from process_guard import contain_self
 from publishing import source_fingerprint
 from state import atomic_write
 
@@ -41,4 +42,6 @@ def main():
 
 
 if __name__=='__main__':
+    # A timed-out test run must not leave its Xray fixtures behind.
+    contain_self()
     main()

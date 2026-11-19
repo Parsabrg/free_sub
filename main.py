@@ -28,6 +28,7 @@ from run_diagnostics_report import count_video_attempts, merge_video_counts, com
 from sources import Registry
 from state import atomic_write, keep_awake, observe, read_state, reliability, retained_by_source, run_lock, save_state, sweep_stale_probe_dirs
 from network import BIND_ENV, physical_interface
+from process_guard import contain_self, kill_stray_xray
 from xray_test import ProbeResult, run_probe
 
 ROOT=Path(__file__).resolve().parent
@@ -501,6 +502,8 @@ def main(argv=None):
     with run_lock(ROOT/'.local'/'run.lock'), keep_awake():
         removed=sweep_stale_probe_dirs()
         if removed: print(f'[CLEANUP] Removed {removed} stale probe folders from the temp directory.',flush=True)
+        stray=kill_stray_xray(args.xray)
+        if stray: print(f'[CLEANUP] Ended {stray} Xray processes left behind by an earlier run.',flush=True)
         registry=Registry(ROOT/'.local'/'sources.json',discover=args.found_sources)
         probe=partial(run_probe,video_mirrors=args.video_mirror,stream_segments=args.stream_segments,
                       check_udp=args.check_udp,check_ipv6=args.check_ipv6,youtube_id=args.youtube_id)
@@ -512,6 +515,7 @@ def main(argv=None):
 
 
 if __name__=='__main__':
+    contain_self()
     try:
         main()
     except Exception as exc:

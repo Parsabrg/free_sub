@@ -128,6 +128,7 @@ Each entry of `nodes`:
 |---|---|
 | `[NETWORK]` | The adapter the tests leave through and the egress country. |
 | `[SKIP]` | The egress country is not Iran; nothing was tested or changed. |
+| `[CLEANUP]` | Leftovers removed at the start of a run: stale probe folders in the temp directory, or Xray processes of this clone's binary whose owner had ended. |
 | `[SOURCES]` | How many sources are about to be fetched. The control panel counts the `[SOURCE]` lines after it for its progress bar. |
 | `[SOURCE]` | One line per source, in the order they finish: links found and supported, or `FAILED`. |
 | `[RELAY]` | Direct fetches failed and a verified node is carrying them. |
