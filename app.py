@@ -78,6 +78,39 @@ def task_installed():
     return bool(result and result.returncode == 0)
 
 
+RUN_KEY = r'Software\Microsoft\Windows\CurrentVersion\Run'
+
+
+def startup_command(root):
+    """What Windows runs at sign-in: the panel, hidden, carrying on its schedule."""
+    exe = Path(sys.executable)
+    quiet_exe = exe.with_name('pythonw.exe')   # no console window at sign-in
+    exe = quiet_exe if quiet_exe.exists() else exe
+    return subprocess.list2cmdline([str(exe), str(Path(__file__).resolve()), '--no-browser', '--resume',
+                                    '--root', str(Path(root).resolve())])
+
+
+def autostart(root, enabled=None, key=RUN_KEY):
+    """Whether this panel starts when the operator signs in to Windows; with enabled, set it
+    first. A per-user Run entry: no administrator, no password. None off Windows.
+    Without it the panel ended with the PC on 2026-11-18 and the feed went stale for days."""
+    if os.name != 'nt':
+        return None
+    import winreg
+    with winreg.CreateKey(winreg.HKEY_CURRENT_USER, key) as run:
+        if enabled is True:
+            winreg.SetValueEx(run, APP_NAME, 0, winreg.REG_SZ, startup_command(root))
+        elif enabled is False:
+            try:
+                winreg.DeleteValue(run, APP_NAME)
+            except FileNotFoundError:
+                pass
+        try:
+            return winreg.QueryValueEx(run, APP_NAME)[0] == startup_command(root)
+        except FileNotFoundError:
+            return False
+
+
 # What the page lets the operator choose: (lowest, highest, default, name). A maximum of 0
 # means no maximum: every working node is listed.
 SETTINGS = {
@@ -245,6 +278,7 @@ class Panel:
         self.port = None       # set by run_server: where a restarted panel must listen again
         self.restarting = False   # an update was pulled: this program is about to be replaced
         self.respawn = False
+        self.run_key = RUN_KEY   # tests use their own key
 
     def task_active(self):
         # Asked at most once a minute: the page polls far more often than a task changes.
@@ -264,8 +298,11 @@ class Panel:
             numbers = clean_settings(saved)
         except ValueError:
             numbers = clean_settings({})
+        repeat = bool(saved.get('repeat', True))
         return {'mode': saved.get('mode') if saved.get('mode') in MODES else 'auto',
-                'publish': bool(saved.get('publish', True)), 'repeat': bool(saved.get('repeat', True)), **numbers}
+                'publish': bool(saved.get('publish', True)), 'repeat': repeat,
+                # A repeat schedule nobody stopped; older files predate the flag.
+                'active': bool(saved.get('active', repeat)), **numbers}
 
     def start(self, body):
         chosen = {'mode': body.get('mode', 'auto'), 'publish': bool(body.get('publish')),
@@ -273,7 +310,21 @@ class Panel:
         self.runner.start(chosen['mode'], chosen['publish'], chosen['repeat'],
                           {key: chosen[key] for key in SETTINGS},
                           chosen['interval'] * 60 if 'interval' in body else None)
-        atomic_write(self.local / 'panel.json', json.dumps(chosen) + '\n')
+        atomic_write(self.local / 'panel.json', json.dumps(dict(chosen, active=chosen['repeat'])) + '\n')
+
+    def stop(self):
+        """Stop pressed: end the run, and do not bring the schedule back at the next sign-in."""
+        self.runner.stop()
+        saved = read_json(self.local / 'panel.json', None)
+        if isinstance(saved, dict) and saved.get('active', True):
+            atomic_write(self.local / 'panel.json', json.dumps(dict(saved, active=False)) + '\n')
+
+    def resume_at_signin(self):
+        """Started by Windows at sign-in: carry on the schedule that was running when the PC went down."""
+        s = self.settings()
+        if s['repeat'] and s['active'] and self.runner.status['state'] == 'idle':
+            self.resume_schedule()
+            self.runner.say('Started with Windows; the repeat schedule continues.')
 
     def test_configs(self, body):
         from xray_test import run_probe
@@ -434,7 +485,7 @@ class Panel:
         return {'run': dict(self.runner.status), 'log': list(self.runner.log)[-400:], 'settings': self.settings(),
                 'now': time.time(), 'sources': rows, 'discovery': discovery,
                 'pages': self.pages, 'task': self.task_active(), 'restarting': self.restarting,
-                'machine': self.machine,
+                'machine': self.machine, 'autostart': autostart(self.root, key=self.run_key),
                 'last': {'published': status.get('published'), 'health': status.get('health'),
                          # Configs that passed in the last run; the list may hold fewer (a maximum)
                          # or, after an outage, older ones kept within their expiry.
@@ -503,7 +554,11 @@ def handler_for(panel, page):
                 if self.path == '/api/start':
                     panel.start(body)
                 elif self.path == '/api/stop':
-                    panel.runner.stop()
+                    panel.stop()
+                elif self.path == '/api/autostart':
+                    if os.name != 'nt':
+                        raise ValueError('Starting with the computer is set up only on Windows')
+                    autostart(panel.root, bool(body.get('enabled')), panel.run_key)
                 elif self.path == '/api/update':
                     panel.update()
                 elif self.path == '/api/quit':
@@ -566,7 +621,7 @@ def background_python():
     return sys.executable
 
 
-def spawn_server(root, port):
+def spawn_server(root, port, resume=False):
     """Start the panel as a background program with no window of its own. Returns the process
     and the log it writes to."""
     root = Path(root)
@@ -576,7 +631,7 @@ def spawn_server(root, port):
     if log.exists() and log.stat().st_size > 512 * 1024:
         log.replace(logs / 'panel.log.old')
     command = [background_python(), '-u', str(Path(__file__).resolve()), '--serve', '--no-browser',
-               '--root', str(root), '--port', str(port)]
+               '--root', str(root), '--port', str(port)] + (['--resume'] if resume else [])
     # Its own hidden console on Windows, its own session elsewhere: closing the window
     # that started it, or the program that started it ending, must not take it down.
     detach = ({'creationflags': subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP}
@@ -587,7 +642,7 @@ def spawn_server(root, port):
         return subprocess.Popen(command, cwd=root, stdin=subprocess.DEVNULL, stdout=out, stderr=out, **detach), log
 
 
-def launch(root, port, open_browser):
+def launch(root, port, open_browser, resume=False):
     """Start the panel as a background program with no window of its own, unless one is
     already running, and open its page. Returns the exit code."""
     root = Path(root)
@@ -597,7 +652,7 @@ def launch(root, port, open_browser):
         print(f'Port {port} is used by another program. Use a free one: python app.py --port {port + 1}', file=sys.stderr)
         return 1
     if state == 'free':
-        child, log = spawn_server(root, port)
+        child, log = spawn_server(root, port, resume)
         deadline = time.monotonic() + 20
         while probe(port)[0] != 'panel':
             if child.poll() is not None or time.monotonic() > deadline:
@@ -613,7 +668,7 @@ def launch(root, port, open_browser):
     return 0
 
 
-def run_server(root, port, open_browser):
+def run_server(root, port, open_browser, resume=False):
     """Serve the panel in this process until it is quit."""
     panel = Panel(root)
     try:
@@ -625,6 +680,8 @@ def run_server(root, port, open_browser):
     url = f'http://127.0.0.1:{panel.port}/'
     print(time.strftime('%H:%M:%S ') + f'panel listening on {url}', flush=True)
     panel.after_restart()
+    if resume:
+        panel.resume_at_signin()
     if open_browser:
         threading.Timer(0.5, webbrowser.open, [url]).start()
         print('Press Ctrl+C, or use "Quit panel" in the page, to stop it and any run it started.', flush=True)
@@ -652,11 +709,13 @@ def main(argv=None):
     ap.add_argument('--serve', action='store_true',
                     help='Run the panel in this window instead of in the background (for diagnosis)')
     ap.add_argument('--root', default=str(ROOT), help=argparse.SUPPRESS)
+    ap.add_argument('--resume', action='store_true',
+                    help='Carry on the repeat schedule that was running (used when started with Windows)')
     args = ap.parse_args(argv)
     if args.serve:
-        run_server(args.root, args.port, not args.no_browser)
+        run_server(args.root, args.port, not args.no_browser, args.resume)
     else:
-        raise SystemExit(launch(args.root, args.port, not args.no_browser))
+        raise SystemExit(launch(args.root, args.port, not args.no_browser, args.resume))
 
 
 if __name__ == '__main__':

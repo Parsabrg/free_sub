@@ -90,7 +90,9 @@ launcher again while the panel is up simply opens the page again.
 - **Log.** The live output of the current run, with a progress bar.
 
 While it repeats, the panel keeps Windows from idle-sleeping. It cannot wake a
-sleeping PC, and it ends when Windows signs out or restarts. If the page shows
+sleeping PC, and it ends when Windows signs out or restarts. Tick **Start with Windows**
+and it starts again at your next sign-in and carries on a repeat schedule you did not
+stop (pressing **Stop** keeps it stopped). If the page shows
 **Panel stopped**, the program ended (it was quit, killed, or crashed); start it
 again with `panel_windows.bat`. A crash is recorded in `.local\logs\panel.log`. The
 page is served to this computer only.
