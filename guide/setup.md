@@ -92,7 +92,10 @@ Double-click `panel_windows.bat` and press **Start** in the page that opens. The
 
 The panel runs in the background with no window of its own. It keeps going when
 the browser tab or the launcher window is closed, and ends only with **Quit panel**,
-a Windows sign-out or restart, or a crash. It runs only while the PC is awake;
+a Windows sign-out or restart, or a crash. With **Start with Windows** ticked it starts
+again by itself when you sign in after a restart, and carries on a repeat schedule that
+was running (not one you stopped with **Stop**). This adds one entry to your account's
+sign-in programs (no administrator needed); untick it to remove it. It runs only while the PC is awake;
 while it repeats it keeps Windows from idle-sleeping, but it cannot wake a sleeping
 PC. For runs with nobody present, use the scheduled task below. The two can be used
 side by side: they never run at the same time, and the panel shows a notice while

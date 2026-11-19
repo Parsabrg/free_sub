@@ -61,6 +61,7 @@ label.check { display: inline-flex; align-items: center; gap: 8px; cursor: point
 .settings { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; margin-top: 14px; }
 .settings label { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; }
 input[type=number] { width: 7.5em; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+#workers { width: 9.5em; }
 .notice { margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--chip); border-left: 3px solid var(--warn); font-size: 14px; }
 code { font: 13px ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
 .links { display: grid; gap: 8px; }
@@ -114,6 +115,7 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
       </label>
       <label class="check"><input type="checkbox" id="repeat"> Keep running (keeps this PC awake)</label>
       <label class="check"><input type="checkbox" id="publish"> Publish the list to GitHub</label>
+      <label class="check" id="autostart-row" hidden title="After Windows restarts and you sign in, the panel starts by itself and carries on a repeat schedule you did not stop"><input type="checkbox" id="autostart"> Start with Windows</label>
     </div>
     <div class="settings">
       <label>Max nodes in the list <input type="number" id="limit" min="1" max="1000" step="1" placeholder="all working"></label>
@@ -412,6 +414,8 @@ function render(state) {
     chips.append(chip);
   }
   $('task').hidden = !state.task;
+  $('autostart-row').hidden = state.autostart === null || state.autostart === undefined;
+  $('autostart').checked = !!state.autostart;
   renderLinks(state.pages);
   renderSources(state);
   if (state.restarting) {
@@ -455,6 +459,7 @@ $('start').onclick = () => {
   act('/api/start', {mode: $('mode').value, repeat: $('repeat').checked, publish: $('publish').checked, limit, interval, workers}, 'run-message');
 };
 $('stop').onclick = () => act('/api/stop', {}, 'run-message');
+$('autostart').onchange = () => act('/api/autostart', {enabled: $('autostart').checked}, 'run-message');
 $('update').onclick = () => act('/api/update', {}, 'run-message');
 $('add').onsubmit = async event => {
   event.preventDefault();

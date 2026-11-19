@@ -39,6 +39,16 @@ class PanelTests(unittest.TestCase):
         command = lambda root, mode, publish: [sys.executable, '-u', '-c', self.script, mode, str(publish)]
         self.runner = app.Runner(self.root, command, interval=0.2)
         self.panel = app.Panel(self.root, self.runner)
+        # Never the real sign-in list of this PC.
+        self.panel.run_key = r'Softwareree-sub-test-' + os.urandom(4).hex()
+        if os.name == 'nt':
+            import winreg
+            def drop_key():
+                try:
+                    winreg.DeleteKey(winreg.HKEY_CURRENT_USER, self.panel.run_key)
+                except FileNotFoundError:
+                    pass
+            self.addCleanup(drop_key)
         self.server = app.serve(self.panel)
         self.port = self.server.server_address[1]
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
@@ -96,7 +106,8 @@ class PanelTests(unittest.TestCase):
         state = self.state()
         self.assertEqual(state['run']['exit'], 0)
         self.assertTrue(any('[CHECK] 25/100' in line for line in state['log']))
-        self.assertEqual(state['settings'], {'mode': 'full', 'publish': False, 'repeat': False, 'limit': 0, 'interval': 30, 'workers': 0})
+        self.assertEqual(state['settings'], {'mode': 'full', 'publish': False, 'repeat': False, 'active': False,
+                                             'limit': 0, 'interval': 30, 'workers': 0})
         self.assertEqual(self.request('POST', '/api/start', {'mode': 'everything'})[0], 400)
 
     def test_a_run_that_ends_before_it_is_contained_still_counts(self):
@@ -193,6 +204,45 @@ class PanelTests(unittest.TestCase):
         self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
         self.assertLess(time.monotonic() - began, 8)
         self.assertTrue(any('Stopped.' in line for line in self.state()['log']))
+
+    def test_after_a_restart_only_a_schedule_nobody_stopped_carries_on(self):
+        self.script = 'import time; print("started", flush=True); time.sleep(60)'
+        self.request('POST', '/api/start', {'mode': 'full', 'publish': True, 'repeat': True, 'interval': 60})
+        self.assertTrue(wait_for(lambda: any('started' in line for line in self.state()['log'])))
+        self.assertTrue(self.panel.settings()['active'])
+        self.runner.stop()   # the PC went down: the schedule was never stopped by hand
+        self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
+        self.panel.resume_at_signin()
+        self.assertEqual(self.state()['run']['mode'], 'auto')
+        self.assertTrue(any('Started with Windows' in line for line in self.state()['log']))
+        self.assertEqual(self.runner.interval, 3600)
+        self.request('POST', '/api/stop', {})   # Stop pressed: nothing comes back at sign-in
+        self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
+        self.assertFalse(self.panel.settings()['active'])
+        self.panel.resume_at_signin()
+        self.assertEqual(self.state()['run']['state'], 'idle')
+        # A file written before the flag existed carries on a repeat schedule.
+        (self.root / '.local' / 'panel.json').write_text(json.dumps({'repeat': True, 'interval': 60}))
+        self.assertTrue(self.panel.settings()['active'])
+
+    def test_start_with_windows_is_one_entry_that_resumes_this_panel(self):
+        command = app.startup_command(self.root)
+        self.assertIn('--resume', command)
+        self.assertIn(str(self.root.resolve()), command)
+        self.assertNotIn('--serve', command)
+        if os.name != 'nt':
+            self.assertIsNone(self.state()['autostart'])
+            self.assertEqual(self.request('POST', '/api/autostart', {'enabled': True})[0], 400)
+            return
+        self.assertFalse(self.state()['autostart'])
+        status, body = self.request('POST', '/api/autostart', {'enabled': True})
+        self.assertEqual(status, 200)
+        self.assertTrue(json.loads(body)['autostart'])
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, self.panel.run_key) as key:
+            self.assertEqual(winreg.QueryValueEx(key, app.APP_NAME)[0], command)
+        self.assertFalse(json.loads(self.request('POST', '/api/autostart', {'enabled': False})[1])['autostart'])
+        self.assertFalse(json.loads(self.request('POST', '/api/autostart', {'enabled': False})[1])['autostart'])
 
     def test_repeat_runs_again_until_stopped(self):
         self.request('POST', '/api/start', {'mode': 'full', 'publish': False, 'repeat': True})
