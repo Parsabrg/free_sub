@@ -165,6 +165,24 @@ class RegressionTests(unittest.TestCase):
         self.assertEqual(pinned['streamSettings']['tlsSettings']['serverName'],'example.com')
         self.assertEqual(c.outbound['settings']['servers'][0]['address'],'example.com')
 
+    def test_publish_skips_tests_only_when_they_passed_today_on_this_code(self):
+        from publishing import already_verified, source_fingerprint
+        import hashlib
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder); (root/'.local').mkdir()
+            (root/'main.py').write_text('x=1'); xray=root/'xray.exe'; xray.write_bytes(b'core')
+            def record(**changes):
+                evidence=dict(dict(passed=True,verified_utc_epoch=time.time(),source_sha256=source_fingerprint(root),
+                                   xray_binary_sha256=hashlib.sha256(b'core').hexdigest()),**changes)
+                (root/'.local'/'verification.json').write_text(json.dumps(evidence))
+            self.assertFalse(already_verified(root,xray))          # never verified
+            record(); self.assertTrue(already_verified(root,xray))
+            record(passed=False); self.assertFalse(already_verified(root,xray))
+            record(verified_utc_epoch=time.time()-90000); self.assertFalse(already_verified(root,xray))
+            record(); xray.write_bytes(b'new core'); self.assertFalse(already_verified(root,xray))
+            xray.write_bytes(b'core'); record(); (root/'main.py').write_text('x=2')
+            self.assertFalse(already_verified(root,xray))
+
     def test_lock_does_not_allow_overlapping_run(self):
         with tempfile.TemporaryDirectory() as folder:
             path=Path(folder)/'lock'

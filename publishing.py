@@ -8,6 +8,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
 from collector import links, parse
 from network import pin_endpoint, public_address
 
@@ -26,6 +27,18 @@ def source_fingerprint(root):
     for path in paths:
         digest.update(path.relative_to(root).as_posix().encode()+b'\0'+path.read_bytes()+b'\0')
     return digest.hexdigest()
+
+
+def already_verified(root, xray, max_age=86400):
+    """verify.py passed within max_age seconds on the same source files and Xray binary."""
+    try:
+        evidence=json.loads((Path(root)/'.local'/'verification.json').read_text(encoding='utf-8'))
+        return (evidence.get('passed') is True
+                and 0 <= time.time()-evidence['verified_utc_epoch'] < max_age
+                and evidence['xray_binary_sha256']==hashlib.sha256(Path(xray).read_bytes()).hexdigest()
+                and evidence['source_sha256']==source_fingerprint(root))
+    except (OSError,ValueError,KeyError,TypeError):
+        return False
 
 
 def validate_outputs(docs):
@@ -177,8 +190,12 @@ def publish(root, xray, docs):
     root,docs=Path(root).resolve(),Path(docs).resolve()
     if docs != root/'docs':
         raise RuntimeError('Only project docs/ may be published')
-    # Run offline tests AND a real Xray/TLS/HTTPS local end-to-end fixture before each push.
-    subprocess.run([sys.executable,str(root/'verify.py'),'--xray',str(xray)],cwd=root,check=True,timeout=180)
+    # Run offline tests AND a real Xray/TLS/HTTPS local end-to-end fixture before each push,
+    # unless they already passed today on this exact code and Xray.
+    if already_verified(root,xray):
+        print('[VERIFY] Skipped: tests already passed today on this code and Xray.',flush=True)
+    else:
+        subprocess.run([sys.executable,str(root/'verify.py'),'--xray',str(xray)],cwd=root,check=True,timeout=180)
     validate_outputs(docs)
     def git(*args,check=True,env=None):
         try:

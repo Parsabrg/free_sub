@@ -30,7 +30,7 @@ Ranked by importance. Status: `open` / `done` / `skipped (reason)`.
 - Option: finalists also fetch ~1 MB (e.g. `--stream-segments 2..4`, already supported, off by default).
   Costs more time per discovery.
 
-## 5. Every publish runs the full test suite twice per discovery — open (low)
+## 5. Every publish runs the full test suite twice per discovery — done (skipped when it passed today on the same code and Xray)
 - `publish()` runs `verify.py` (~80 s here, 180 s limit) before each push; a discovery publishes twice.
   On a busy PC it can hit the limit and block publishing.
 - Fix: skip it when code and Xray are unchanged since the last pass (`verification.json` already
