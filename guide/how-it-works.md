@@ -105,7 +105,7 @@ Private inputs stay outside the discovery history and publishing pipeline.
 Every candidate runs in **its own Xray process** with a loopback SOCKS inbound and
 routing to that candidate only. The tester has no direct fallback outbound.
 
-**Endpoint rules.** DNS resolution runs out of process with a deadline. Private,
+**Endpoint rules.** DNS resolution has a 4 s deadline. Private,
 loopback, link-local and mixed public/private answers are rejected. Xray is pinned
 to the validated public IP while SNI and transport Host values stay as given.
 

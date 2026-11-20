@@ -18,7 +18,7 @@ Ranked by importance. Status: `open` / `done` / `skipped (reason)`.
 - Fix: write each run's output to `.local/logs/run.log` (keep the last few) and the traceback of a
   failure to the same place. Both stay private in `.local`.
 
-## 3. Up to 11% of configs may fail on a slow DNS helper, not on DNS — open (medium, measure first)
+## 3. Up to 11% of configs may fail on a slow DNS helper, not on DNS — done (in-process lookup; 64 lookups 0.79 s → 0.02 s idle)
 - Each config's hostname is looked up by starting another Python process with a 4 s limit.
   Last discovery: 972 of 13,427 configs hit that limit and 526 failed the lookup.
 - With 64 tests in parallel, starting Python can take much of those 4 s, so some are likely false failures.

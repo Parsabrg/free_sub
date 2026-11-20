@@ -2,6 +2,7 @@ import base64
 from contextlib import redirect_stdout, redirect_stderr
 import io
 import json
+import socket
 from pathlib import Path
 import subprocess
 import tempfile
@@ -148,9 +149,16 @@ class RegressionTests(unittest.TestCase):
     def test_no_private_or_mixed_dns_endpoint(self):
         for address in ('127.0.0.1','10.0.0.1','169.254.169.254','::1','224.0.0.1'):
             with self.assertRaises(ValueError): resolve_public(address)
-        completed=subprocess.CompletedProcess([],0,stdout='["8.8.8.8","127.0.0.1"]')
-        with patch('network.subprocess.run',return_value=completed):
+        answer=[(socket.AF_INET,0,0,'',(ip,0)) for ip in ('8.8.8.8','127.0.0.1')]
+        with patch('network.socket.getaddrinfo',return_value=answer):
             with self.assertRaises(ValueError): resolve_public('mixed.example')
+        with patch('network.socket.getaddrinfo',return_value=answer[:1]):
+            self.assertEqual(resolve_public('public.example'),['8.8.8.8'])
+        # A resolver that hangs is given up on at the timeout, as a DNS failure.
+        with patch('network.socket.getaddrinfo',side_effect=lambda *a,**k: time.sleep(2)):
+            began=time.monotonic()
+            with self.assertRaises(OSError): resolve_public('slow.example',timeout=0.2)
+            self.assertLess(time.monotonic()-began,1.5)
         c=parse('trojan://pw@example.com:443?security=tls&sni=example.com')
         pinned=pin_endpoint(c.outbound,['8.8.8.8'])
         self.assertEqual(pinned['settings']['servers'][0]['address'],'8.8.8.8')

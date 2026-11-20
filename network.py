@@ -1,13 +1,11 @@
-"""Resolve endpoints out of process, reject private addresses and pin Xray DNS."""
+"""Resolve endpoints, reject private addresses and pin Xray DNS."""
 from __future__ import annotations
 import copy
 import ipaddress
-import json
 import os
 import socket
 import subprocess
-import sys
-from pathlib import Path
+import threading
 
 
 def public_address(value):
@@ -27,9 +25,24 @@ def resolve_public(host, timeout=4):
         if not public_address(str(literal)):
             raise ValueError('NonPublicEndpoint')
         return [str(literal)]
-    result = subprocess.run([sys.executable, str(Path(__file__).resolve()), host],
-                            capture_output=True, text=True, timeout=timeout, check=True)
-    addresses = json.loads(result.stdout)
+    # getaddrinfo cannot be cancelled, so it runs on a daemon thread we stop waiting for.
+    # It used to run in a fresh Python process: at 64 tests in parallel, starting that
+    # process ate much of the 4 s, and 972 of 13,427 configs failed on it (2026-11-20).
+    answer = {}
+    def lookup():
+        try:
+            answer['addresses'] = list(dict.fromkeys(r[4][0] for r in socket.getaddrinfo(
+                host, None, type=socket.SOCK_STREAM)))
+        except (OSError, UnicodeError) as exc:
+            answer['error'] = exc
+    thread = threading.Thread(target=lookup, daemon=True)
+    thread.start()
+    thread.join(timeout)
+    if thread.is_alive():
+        raise TimeoutError('DnsTimeout')
+    if 'error' in answer:
+        raise OSError('DnsFailed') from answer['error']
+    addresses = answer['addresses']
     # Reject mixed public/private answers too. Never pass an unvalidated alternative to Xray.
     if not addresses or any(not public_address(ip) for ip in addresses):
         raise ValueError('NonPublicEndpoint')
@@ -87,11 +100,3 @@ def outbound_endpoint(outbound):
     settings = outbound.get('settings') or {}
     return (settings.get('vnext') or settings.get('servers') or [settings])[0]
 
-
-if __name__ == '__main__':
-    try:
-        addresses = list(dict.fromkeys(r[4][0] for r in socket.getaddrinfo(
-            sys.argv[1], None, type=socket.SOCK_STREAM)))
-        print(json.dumps(addresses))
-    except (OSError, UnicodeError):
-        sys.exit(1)
