@@ -405,6 +405,7 @@ class Panel:
             if self.runner.thread is not None:
                 self.runner.thread.join(timeout=10)
         say('Checking GitHub for a newer version.')
+        before = head(self.root)
         try:
             result = subprocess.run(['git', 'pull', '--no-rebase', '--no-edit'], cwd=self.root, capture_output=True,
                                     text=True, encoding='utf-8', errors='replace', env=noninteractive_env(),
@@ -416,7 +417,8 @@ class Panel:
             # Only stdout is shown: Git's stderr names the remote, which can hold a credential.
             for line in result.stdout.splitlines()[-12:]:
                 say('  ' + line)
-        if result is None or result.returncode or 'Already up to date' in result.stdout:
+        # Not Git's "Already up to date": that wording depends on Git's language.
+        if result is None or result.returncode or head(self.root) == before:
             if result is not None and result.returncode:
                 say(f'Update failed (exit code {result.returncode}). Run "git pull --no-rebase --no-edit" '
                     'in this folder to see why.')
@@ -635,6 +637,11 @@ def background_python():
     return sys.executable
 
 
+def head(root):
+    result = quiet(['git', 'rev-parse', 'HEAD'], root)
+    return result.stdout.strip() if result and result.returncode == 0 else None
+
+
 def spawn_server(root, port, resume=False):
     """Start the panel as a background program with no window of its own. Returns the process
     and the log it writes to."""
@@ -709,9 +716,11 @@ def run_server(root, port, open_browser, resume=False):
         print(time.strftime('%H:%M:%S ') + 'panel ended', flush=True)
         if panel.respawn:
             # The port is free now. The new program is read from disk again: it is the updated one.
+            # Said before the new panel starts: this process writes the log at its own position,
+            # so a line after the new one's header wrote over it ("el starting").
+            print(time.strftime('%H:%M:%S ') + 'panel restarting', flush=True)
             try:
                 spawn_server(root, panel.port)
-                print(time.strftime('%H:%M:%S ') + 'panel restarting', flush=True)
             except OSError as exc:
                 print(time.strftime('%H:%M:%S ') + f'panel could not restart ({type(exc).__name__})', flush=True)
 

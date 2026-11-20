@@ -36,7 +36,7 @@ Ranked by importance. Status: `open` / `done` / `skipped (reason)`.
 - Fix: skip it when code and Xray are unchanged since the last pass (`verification.json` already
   records `source_sha256` and the Xray hash; nothing reads them).
 
-## 6. Small things — open (low)
+## 6. Small things — first two done
 - "Update program" decides "nothing new" by Git's English message; compare HEAD before/after instead.
 - `panel.log` lines get overwritten when the panel restarts itself ("el starting").
 - The panel clone always shows modified `docs/` files, because runs rewrite tracked files.

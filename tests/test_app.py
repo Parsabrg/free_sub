@@ -319,9 +319,10 @@ class PanelTests(unittest.TestCase):
             calls.append((command, (kwargs.get('env') or {}).get('GIT_TERMINAL_PROMPT')))
             return subprocess.CompletedProcess(command, 0, stdout='Updating 1..2\nFast-forward\n app.py | 2 +-\n',
                                                stderr='From https://token@github.com/owner/free_sub\n')
-        with patch('app.subprocess.run', pull), patch('app.clone_root', return_value=True):
+        with patch('app.subprocess.run', pull), patch('app.clone_root', return_value=True), \
+                patch('app.head', side_effect=['1', '2']):
             self.assertEqual(self.request('POST', '/api/update', {})[0], 200)
-        log = '\n'.join(self.state()['log'])
+        log ='\n'.join(self.state()['log'])
         self.assertEqual([c for c in calls if c[0][:2] == ['git', 'pull']], [(['git', 'pull', '--no-rebase', '--no-edit'], '0')])
         self.assertIn('Fast-forward', log)
         self.assertIn('Restarting the panel', log)
@@ -350,7 +351,8 @@ class PanelTests(unittest.TestCase):
         ended = threading.Event()
         self.panel.shutdown = ended.set
         self.start_waiting_schedule()
-        with patch('app.subprocess.run', self.pulled('Updating 1..2\nFast-forward\n')), patch('app.clone_root', return_value=True):
+        with patch('app.subprocess.run', self.pulled('Updating 1..2\nFast-forward\n')), patch('app.clone_root', return_value=True), \
+                patch('app.head', side_effect=['1', '2']):
             status, body = self.request('POST', '/api/update', {})
         self.assertEqual(status, 200)
         self.assertTrue(json.loads(body)['restarting'])
@@ -363,7 +365,9 @@ class PanelTests(unittest.TestCase):
     def test_an_update_with_nothing_new_leaves_everything_as_it_was(self):
         self.panel.shutdown = lambda: self.fail('the panel must not restart')
         self.start_waiting_schedule()
-        with patch('app.subprocess.run', self.pulled('Already up to date.\n')), patch('app.clone_root', return_value=True):
+        # Git in another language: the commit, not the wording, says nothing changed.
+        with patch('app.subprocess.run', self.pulled('Bereits aktuell.\n')), patch('app.clone_root', return_value=True), \
+                patch('app.head', return_value='1'):
             self.assertEqual(self.request('POST', '/api/update', {})[0], 200)
         state = self.state()
         self.assertFalse(state['restarting'])
