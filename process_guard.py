@@ -195,8 +195,8 @@ def communicate_bounded(command, payload, timeout, *, ready_timeout=None):
                 stream.close()
 
 
-# One probe at its peak: a Python worker (~17 MB), its Xray (~21 MB) and the short DNS
-# helper. Measured on Windows 11, Xray 26.3.27.
+# One probe at its peak: a Python worker (~17 MB) and its Xray (~21 MB), with some
+# headroom. Measured on Windows 11, Xray 26.3.27.
 PROBE_MB = 45
 
 
