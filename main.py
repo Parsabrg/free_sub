@@ -525,6 +525,14 @@ if __name__=='__main__':
             # Safe to say, and the control panel needs to tell it from a failure.
             print('[BUSY] Another run is already active (the scheduled task, or a second window).',file=sys.stderr)
             sys.exit(2)
-        # Redact source URLs, credentials, subprocess stderr and Git remote tokens.
-        print(f'[ERROR] {type(exc).__name__}: run failed; inspect .local/last_run.json and logs.',file=sys.stderr)
+        # The screen gets no source URL, credential, subprocess stderr or Git remote token;
+        # the whole traceback goes to a private file for whoever has to find out why.
+        try:
+            import traceback
+            atomic_write(ROOT/'.local'/'logs'/'last_error.txt',
+                         time.strftime('%Y-%m-%d %H:%M:%S\n')+traceback.format_exc())
+            where='.local/logs/last_error.txt'
+        except OSError:
+            where='nothing (the error file could not be written)'
+        print(f'[ERROR] {type(exc).__name__}: run failed; the details are in {where}.',file=sys.stderr)
         sys.exit(2)

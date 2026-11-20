@@ -11,7 +11,7 @@ Ranked by importance. Status: `open` / `done` / `skipped (reason)`.
   schedule (`.local/panel.json` already holds mode, publish, repeat, interval). No admin, no password.
 - Also: the Documents clone is on b0036e8, without #13 and #14.
 
-## 2. A crashed or interrupted run leaves no log on disk — open (high)
+## 2. A crashed or interrupted run leaves no log on disk — done (run.log, last_error.txt)
 - Run output lives only in the panel's memory (last 2000 lines). After the shutdown above there is
   nothing to read. `main.py` prints only the error type and points at `last_run.json`, which a failed
   run never writes.

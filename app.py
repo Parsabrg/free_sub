@@ -152,9 +152,17 @@ class Runner:
         self.thread = None; self.tree = None
         self.wake = threading.Event(); self.stopping = False
         self.status = {'state': 'idle', 'mode': None, 'started': None, 'next_run': None, 'exit': None}
+        self.log_path = self.root / '.local' / 'logs' / 'run.log'
 
     def say(self, text):
         self.log.append(time.strftime('%H:%M:%S ') + text)
+        # Also on disk: the page's copy dies with the panel, and when Windows went down in a
+        # run on 2026-11-18 nothing was left to tell what had happened.
+        try:
+            with self.log_path.open('a', encoding='utf-8') as out:
+                out.write(time.strftime('%Y-%m-%d %H:%M:%S ') + text + '\n')
+        except OSError:
+            pass
 
     def start(self, mode, publish, repeat, settings=None, interval=None):
         if mode not in MODES:
@@ -214,6 +222,12 @@ class Runner:
 
     def _run(self, mode, publish):
         env = dict(os.environ, PYTHONIOENCODING='utf-8', PYTHONUNBUFFERED='1')
+        try:
+            self.log_path.parent.mkdir(parents=True, exist_ok=True)
+            if self.log_path.exists() and self.log_path.stat().st_size > 2 * 1024 * 1024:
+                self.log_path.replace(self.log_path.with_name('run.log.old'))
+        except OSError:
+            pass
         self.say(f'Starting a {mode} run' + (' (publishing)' if publish else ' (not publishing)') + '.')
         try:
             proc = subprocess.Popen(self.command(self.root, mode, publish), cwd=self.root, env=env,

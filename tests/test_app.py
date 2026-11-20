@@ -205,6 +205,18 @@ class PanelTests(unittest.TestCase):
         self.assertLess(time.monotonic() - began, 8)
         self.assertTrue(any('Stopped.' in line for line in self.state()['log']))
 
+    def test_what_a_run_says_is_also_kept_on_disk(self):
+        logs = self.root / '.local' / 'logs'
+        logs.mkdir(parents=True)
+        (logs / 'run.log').write_text('x' * (2 * 1024 * 1024 + 1))   # an old, full log rolls over
+        self.request('POST', '/api/start', {'mode': 'full', 'publish': False, 'repeat': False})
+        self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
+        text = (logs / 'run.log').read_text(encoding='utf-8')
+        self.assertRegex(text, r'\d{4}-\d\d-\d\d \d\d:\d\d:\d\d Starting a full run')
+        self.assertIn('[CHECK] 25/100', text)
+        self.assertIn('Run finished.', text)
+        self.assertEqual((logs / 'run.log.old').stat().st_size, 2 * 1024 * 1024 + 1)
+
     def test_after_a_restart_only_a_schedule_nobody_stopped_carries_on(self):
         self.script = 'import time; print("started", flush=True); time.sleep(60)'
         self.request('POST', '/api/start', {'mode': 'full', 'publish': True, 'repeat': True, 'interval': 60})
