@@ -253,6 +253,22 @@ class RegressionTests(unittest.TestCase):
             for row in read_state(path)['nodes'].values():
                 self.assertEqual(row['last_success'],now-7*3600)
 
+    def test_history_keeps_every_recent_config_and_trims_those_that_never_worked(self):
+        from state import save_state
+        now=time.time()
+        events=[{'at':now-i,'ok':False,'latency_ms':0} for i in range(10)]
+        nodes={f'k{i}':{'url':f'u{i}','last_seen':now,'last_attempt':now,'last_success':0,'verified':False,
+                        'history':list(events),'verification_history':[],'metrics':{'big':'x'*50}} for i in range(25000)}
+        nodes['good']={'url':'g','last_seen':now,'last_success':now,'verified':True,'history':list(events),'metrics':{'a':1}}
+        nodes['old']={'url':'o','last_seen':now-31*86400,'last_success':0,'history':[]}
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder)/'history.json'
+            save_state(path,{'schema':3,'nodes':nodes,'published':['good'],'next_number':1})
+            kept=read_state(path)['nodes']
+        self.assertEqual(len(kept),25001)                     # past the old 20,000, without the stale one
+        self.assertEqual((len(kept['k7']['history']),'metrics' in kept['k7']),(3,False))
+        self.assertEqual(kept['good']['history'],events)       # a config that worked keeps everything
+
     def test_old_history_requires_reverification_but_keeps_node_identity(self):
         with tempfile.TemporaryDirectory() as folder:
             path=Path(folder)/'history.json'

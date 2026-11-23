@@ -52,10 +52,10 @@ usable feeds. Whether a found feed has anything that works from the operator's
 network is only known once it has been tested there, so:
 
 - A found feed is tested only on configurations that no listed source carries:
-  150 per run, never-tested ones first, until one passes full verification.
-- A verified contribution raises its allowance to 450 for seven days. A source
+  500 per run, never-tested ones first, until one passes full verification.
+- A verified contribution raises its allowance to 3,000 for seven days. A source
   with a currently verified config that passed again at least 24 hours after
-  its first credited pass gets up to 1,500 per run. Each config is credited once.
+  its first credited pass is tested whole. Each config is credited once.
 - A feed with nothing working waits 8 hours before its next sample, then 16, 32 and
   so on up to a week.
 - At most 40 found feeds are tested per discovery (`--found-sources`; `0` turns
@@ -184,8 +184,9 @@ never how a candidate is tested.
 
 ## Selection
 
-- **History.** At most 20,000 nodes from the last 30 days, each with its last 48
-  results.
+- **History.** Every config seen in the last 30 days (at most 400,000). One that has
+  worked keeps its last 48 results; one that never worked keeps its last three, which
+  is what picking the never-tested first and resting after three failures need.
 - **Reliability.** A recency-weighted score in which a result loses half its weight
   each day. A single fresh success cannot score as 100% reliable.
 - **Ranking.** Reliability first, then a full-size transfer, latency, and the
