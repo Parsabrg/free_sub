@@ -18,6 +18,28 @@ from xray_test import ProbeResult
 
 
 class RegressionTests(unittest.TestCase):
+    def test_no_run_when_the_country_cannot_be_told(self):
+        import sys
+        import main
+        version = subprocess.CompletedProcess([], 0, stdout='Xray fixture')
+        def run(countries, *extra):
+            out = io.StringIO()
+            with patch('main.subprocess.run', return_value=version), patch('main.physical_interface', return_value=None), \
+                    patch('main.egress_country', side_effect=countries) as asked, patch('main.time.sleep'), \
+                    patch('main.run_lock', side_effect=RuntimeError('ran')), redirect_stdout(out):
+                try:
+                    main.main(['--xray', sys.executable, *extra])
+                    ran = False
+                except RuntimeError:
+                    ran = True
+            return ran, asked.call_count, out.getvalue()
+        ran, asked, said = run([None] * 4)                  # offline for a minute: no run
+        self.assertEqual((ran, asked), (False, 4))
+        self.assertIn('Could not tell which country', said)
+        self.assertEqual(run([None, 'IR'])[:2], (True, 2))  # Wi-Fi came back on the second try
+        self.assertEqual(run(['DE'])[:2], (False, 1))
+        self.assertEqual(run([None] * 4, '--allow-non-iran')[:2], (True, 4))
+
     def test_parallel_worker_budget(self):
         import sys
         from main import arguments
