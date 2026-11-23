@@ -300,7 +300,7 @@ class RegressionTests(unittest.TestCase):
                 elif args==['branch','--show-current']: out='main\n'
                 elif args==['diff','--cached','--name-only']: out='unrelated.txt\n'
                 return subprocess.CompletedProcess(command,0,stdout=out,stderr='')
-            with patch('publishing.subprocess.run',side_effect=fake),patch('publishing.validate_outputs'):
+            with patch('publishing.subprocess.run',side_effect=fake),patch('publishing.validate_outputs',return_value={}):
                 with self.assertRaisesRegex(RuntimeError,'staged work'): publish(root,'xray',root/'docs')
             self.assertFalse(any(c[:2]==['git','push'] for c in calls))
             calls.clear()
@@ -308,7 +308,7 @@ class RegressionTests(unittest.TestCase):
                 result=fake(command,**kwargs)
                 if command[:5]==['git','diff','--cached','--name-only']: result.stdout=''
                 return result
-            with patch('publishing.subprocess.run',side_effect=clean),patch('publishing.validate_outputs'):
+            with patch('publishing.subprocess.run',side_effect=clean),patch('publishing.validate_outputs',return_value={}):
                 publish(root,'xray',root/'docs')
             self.assertTrue(any(c[:2]==['git','push'] for c in calls))
             self.assertFalse(any(c[:2]==['git','commit'] for c in calls))
@@ -318,7 +318,7 @@ class RegressionTests(unittest.TestCase):
                 result=clean(command,**kwargs)
                 if command[:2]==['git','ls-remote']: result.stdout='existing-ref'
                 return result
-            with patch('publishing.subprocess.run',side_effect=offline),patch('publishing.validate_outputs'),redirect_stderr(io.StringIO()) as errors:
+            with patch('publishing.subprocess.run',side_effect=offline),patch('publishing.validate_outputs',return_value={}),redirect_stderr(io.StringIO()) as errors:
                 with self.assertRaises(subprocess.CalledProcessError): publish(root,'xray',root/'docs')
             self.assertIn('Git fetch exited 128; category=network',errors.getvalue())
             self.assertNotIn('private-token-fixture',errors.getvalue())

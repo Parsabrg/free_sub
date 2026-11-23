@@ -2,19 +2,21 @@ name: Deploy locally verified subscription
 on:
   push:
     branches: [main]
-    paths: ['docs/**', '.github/workflows/pages.yml', 'public_page.py', 'publishing.py']
+    paths: ['docs/**', '.github/workflows/pages.yml', 'public_page.py', 'publishing.py', 'scripts/check_pages.py']
   workflow_run:
     workflows: [Subscription snapshot]
     branches: [subscriptions]
     types: [completed]
   workflow_dispatch:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
 permissions:
   contents: read
   pages: write
   id-token: write
 concurrency:
   group: github-pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   deploy:
     # Configure Settings > Pages > GitHub Actions once. No source collection on hosted runners.
@@ -39,8 +41,25 @@ jobs:
           fi
           python -c 'import sys; from publishing import prepare_pages; prepare_pages("_site", sys.argv[1])' "$ref"
       - uses: actions/configure-pages@v5
+        id: pages
+      - name: Check whether the scheduled run needs to publish
+        id: current
+        shell: bash
+        env:
+          SITE: ${{ steps.pages.outputs.base_url }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == schedule ]] && python scripts/check_pages.py "$SITE" _site --attempts 1; then
+            echo 'same=true' >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/upload-pages-artifact@v4
+        if: steps.current.outputs.same != 'true'
         with:
           path: _site
       - id: deployment
+        if: steps.current.outputs.same != 'true'
         uses: actions/deploy-pages@v4
+      - name: Verify all public files match the published snapshot
+        if: steps.current.outputs.same != 'true'
+        env:
+          SITE: ${{ steps.deployment.outputs.page_url }}
+        run: python scripts/check_pages.py "$SITE" _site

@@ -96,7 +96,7 @@ class PanelTests(unittest.TestCase):
         state = self.state()
         self.assertEqual(state['run']['exit'], 0)
         self.assertTrue(any('[CHECK] 25/100' in line for line in state['log']))
-        self.assertEqual(state['settings'], {'mode': 'full', 'publish': False, 'repeat': False, 'limit': 0, 'interval': 30})
+        self.assertEqual(state['settings'], {'mode': 'full', 'publish': False, 'repeat': False, 'limit': 0, 'interval': 30, 'playback': 0})
         self.assertEqual(self.request('POST', '/api/start', {'mode': 'everything'})[0], 400)
 
     def test_a_run_that_ends_before_it_is_contained_still_counts(self):
@@ -148,11 +148,12 @@ class PanelTests(unittest.TestCase):
             self.assertEqual(status, 400, bad)
             self.assertIn('must be a whole number from', json.loads(body)['error'])
         self.assertEqual(self.state()['run']['state'], 'idle')
-        self.assertEqual(app.clean_settings({}), {'limit': 0, 'interval': 30})
-        self.assertEqual(app.clean_settings({'limit': 250.0, 'interval': 60}), {'limit': 250, 'interval': 60})
+        self.assertEqual(app.clean_settings({}), {'limit': 0, 'interval': 30, 'playback': 0})
+        self.assertEqual(app.clean_settings({'limit': 250.0, 'interval': 60, 'playback': 20}),
+                         {'limit': 250, 'interval': 60, 'playback': 20})
         self.assertEqual(self.request('POST', '/api/start', {'mode': 'health', 'repeat': True, 'limit': 250, 'interval': 5})[0], 200)
         self.assertEqual(self.runner.interval, 5 * 60)
-        self.assertEqual(self.runner.settings, {'limit': 250, 'interval': 5})
+        self.assertEqual(self.runner.settings, {'limit': 250, 'interval': 5, 'playback': 0})
         self.request('POST', '/api/stop', {})
         self.assertTrue(wait_for(lambda: self.state()['run']['state'] == 'idle'))
         self.assertEqual({k: self.state()['settings'][k] for k in ('limit', 'interval')}, {'limit': 250, 'interval': 5})

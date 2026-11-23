@@ -17,6 +17,7 @@ ROOT=Path(__file__).resolve().parent
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--xray',required=True)
+    ap.add_argument('--evidence',type=Path,default=ROOT/'.local'/'verification.json')
     args=ap.parse_args()
     xray=Path(args.xray).expanduser().resolve()
     if not xray.is_file(): raise SystemExit('An actual Xray binary is required; verification cannot skip it')
@@ -35,7 +36,7 @@ def main():
               'source_sha256':source_fingerprint(ROOT),'xray_binary_sha256':hashlib.sha256(xray.read_bytes()).hexdigest(),
               'elapsed_seconds':round(time.monotonic()-started,2),'output':output,
               'scope':'Actual Xray core with loopback protocol fixtures, trusted HTTPS and MP4 range checks'}
-    atomic_write(ROOT/'.local'/'verification.json',json.dumps(evidence,indent=2)+'\n')
+    atomic_write(args.evidence,json.dumps(evidence,indent=2)+'\n')
     if result.returncode: raise SystemExit(result.returncode)
     print('[VERIFY] Regression and actual Xray end-to-end checks passed.',flush=True)
 

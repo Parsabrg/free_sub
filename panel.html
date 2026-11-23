@@ -118,6 +118,7 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
     <div class="settings">
       <label>Max nodes in the list <input type="number" id="limit" min="1" max="1000" step="1" placeholder="all working"></label>
       <label>Run every <input type="number" id="interval" min="5" max="1440" step="1"> minutes</label>
+      <label>Browser playback checks <input type="number" id="playback" min="0" max="20" step="1"></label>
     </div>
     <p class="note" style="margin:8px 0 0">Leave the maximum empty to list every working node. Both apply the next
       time you press Start.</p>
@@ -139,6 +140,7 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
 
   <section id="links" hidden>
     <h2>Your subscription</h2>
+    <p class="note" id="delivery"></p>
     <div id="link-rows" class="links"></div>
   </section>
 
@@ -190,7 +192,7 @@ let first = true, busy = false, linked = false, failures = 0, gone = false, last
 function renderLinks(pages) {
   if (linked || !pages) return;
   linked = true;
-  const files = [['v2rayN (desktop)', 'xray.json'], ['v2rayNG (Android)', 'sub.b64'], ['Compact (Android)', 'sub-compact.b64'], ['Plain list', 'sub.txt'], ['Status page', '']];
+  const files = [['v2rayN (desktop)', 'xray.json'], ['v2rayNG (Android)', 'sub.b64'], ['Browser playback', 'sub-playback.b64'], ['Compact (Android)', 'sub-compact.b64'], ['Plain list', 'sub.txt'], ['Status page', '']];
   for (const [label, file] of files) {
     const row = document.createElement('div'), name = document.createElement('span'), link = document.createElement('a');
     name.textContent = label;
@@ -346,6 +348,7 @@ function render(state) {
     $('publish').checked = state.settings.publish;
     $('limit').value = state.settings.limit || '';
     $('interval').value = state.settings.interval;
+    $('playback').value = state.settings.playback;
     first = false;
   }
   // Progress of the run that is going now: its lines start at the last "Starting a … run".
@@ -401,6 +404,9 @@ function render(state) {
   }
   $('task').hidden = !state.task;
   renderLinks(state.pages);
+  const delivery = state.delivery;
+  const when = stamp => stamp ? new Date(stamp * 1000).toLocaleTimeString() : '—';
+  $('delivery').textContent = `Tested ${when(delivery.tested_epoch)} · Pushed ${when(delivery.pushed.tested_epoch)} · Live ${when(delivery.live.manifest?.tested_epoch)}${delivery.live.error ? ' (verification unavailable)' : ''}`;
   renderSources(state);
   if (state.restarting) {
     // The update was pulled and the program is being replaced: this page reloads itself when the new one answers.
@@ -438,7 +444,7 @@ $('start').onclick = () => {
     $('run-message').textContent = problem[1]; $('run-message').className = 'message bad'; $(problem[0]).focus();
     return;
   }
-  act('/api/start', {mode: $('mode').value, repeat: $('repeat').checked, publish: $('publish').checked, limit, interval}, 'run-message');
+  act('/api/start', {mode: $('mode').value, repeat: $('repeat').checked, publish: $('publish').checked, limit, interval, playback: Number($('playback').value)}, 'run-message');
 };
 $('stop').onclick = () => act('/api/stop', {}, 'run-message');
 $('update').onclick = () => act('/api/update', {}, 'run-message');

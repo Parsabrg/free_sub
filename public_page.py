@@ -41,6 +41,7 @@ a[href]{color:var(--accent)}
 <script>
 const feeds = [
   ['Compact mobile feed (up to 20 servers)', 'sub-compact.b64', 'compact_ids'],
+  ['Browser playback verified', 'sub-playback.b64', 'playback_ids'],
   ['v2rayN (desktop)', 'xray.json'],
   ['v2rayN (verified IPs)', 'xray-pinned.json', 'pinned_ids'],
   ['v2rayNG (Android)', 'sub.b64'],

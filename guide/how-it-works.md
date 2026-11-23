@@ -148,6 +148,13 @@ with `python -m pip install playwright` and `python -m playwright install chromi
 then pass `--youtube-id` with an embeddable video ID. The browser check requires
 both playback progress and a media response through Xray.
 
+Set **Browser playback checks** in the panel, or pass `--playback-top 20`, to test
+up to 20 freshly verified configs against the W3C Sintel trailer. A Playwright
+browser must advance 15 seconds, deliver decoded frames, and receive the video
+through the tested endpoint. The report records startup time, stalls and any
+failure. Successful entries appear in `sub-playback.b64`; the baseline feed still
+uses the HTTPS and MP4 range gate. Install Playwright and Chromium as above.
+
 **Resting.** A configuration that failed its last three tests and has not worked
 for three days is retested once a day rather than on every discovery
 (`--retry-failed-hours`; `0` retests every time). In one discovery on 2026-11-12,
@@ -220,8 +227,13 @@ no switch to bypass the public-address checks or accept an untrusted certificate
 - A separate Git index builds the `subscriptions` branch from the generated
   feed files and a snapshot signal workflow. The Pages workflow deploys the feed
   using the site and validation code from the default branch.
-- Git uses time limits and noninteractive authentication. A failed push can be
-  retried on the next run. Concurrent updates use normal fast-forward rules.
+- Git uses time limits and noninteractive authentication. Temporary push failures
+  retry with the same validated commit. `python main.py --publish-only` retries
+  the saved snapshot without rescanning. Concurrent updates use normal fast-forward rules.
+- Pages checks for expirations every 15 minutes, subject to GitHub scheduling and
+  CDN delays. It rebuilds all public feeds together and checks their live hashes
+  against `delivery.json`. Scheduled runs can recover a missed or failed deployment
+  using the newest pushed snapshot. The panel shows the tested, pushed and live generations.
 - Share-link passwords are URL-escaped on output so that reserved characters
   survive import into a client.
 
@@ -230,7 +242,7 @@ the PowerShell scripts. It never tests public proxies, registers tasks, wakes
 hardware or publishes results; that stays on the operator's PC.
 
 Run the compatibility gate before changing Xray or a supported client version.
-CI tests six generated profiles through the pinned core. The interactive gate
+CI tests eight generated profiles through the pinned core, including REALITY and XHTTP. The interactive gate
 also checks the actual v2rayN **7.25.6** and v2rayNG **2.3.15** import paths.
 Start a separate portable desktop instance and install the pinned Android APK
 on a disposable emulator. Use its serial and the desktop process ID:
@@ -239,18 +251,32 @@ on a disposable emulator. Use its serial and the desktop process ID:
 python scripts/check_client_release.py --desktop-pid 12345 --android-serial emulator-5554 --output .local/client-release.json
 ```
 
-Follow the prompts to import the feeds, share each Android profile as a link,
+Follow the prompts to add the HTTP subscription URLs, refresh both after a new
+profile is added, share each Android profile as a link,
 and activate each profile. The gate compares desktop outbound settings and Android
 share settings, tests both clients over their running
 core, and writes evidence after all expected responses arrive. The Android
 emulator reaches the host fixtures through its `10.0.2.2` gateway.
 
+Use **Compare a candidate Xray release** in GitHub Actions for the Windows and
+Linux fixture matrix. To also replay a fresh local snapshot from the operator's
+network, run the following on the scanner PC:
+
+```powershell
+python download_xray.py --release v26.11.9 --directory .local/xray-candidate
+python scripts/compare_xray.py tools/xray.exe .local/xray-candidate/xray.exe --snapshot docs --output .local/xray-comparison.json
+```
+
+The comparison records fixture results and changes on the same sampled configs.
+Fixture failures or a baseline pass lost on the candidate make the command fail.
+Review the report and repeat the interactive client gate before promoting a core.
+
 ## When things fail
 
 - After a run in which nothing passed, the previous list may be kept **only within
   each node's original expiry**, and the report says `retained_previous`.
-- A failed run never renews a last-success time. An expired list becomes empty on
-  the next completed run (`expired_or_empty`).
+- A failed run never renews a last-success time. Public Pages files become empty
+  after the next scheduled expiry deployment. The self-hosted server filters on each request.
 - A failure before the outputs are written leaves the previous deployment in place,
   and its timestamps keep aging.
 - No success is ever invented to fill the list.

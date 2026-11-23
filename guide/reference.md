@@ -14,11 +14,13 @@
 |---|---|---|
 | `--mode auto\|full\|health` | `auto` | `full` fetches every source, screens and verifies. `health` rechecks the published and standby nodes. `auto` picks `full` when the last discovery is older than `--discovery-hours`, otherwise `health`. |
 | `--publish` | off | Run the test gate and push the verified files to the `subscriptions` branch. |
+| `--publish-only` | off | Retry publishing the saved validated feed with its original verification timestamps. |
 | `--probe-control PATH` | off | Local file holding a known-good share link for identifying a video mirror outage. |
 | `--video-mirror URL` | built-in mirrors | Override the video origins with up to four public HTTPS MP4 range URLs. Repeat the option for each URL. |
 | `--stream-segments N` | 1 | Transfer up to eight consecutive MP4 ranges and record startup, throughput and stalls. |
 | `--check-udp`, `--check-ipv6` | off | Record separate UDP relay and IPv6 destination checks. |
 | `--youtube-id ID` | off | Measure playback of an embeddable YouTube video with Playwright Chromium. |
+| `--playback-top N` | 0 | Check up to 20 freshly verified configs for 15 seconds of browser playback and generate `sub-playback.b64`. |
 | `--xray PATH` | `tools\xray.exe` | The Xray binary (`tools/xray` on Linux). |
 | `--limit N` | 0 | Most nodes in the published list (1 to 1000). `0` lists every working node. |
 | `--interval-minutes N` | 30 | How often runs are started (1 to 1440), published in `status.json`. The panel or the scheduled task does the scheduling; this option only states it. |

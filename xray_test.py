@@ -66,6 +66,11 @@ class ProbeResult:
     ipv6: bool | None = None
     youtube_played: bool | None = None
     youtube_error: str = ''
+    playback_seconds: float = 0
+    playback_start_ms: int = 0
+    playback_stalls: int = 0
+    playback_error: str = ''
+    playback_completed_epoch: float = 0
 
 
 def validate_video_mirrors(urls):
@@ -370,6 +375,20 @@ def run_probe(candidate, xray_bin, timeout=30.0, *, quick=False, screen_timeout=
             if stream_segments>1: result.stream_error='DiagnosticWorkerFailed'
             if youtube_id: result.youtube_error='DiagnosticWorkerFailed'
         return result
+
+
+def verify_playback(candidate, result, xray_bin):
+    """Run a separate bounded browser worker against the IP that passed verification."""
+    with tempfile.TemporaryDirectory(prefix='xray-probe-',ignore_cleanup_errors=True) as work_dir:
+        payload={'candidate':asdict(candidate),'xray_bin':str(xray_bin),'timeout':40,
+                 'work_dir':work_dir,'endpoint':result.endpoint_ip,'fixture':None,
+                 'playback':True,'stream_segments':1,'check_udp':False,'check_ipv6':False,'youtube_id':None}
+        command=[sys.executable,str(Path(__file__).resolve()),'--worker']
+        try:
+            output=json.loads(communicate_bounded(command,json.dumps(payload),payload['timeout']))
+            return {key:value for key,value in output.items() if key.startswith('playback_')} or {'playback_error':'PlaybackWorkerFailed'}
+        except (OSError,ValueError,RuntimeError,subprocess.TimeoutExpired):
+            return {'playback_error':'PlaybackWorkerFailed'}
 
 
 def fixture_address(host):

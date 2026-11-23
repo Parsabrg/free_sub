@@ -1,0 +1,41 @@
+name: Compare a candidate Xray release
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Exact official Xray release tag
+        default: v26.11.9
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  compare:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            binary: xray
+          - os: windows-latest
+            binary: xray.exe
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CANDIDATE: ${{ inputs.release }}
+        run: |
+          python download_xray.py
+          python download_xray.py --release "$CANDIDATE" --directory .local/candidate
+      - run: python scripts/compare_xray.py tools/${{ matrix.binary }} .local/candidate/${{ matrix.binary }} --output .local/comparison.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: xray-comparison-${{ matrix.os }}
+          path: .local/comparison.json

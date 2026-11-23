@@ -35,7 +35,7 @@ PACKAGE = 'com.v2ray.ang'
 UID = '14a2c062-1234-5678-abcd-0123456789ab'
 
 
-def xray_cases(xray, root):
+def xray_cases(xray, root, tls_origin):
     material = json.loads(subprocess.check_output([xray,'tls','cert','--ca','--domain=localhost','--json'],timeout=10))
     cert,key = root/'cert.pem',root/'key.pem'
     cert.write_text('\n'.join(material['certificate'])+'\n',encoding='ascii')
@@ -48,6 +48,10 @@ def xray_cases(xray, root):
     password=secrets.token_hex(12)
     hy2={'network':'hysteria','security':'tls','tlsSettings':dict(tls['tlsSettings'],alpn=['h3']),
          'hysteriaSettings':{'version':2}}
+    reality_keys=subprocess.check_output([xray,'x25519'],text=True,timeout=10).splitlines()
+    private_key,public_key=[line.split(': ',1)[1] for line in reality_keys[:2]]
+    reality={'network':'tcp','security':'reality','realitySettings':{'target':'127.0.0.1:'+str(tls_origin(cert,key)),
+             'privateKey':private_key,'serverNames':['localhost'],'shortIds':['0708']}}
     vmess={'id':UID,'aid':'0','add':'127.0.0.1','net':'ws','path':'/fixture','tls':'','scy':'auto'}
     return [
         ('socks',{'auth':'password','accounts':[{'user':'fixture','pass':password}]},{},
@@ -62,29 +66,55 @@ def xray_cases(xray, root):
          lambda port:f'trojan://{password}@127.0.0.1:{port}{suffix}'),
         ('hysteria',{'version':2,'clients':[{'auth':password}]},hy2,
          lambda port:f'hy2://{password}@127.0.0.1:{port}?sni=localhost&pinSHA256={pin}'),
+        ('vless',{'clients':[{'id':UID}],'decryption':'none'},reality,
+         lambda port:f'vless://{UID}@127.0.0.1:{port}?security=reality&sni=localhost&fp=chrome&sid=0708&pbk={public_key}'),
+        ('vless',{'clients':[{'id':UID}],'decryption':'none'},dict(tls,network='xhttp',xhttpSettings={'path':'/fixture','mode':'packet-up'}),
+         lambda port:f'vless://{UID}@127.0.0.1:{port}{suffix}&type=xhttp&path=%2Ffixture&mode=packet-up'),
     ]
 
 
-def new_origin(stack, folder, nonce=None):
+def new_origin(stack, folder, nonce=None, tls=None, requests=None):
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
             path=folder/self.path.removeprefix('/')
             if nonce is not None:
                 body=nonce.encode()
-            elif self.path in ('/xray.json','/sub.b64'):
+            elif self.path in ('/xray.json','/sub.b64','/android.b64'):
                 body=path.read_bytes()
             else:
                 self.send_error(404)
                 return
             self.send_response(200)
             self.send_header('Content-Length',str(len(body)))
+            self.send_header('Cache-Control','no-store')
             self.end_headers()
             self.wfile.write(body)
+            if requests is not None:
+                requests.append((self.path,hashlib.sha256(body).hexdigest()))
 
         def log_message(self,*args):
             pass
 
-    server=stack.enter_context(ThreadingHTTPServer(('127.0.0.1',0),Handler))
+    if tls:
+        # Xray's generated PEM contains a PKCS#8 key under a legacy label.
+        cert,key=tls
+        python_key=folder/'python-key.pem'
+        python_key.write_text(key.read_text(encoding='ascii').replace('RSA PRIVATE KEY','PRIVATE KEY'),encoding='ascii')
+        context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(cert,python_key)
+        context.set_alpn_protocols(['h2','http/1.1'])
+        class Origin(ThreadingHTTPServer):
+            def process_request_thread(self, request, client_address):
+                try:
+                    request.settimeout(5)
+                    request=context.wrap_socket(request,server_side=True)
+                except OSError:
+                    request.close()
+                    return
+                super().process_request_thread(request,client_address)
+        server=stack.enter_context(Origin(('127.0.0.1',0),Handler))
+    else:
+        server=stack.enter_context(ThreadingHTTPServer(('127.0.0.1',0),Handler))
     worker=threading.Thread(target=server.serve_forever,kwargs={'poll_interval':0.05},daemon=True)
     worker.start()
     stack.callback(server.shutdown)
@@ -98,10 +128,10 @@ def setup_fixtures(stack, xray, folder):
     target_port=allocate_port()
     now=time.time()
     state=read_state(folder/'history.json')
-    for protocol,settings,stream,make_link in xray_cases(xray,folder):
+    for protocol,settings,stream,make_link in xray_cases(xray,folder,lambda cert,key:new_origin(stack,folder,'reality',tls=(cert,key))):
         socket_type=socket.SOCK_DGRAM if protocol=='hysteria' else socket.SOCK_STREAM
         port=allocate_port(socket_type)
-        tag='fixture-'+protocol
+        tag=f'fixture-{len(profiles)}'
         nonce=secrets.token_hex(16)
         origin=new_origin(stack,folder,nonce)
         config['inbounds'].append({'listen':'127.0.0.1','port':port,'tag':tag,'protocol':protocol,
@@ -147,7 +177,10 @@ def check_traffic(socks_port, target):
 def check_core(xray, folder, profiles):
     from xray_test import make_config
 
+    failed=[]
     for candidate,_,nonce in profiles:
+        stream=candidate.outbound.get('streamSettings',{})
+        label=f'{candidate.protocol}/{stream.get("network","tcp")}/{stream.get("security","none")}'
         port=allocate_port()
         config=folder/'core-client.json'
         config.write_text(json.dumps(make_config(candidate.outbound,port)),encoding='utf-8')
@@ -155,15 +188,18 @@ def check_core(xray, folder, profiles):
             try:
                 check_ready(port,server)
                 if not check_traffic(port,nonce):
-                    raise ValueError(f'Xray fixture failed for {candidate.protocol}')
+                    failed.append(f'{label} (wrong response)')
+            except (OSError,RuntimeError,http.client.HTTPException) as exc:
+                failed.append(f'{label} ({type(exc).__name__})')
             finally:
                 if server.poll() is None:
                     server.terminate()
                 server.wait(timeout=5)
+    if failed:
+        raise SystemExit('Xray fixtures failed: '+', '.join(failed))
 
 
-def check_desktop_export(directory, docs):
-    expected=json.loads((docs/'xray.json').read_text(encoding='utf-8'))['outbounds']
+def check_desktop_export(directory, expected):
     imported=[]
     for path in directory.glob('*.json'):
         try:
@@ -187,12 +223,16 @@ def android_settings(candidate):
     tls=stream.get('tlsSettings',{})
     ws=stream.get('wsSettings',{})
     hysteria=stream.get('hysteriaSettings',{})
+    reality=stream.get('realitySettings',{})
+    xhttp=stream.get('xhttpSettings',{})
     account=(endpoint.get('users') or [endpoint])[0]
     return (candidate.protocol,candidate.host,candidate.port,stream.get('network','tcp'),
             stream.get('security','none'),tls.get('serverName',''),tls.get('pinnedPeerCertSha256',''),
             ws.get('path',''),(ws.get('headers') or {}).get('Host',''),
             account.get('id'),account.get('security'),endpoint.get('method'),endpoint.get('password'),
-            endpoint.get('user'),endpoint.get('pass'),hysteria.get('auth'))
+            endpoint.get('user'),endpoint.get('pass'),hysteria.get('auth'),reality.get('serverName'),
+            reality.get('fingerprint'),reality.get('publicKey') or reality.get('password'),reality.get('shortId'),
+            xhttp.get('path'),xhttp.get('host'),xhttp.get('mode'))
 
 
 def android_fixture(docs, profiles, destination):
@@ -243,21 +283,40 @@ def main():
         info=subprocess.check_output(adb+['shell','dumpsys','package',PACKAGE],text=True,timeout=15)
         if not re.search(rf'^\s*versionName={re.escape(ANDROID_VERSION)}\s*$',info,re.MULTILINE):
             raise SystemExit(f'Install v2rayNG {ANDROID_VERSION} on the emulator')
-        feed_port=new_origin(stack,docs)
+        requests=[]
+        desktop_feed=docs/'xray.json'
+        desktop_raw=desktop_feed.read_bytes()
+        desktop_profiles=json.loads(desktop_raw)['outbounds']
+        desktop_feed.write_text(json.dumps({'outbounds':desktop_profiles[:-1]}),encoding='utf-8')
+        feed_port=new_origin(stack,docs,requests=requests)
         android_port=allocate_port()
         subprocess.run(adb+['forward',f'tcp:{android_port}',f'tcp:{args.android_socks}'],check=True,timeout=10)
         stack.callback(subprocess.run,adb+['forward','--remove',f'tcp:{android_port}'],timeout=10)
-        android_file=folder/'android.b64'
+        android_file=docs/'android.b64'
         android_profiles=android_fixture(docs,profiles,android_file)
-        remote='/sdcard/Download/free-sub-release-'+secrets.token_hex(4)+'.b64'
-        subprocess.run(adb+['push',str(android_file),remote],check=True,timeout=15)
-        stack.callback(subprocess.run,adb+['shell','rm',remote],timeout=10)
-        print(f'Import http://127.0.0.1:{feed_port}/xray.json in v2rayN {DESKTOP_VERSION}.')
-        print(f'Import {remote} in v2rayNG {ANDROID_VERSION}.')
+        android_raw=android_file.read_bytes()
+        initial=base64.b64decode(android_raw).splitlines(keepends=True)[:-1]
+        android_file.write_bytes(base64.b64encode(b''.join(initial))+b'\n')
+        print(f'Add a new subscription at http://127.0.0.1:{feed_port}/xray.json in v2rayN {DESKTOP_VERSION}.')
+        print(f'Add a new subscription at http://10.0.2.2:{feed_port}/android.b64 in v2rayNG {ANDROID_VERSION}.')
+        print('Enable “Allow insecure HTTP address” on that emulator-only subscription.')
         print('Set both test clients to Global proxy routing in their test profiles.')
-        input('Press Enter after both imports finish. ')
-        check_desktop_export(Path(desktop['Path']).parent/'guiConfigs',docs)
+        print('For these local fixture URLs, choose the subscription update option that connects directly.')
+        def check_fetch():
+            for file in (desktop_feed,android_file):
+                if ('/'+file.name,hashlib.sha256(file.read_bytes()).hexdigest()) not in requests:
+                    raise SystemExit(f'The client did not fetch the current {file.name} over HTTP')
+        input(f'Press Enter after both subscriptions show {len(profiles)-1} profiles. ')
+        check_fetch()
+        directory=Path(desktop['Path']).parent/'guiConfigs'
+        check_desktop_export(directory,desktop_profiles[:-1])
+        desktop_feed.write_bytes(desktop_raw)
+        android_file.write_bytes(android_raw)
+        input(f'Refresh both subscriptions. Press Enter after both show {len(profiles)} profiles. ')
+        check_fetch()
+        check_desktop_export(directory,desktop_profiles)
         evidence={'xray':version,'v2rayN':DESKTOP_VERSION,'v2rayNG':ANDROID_VERSION,'checks':[]}
+        evidence['subscription_http']={'initial':len(profiles)-1,'refreshed':len(profiles)}
         for client,port,rows in (('v2rayN',args.desktop_socks,profiles),('v2rayNG',android_port,android_profiles)):
             for candidate,row,target in rows:
                 if client=='v2rayNG':
@@ -273,7 +332,7 @@ def main():
                     print('Fixture response did not match. Check the active profile and proxy routing.',flush=True)
                 else:
                     raise SystemExit(f'{client} {candidate.protocol} failed the fixture request')
-                evidence['checks'].append({'client':client,'protocol':candidate.protocol,'result':'passed'})
+                evidence['checks'].append({'client':client,'protocol':candidate.protocol,'profile':row['name'],'result':'passed'})
         args.output.write_text(json.dumps(evidence,indent=2)+'\n',encoding='utf-8')
         print(f'Passed {len(evidence["checks"])} client traffic checks.',flush=True)
 

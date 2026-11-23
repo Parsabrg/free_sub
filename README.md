@@ -18,6 +18,7 @@ Tests run on the operator's own network, so "working" means "working from there"
 | v2rayN (verified IPs) | `https://parsabrg.github.io/free_sub/xray-pinned.json` |
 | v2rayNG (Android) | `https://parsabrg.github.io/free_sub/sub.b64` |
 | Compact (up to 20 server IPs) | `https://parsabrg.github.io/free_sub/sub-compact.b64` |
+| Browser playback (when enabled) | `https://parsabrg.github.io/free_sub/sub-playback.b64` |
 | Other clients, plain share links | `https://parsabrg.github.io/free_sub/sub.txt` |
 | Status page and test report | `https://parsabrg.github.io/free_sub/` and `status.json` |
 
@@ -146,7 +147,8 @@ Details, limits and the reasons behind them are in
   behave differently.
 - Testing public proxies exposes the PC's IP address and connection metadata to
   their operators.
-- No UDP, DNS-leak, sustained-speed or gaming-latency measurement is made.
+- The default check measures a bounded video transfer. Optional browser playback,
+  UDP and IPv6 checks describe the sites and conditions actually tested.
 
 ## Sources and acknowledgments
 

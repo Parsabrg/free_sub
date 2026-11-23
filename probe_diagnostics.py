@@ -19,6 +19,8 @@ from xray_test import (VIDEO_BYTES, allocate_port, check_ready, fixture_address,
 
 UDP_TARGET = ('1.1.1.1',53)
 IPV6_TARGET = 'https://[2606:4700:4700::1111]/dns-query?name=example.com&type=AAAA'
+PLAYBACK_CLIP = 'https://media.w3.org/2010/05/sintel/trailer.mp4'
+PLAYBACK_SECONDS = 15
 PROBE_ERRORS = (OSError,ValueError,http.client.HTTPException)
 
 
@@ -102,6 +104,60 @@ function onYouTubeIframeAPIReady() {
         return None,'YouTubeBrowserUnavailable'
 
 
+def controlled_playback(port, clip=PLAYBACK_CLIP):
+    """Watch decoded video frames and playback time in a fresh proxied browser."""
+    try:
+        from playwright.sync_api import Error, TimeoutError, sync_playwright
+    except ImportError:
+        return {'playback_error':'InstallPlaywrightChromium'}
+    html='''<!doctype html><video muted playsinline preload="none"></video><script>
+const video = document.querySelector('video');
+const started = performance.now();
+const metrics = {seconds:0, start:0, stalls:0, frames:0, error:false};
+video.addEventListener('playing', () => {if (!metrics.start) metrics.start = performance.now()-started;});
+video.addEventListener('waiting', () => {if (metrics.start) metrics.stalls++;});
+video.addEventListener('error', () => metrics.error = true);
+video.addEventListener('timeupdate', () => metrics.seconds = video.currentTime);
+const frame = () => {metrics.frames++; video.requestVideoFrameCallback(frame);};
+video.requestVideoFrameCallback(frame);
+video.src = CLIP;
+video.play().catch(() => metrics.error = true);
+</script>'''
+    with sync_playwright() as driver:
+        options={'timeout':6500,'proxy':{'server':f'socks5://127.0.0.1:{port}'},
+                 'args':['--disable-quic','--autoplay-policy=no-user-gesture-required']}
+        try:
+            browser=driver.chromium.launch(**options)
+        except Error:
+            try:
+                browser=driver.chromium.launch(channel='chrome',**options)
+            except Error:
+                return {'playback_error':'PlaybackBrowserUnavailable'}
+        try:
+            page=browser.new_page(service_workers='block')
+            probe='https://free-sub-probe.invalid/'
+            page.route('**/*',lambda route: route.fulfill(content_type='text/html',body=html.replace('CLIP',json.dumps(clip)))
+                       if route.request.url==probe else route.continue_() if route.request.url==clip else route.abort())
+            media=[]
+            page.on('response',lambda response: media.append(response.status) if response.url==clip and response.ok else None)
+            page.goto(probe,wait_until='domcontentloaded',timeout=4000)
+            try:
+                page.wait_for_function('seconds => metrics.error || (metrics.seconds >= seconds && metrics.frames >= seconds)',
+                                       arg=PLAYBACK_SECONDS,timeout=25_000)
+            except TimeoutError:
+                pass
+            metrics=page.evaluate('metrics')
+            played=metrics['seconds']>=PLAYBACK_SECONDS and metrics['frames']>=PLAYBACK_SECONDS and bool(media) and not metrics['error']
+            return {'playback_seconds':round(metrics['seconds'],2) if played else 0,
+                    'playback_start_ms':round(metrics['start']),'playback_stalls':metrics['stalls'],
+                    'playback_error':'' if played else 'PlaybackIncomplete',
+                    'playback_completed_epoch':time.time() if played else 0}
+        except Error:
+            return {'playback_error':'PlaybackBrowserError'}
+        finally:
+            browser.close()
+
+
 def run_diagnostics(payload, outbound, mirrors, context):
     fixture=payload.get('fixture')
     udp=payload['check_udp']
@@ -116,6 +172,8 @@ def run_diagnostics(payload, outbound, mirrors, context):
                               creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
         try:
             check_ready(port,proc)
+            if payload.get('playback'):
+                return controlled_playback(port)
             if udp:
                 target = tuple(fixture['udp_target']) if fixture and 'udp_target' in fixture else UDP_TARGET
                 try:

@@ -9,7 +9,8 @@ import time
 import unittest
 
 from collector import parse
-from publishing import PINNED_FEED, validate_outputs, write_compact_feed, write_pinned_feed
+from publishing import (DELIVERY, OUTPUTS, PINNED_FEED, PLAYBACK_FEED, fresh_outputs, playback_selection,
+                        read_snapshot, validate_outputs, verify_live, write_compact_feed, write_pinned_feed)
 from serve_feed import handler_for
 
 
@@ -41,6 +42,30 @@ class FeedDeliveryTests(unittest.TestCase):
 
     def save_report(self):
         (self.docs/'status.json').write_text(json.dumps(self.report),encoding='utf-8')
+
+    def test_playback_feed_and_expiry_preserve_verification_time(self):
+        for row in self.rows[:2]:
+            row.update(playback_seconds=15.2,playback_completed_epoch=self.now-90,verified_this_run=True)
+        self.report['playback_ids'],data=playback_selection(self.urls,self.rows)
+        (self.docs/PLAYBACK_FEED).write_bytes(data)
+        self.save_report()
+        files=fresh_outputs(read_snapshot(self.docs),self.now)
+        self.assertEqual(base64.b64decode(files[PLAYBACK_FEED]).decode(),self.urls[0]+'\n')
+        self.assertEqual(json.loads(files['status.json'])['generated_epoch'],self.now-60)
+        self.assertEqual(json.loads(files['status.json'])['playback_ids'],[self.rows[0]['id']])
+
+    def test_live_verification_rejects_one_stale_file(self):
+        import hashlib
+        from unittest.mock import patch
+        data={name:name.encode() for name in OUTPUTS}
+        manifest={'snapshot':'fixture','files':{name:hashlib.sha256(body).hexdigest() for name,body in data.items()}}
+        data[DELIVERY]=json.dumps(manifest).encode()
+        (self.docs/DELIVERY).write_bytes(data[DELIVERY])
+        with patch('publishing.fetch_public',side_effect=lambda _,name,*args:data[name]):
+            self.assertEqual(verify_live('https://example.org',self.docs),manifest)
+            data['sub.b64']=b'old'
+            with self.assertRaisesRegex(ValueError,'sub.b64'):
+                verify_live('https://example.org',self.docs)
 
     def test_pinned_export_changes_only_the_tested_address(self):
         self.assertEqual(validate_outputs(self.docs)['pinned_ids'],[row['id'] for row in self.rows[:2]])

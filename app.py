@@ -25,7 +25,7 @@ import webbrowser
 import collector
 import sources
 from network import physical_interface
-from publishing import noninteractive_env
+from publishing import DELIVERY, fetch_public, noninteractive_env, verify_public_files
 from process_guard import ProcessTree
 from state import atomic_write, keep_awake
 
@@ -83,6 +83,7 @@ def task_installed():
 SETTINGS = {
     'limit': (0, 1000, 0, 'Maximum nodes in the list'),
     'interval': (5, 1440, 30, 'Run interval in minutes'),
+    'playback': (0, 20, 0, 'Browser playback checks'),
 }
 
 
@@ -101,7 +102,8 @@ def clean_settings(body):
 def run_command(root, mode, publish, settings=None):
     command = [sys.executable, '-u', str(Path(root) / 'main.py'), '--mode', mode]
     if settings:
-        command += ['--limit', str(settings['limit']), '--interval-minutes', str(settings['interval'])]
+        command += ['--limit', str(settings['limit']), '--interval-minutes', str(settings['interval']),
+                    '--playback-top', str(settings.get('playback',0))]
     return command + (['--publish'] if publish else [])
 
 
@@ -240,6 +242,9 @@ class Panel:
         self.port = None       # set by run_server: where a restarted panel must listen again
         self.restarting = False   # an update was pulled: this program is about to be replaced
         self.respawn = False
+        self.live_delivery = {}
+        self.live_check_due = 0
+        self.live_check_lock = threading.Lock()
 
     def task_active(self):
         # Asked at most once a minute: the page polls far more often than a task changes.
@@ -315,7 +320,7 @@ class Panel:
     def resume_schedule(self):
         """Start the repeating schedule again with the settings last used."""
         s = self.settings()
-        self.runner.start('auto', s['publish'], True, {'limit': s['limit'], 'interval': s['interval']}, s['interval'] * 60)
+        self.runner.start('auto', s['publish'], True, {key:s[key] for key in SETTINGS}, s['interval'] * 60)
 
     def update(self):
         """Bring this copy up to date with GitHub and, when something changed, restart the panel
@@ -420,8 +425,22 @@ class Panel:
         return rows, {'at': last.get('at'), 'searched': registry['refreshed'],
                       'repositories': len(registry['found'])}
 
+    def check_live_delivery(self):
+        try:
+            manifest=json.loads(fetch_public(self.pages,DELIVERY,4096))
+            if manifest != self.live_delivery.get('manifest'):
+                verify_public_files(self.pages,manifest)
+            self.live_delivery={'manifest':manifest,'error':False}
+        except (OSError,ValueError,KeyError,TypeError,AttributeError):
+            self.live_delivery=dict(self.live_delivery,error=True)
+        finally:
+            self.live_check_lock.release()
+
     def snapshot(self):
         status = read_json(self.root / 'docs' / 'status.json', {})
+        if self.pages and self.live_check_due <= time.monotonic() and self.live_check_lock.acquire(blocking=False):
+            self.live_check_due=time.monotonic()+60
+            threading.Thread(target=self.check_live_delivery,daemon=True).start()
         rows, discovery = self.source_rows()
         protocols = {}
         for node in status.get('nodes', []):
@@ -429,6 +448,8 @@ class Panel:
         return {'run': dict(self.runner.status), 'log': list(self.runner.log)[-400:], 'settings': self.settings(),
                 'now': time.time(), 'sources': rows, 'discovery': discovery,
                 'pages': self.pages, 'task': self.task_active(), 'restarting': self.restarting,
+                'delivery': {'tested_epoch':status.get('generated_epoch'),
+                             'pushed':read_json(self.local/'pushed.json',{}),'live':self.live_delivery},
                 'last': {'published': status.get('published'), 'health': status.get('health'),
                          # Configs that passed in the last run; the list may hold fewer (a maximum)
                          # or, after an outage, older ones kept within their expiry.

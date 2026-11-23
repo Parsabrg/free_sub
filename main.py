@@ -22,7 +22,7 @@ from collector import collect, parse
 from geolocation import geolocate_hosts, country_flag
 from naming import assign_labels, node_name, rename_share_link
 from public_page import INDEX
-from publishing import OUTPUTS, publish, validate_outputs, write_compact_feed, write_pinned_feed
+from publishing import OUTPUTS, PLAYBACK_FEED, playback_selection, publish, validate_outputs, write_compact_feed, write_pinned_feed
 from relay import fallback
 from run_diagnostics_report import count_video_attempts, merge_video_counts, compare_runs, read_previous_report
 from sources import Registry
@@ -126,7 +126,8 @@ def write_outputs(docs, selected, state, report, now, ttl, previous=None):
                      'verified_this_run':False})
         metrics=asdict(result)
         for key in ('stream_segments','stream_kbps','stream_start_ms','stream_stalls','stream_error',
-                    'udp','ipv6','youtube_played','youtube_error'):
+                    'udp','ipv6','youtube_played','youtube_error','playback_seconds','playback_start_ms',
+                    'playback_stalls','playback_error','playback_completed_epoch'):
             if key in metrics:
                 rows[-1][key]=metrics[key]
     # Set membership separately: do not mutate metadata while iterating.
@@ -149,6 +150,8 @@ def write_outputs(docs, selected, state, report, now, ttl, previous=None):
     atomic_write(staging/'xray.json',json.dumps({'outbounds':outbounds},indent=2,ensure_ascii=False)+'\n')
     write_compact_feed(staging,urls,rows,report)
     write_pinned_feed(staging,outbounds,rows,report)
+    report['playback_ids'],playback=playback_selection(urls,rows)
+    (staging/PLAYBACK_FEED).write_bytes(playback)
     comparison=compare_runs(report,previous or {})
     if comparison:
         report['run_comparison']=comparison
@@ -353,6 +356,18 @@ def run_cycle_report(args,root,state,mode,now,queue,passed,first_counts,second_c
                     row.update(country_code=None,country_ip=r.endpoint_ip)
     if args.require_country:
         selected=[pair for pair in selected if state['nodes'][pair[0].key].get('country_code')]
+    playback_top=getattr(args,'playback_top',0)
+    if playback_top:
+        from xray_test import verify_playback
+        eligible=[pair for pair in selected if pair[0].key in passed][:playback_top]
+        print(f'[PLAYBACK] Checking up to {len(eligible)} configs with a browser.',flush=True)
+        def measure(pair):
+            candidate,result=pair
+            return verify_playback(candidate,result,args.xray)
+        with cf.ThreadPoolExecutor(max_workers=4) as pool:
+            for (_,result),metrics in zip(eligible,pool.map(measure,eligible)):
+                for key,value in metrics.items():
+                    setattr(result,key,value)
     report={'mode':mode,'health':health,'tested_on':'operator network; local Xray',
             'source_retained_24h':retained_by_source(state,now,args.ttl_hours*3600),
             'xray_version':args.xray_version,'source_status':stats or {},'unique_selected_for_test':len(queue),
@@ -401,6 +416,7 @@ def arguments(argv=None):
     ap.add_argument('--discovery-hours',type=float,default=4)
     ap.add_argument('--ttl-hours',type=float,default=6)
     ap.add_argument('--publish',action='store_true')
+    ap.add_argument('--publish-only',action='store_true',help='Retry publishing the saved verified snapshot')
     ap.add_argument('--found-sources',type=int,default=40,
                     help='Feeds found on GitHub to test per discovery run; 0 uses only the listed sources')
     ap.add_argument('--retry-failed-hours',type=float,default=24,
@@ -413,6 +429,8 @@ def arguments(argv=None):
     ap.add_argument('--check-udp',action='store_true',help='Record a separate UDP relay result')
     ap.add_argument('--check-ipv6',action='store_true',help='Record a separate IPv6 result')
     ap.add_argument('--youtube-id',help='Measure actual playback of an embeddable YouTube video using Playwright')
+    ap.add_argument('--playback-top',type=int,choices=range(21),default=0,metavar='0..20',
+                    help='Publish a separate browser-playback feed for up to 20 freshly verified configs')
     args=ap.parse_args(argv)
     from xray_test import YOUTUBE_ID, validate_video_mirrors
     try:
@@ -484,6 +502,10 @@ def egress_country(xray, interface=None, timeout=10):
 
 def main(argv=None):
     args=arguments(argv)
+    if args.publish_only:
+        with run_lock(ROOT/'.local'/'run.lock'), keep_awake():
+            publish(ROOT,args.xray,ROOT/'docs')
+        return
     # Results only mean something from the network the subscription is for.
     # This PC is often on a VPN; tests from there passed or failed configs for
     # the VPN's network, while status.json said "operator network".

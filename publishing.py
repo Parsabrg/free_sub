@@ -1,6 +1,7 @@
 """Validate generated subscriptions and publish only exact project output paths."""
 from __future__ import annotations
 import base64
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import os
@@ -8,11 +9,16 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
+from urllib.request import Request, urlopen
 from collector import links, parse
 from network import pin_endpoint, public_address
+from state import atomic_write
 
 PINNED_FEED = 'xray-pinned.json'
-OUTPUTS = ('sub.txt','sub.b64','xray.json','status.json','index.html','sub-compact.b64',PINNED_FEED)
+PLAYBACK_FEED = 'sub-playback.b64'
+DELIVERY = 'delivery.json'
+OUTPUTS = ('sub.txt','sub.b64','xray.json','status.json','index.html','sub-compact.b64',PINNED_FEED,PLAYBACK_FEED)
 FEED_BRANCH = 'subscriptions'
 SNAPSHOT_WORKFLOW = '.github/workflows/subscription-snapshot.yml'
 COMPACT_LIMIT = 20
@@ -69,6 +75,11 @@ def read_snapshot(docs):
         if (report.get('pinned_ids')!=ids or not pinned.is_file()
                 or json.loads(pinned.read_text(encoding='utf-8'))!=expected):
             raise ValueError('Pinned Xray export differs from verified endpoints')
+    playback=docs/PLAYBACK_FEED
+    if 'playback_ids' in report or playback.exists():
+        ids, data=playback_selection(urls,report['nodes'])
+        if report.get('playback_ids')!=ids or not playback.is_file() or playback.read_bytes().strip()!=data.strip():
+            raise ValueError('Playback subscription differs from verified playback results')
     return report,urls,outbounds
 
 
@@ -106,6 +117,32 @@ def write_pinned_feed(docs, outbounds, rows, report):
     (Path(docs)/PINNED_FEED).write_text(json.dumps(pinned,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 
 
+def playback_selection(urls, rows):
+    selected=[(url,row['id']) for url,row in zip(urls,rows) if row.get('playback_seconds',0)>=15
+              and row.get('playback_completed_epoch',0)>=row['last_success_epoch'] and row.get('verified_this_run')]
+    return [key for _,key in selected],base64.b64encode(''.join(f'{url}\n' for url,_ in selected).encode('utf-8'))+b'\n'
+
+
+def fresh_outputs(snapshot, now):
+    report,urls,outbounds=snapshot
+    fresh=[(url,row,outbound) for url,row,outbound in zip(urls,report['nodes'],outbounds) if row['expires_epoch']>now]
+    urls=[url for url,_,_ in fresh]
+    rows=[dict(row,rank=rank) for rank,(_,row,_) in enumerate(fresh,1)]
+    outbounds=[outbound for _,_,outbound in fresh]
+    compact_ids,compact=compact_selection(urls,rows)
+    pinned_ids,pinned=pinned_selection(outbounds,rows)
+    playback_ids,playback=playback_selection(urls,rows)
+    status=dict(report,nodes=rows,published=len(rows),compact_ids=compact_ids,pinned_ids=pinned_ids,playback_ids=playback_ids)
+    if not rows:
+        status['health']='expired_or_empty'
+    def encode(value):
+        return (json.dumps(value,ensure_ascii=False)+'\n').encode('utf-8')
+    plain=''.join(f'{url}\n' for url in urls).encode('utf-8')
+    return {'sub.txt':plain,'sub.b64':base64.b64encode(plain)+b'\n','xray.json':encode({'outbounds':outbounds}),
+            'status.json':encode(status),'sub-compact.b64':base64.b64encode(compact)+b'\n',
+            PINNED_FEED:encode(pinned),PLAYBACK_FEED:playback}
+
+
 def prepare_legacy_feed(docs):
     """Keep only entries the current parser can verify against a pre-migration snapshot."""
     plain=(docs/'sub.txt').read_text(encoding='utf-8').encode('utf-8')
@@ -134,36 +171,65 @@ def prepare_legacy_feed(docs):
     (docs/'status.json').write_text(json.dumps(report,ensure_ascii=False)+'\n',encoding='utf-8')
 
 
-def prepare_pages(destination, ref=None):
+def prepare_pages(destination, ref=None, *, now=None):
     """Copy only feed data and render the public page from the deployment code."""
     from public_page import INDEX
 
     destination=Path(destination)
     destination.mkdir(parents=True,exist_ok=True)
-    optional={'sub-compact.b64',PINNED_FEED}
+    optional={'sub-compact.b64',PINNED_FEED,PLAYBACK_FEED}
     for name in OUTPUTS:
         if name=='index.html':
             continue
         if ref:
             result=subprocess.run(['git','show',f'{ref}:docs/{name}'],capture_output=True)
             if name in optional and result.returncode:
+                (destination/name).unlink(missing_ok=True)
                 continue
             result.check_returncode()
             data=result.stdout
         else:
             source=Path('docs')/name
             if name in optional and not source.is_file():
+                (destination/name).unlink(missing_ok=True)
                 continue
             data=source.read_bytes()
         (destination/name).write_bytes(data)
     if not ref and not (destination/'sub-compact.b64').exists():
         prepare_legacy_feed(destination)
-    report,_,outbounds=read_snapshot(destination)
-    if 'pinned_ids' not in report:
-        write_pinned_feed(destination,outbounds,report['nodes'],report)
-        (destination/'status.json').write_text(json.dumps(report,ensure_ascii=False)+'\n',encoding='utf-8')
-    (destination/'index.html').write_text(INDEX,encoding='utf-8')
-    validate_outputs(destination)
+    for name,data in fresh_outputs(read_snapshot(destination),time.time() if now is None else now).items():
+        (destination/name).write_bytes(data)
+    (destination/'index.html').write_bytes(INDEX.encode('utf-8'))
+    report=validate_outputs(destination)
+    revision=subprocess.check_output(['git','rev-parse',ref or 'HEAD'],text=True).strip()
+    manifest={'snapshot':revision,'tested_epoch':report['generated_epoch'],'published':report['published'],
+              'files':{name:hashlib.sha256((destination/name).read_bytes()).hexdigest() for name in OUTPUTS}}
+    (destination/DELIVERY).write_text(json.dumps(manifest,sort_keys=True)+'\n',encoding='utf-8')
+
+
+def fetch_public(base, name, limit=1024*1024*32):
+    request=Request(f'{base.rstrip("/")}/{name}?check={time.time_ns()}',headers={'Cache-Control':'no-cache'})
+    with urlopen(request,timeout=12) as response:
+        data=response.read(limit+1)
+    if len(data)>limit:
+        raise ValueError(f'Oversized response for {name}')
+    return data
+
+
+def verify_live(base, destination):
+    manifest=json.loads((Path(destination)/DELIVERY).read_bytes())
+    if json.loads(fetch_public(base,DELIVERY,4096))!=manifest:
+        raise ValueError('Live snapshot differs from the prepared deployment')
+    verify_public_files(base,manifest)
+    return manifest
+
+
+def verify_public_files(base, manifest):
+    def verify(name):
+        if hashlib.sha256(fetch_public(base,name)).hexdigest()!=manifest['files'].get(name):
+            raise ValueError(f'Live checksum mismatch for {name}')
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        list(pool.map(verify,OUTPUTS))
 
 
 def noninteractive_env():
@@ -179,7 +245,9 @@ def publish(root, xray, docs):
         raise RuntimeError('Only project docs/ may be published')
     # Run offline tests AND a real Xray/TLS/HTTPS local end-to-end fixture before each push.
     subprocess.run([sys.executable,str(root/'verify.py'),'--xray',str(xray)],cwd=root,check=True,timeout=180)
-    validate_outputs(docs)
+    report=validate_outputs(docs)
+    if report.get('nodes') and not any(row['expires_epoch']>time.time() for row in report['nodes']):
+        raise RuntimeError('Verified snapshot has expired; run a new check')
     def git(*args,check=True,env=None):
         try:
             return subprocess.run(['git',*args],cwd=root,check=check,capture_output=True,text=True,
@@ -203,6 +271,9 @@ def publish(root, xray, docs):
     if remote:
         git('fetch','--no-tags','origin',ref)
         parent=git('rev-parse','FETCH_HEAD').stdout.strip()
+        previous=json.loads(git('show',f'{parent}:docs/status.json').stdout)
+        if previous['generated_epoch']>report['generated_epoch']:
+            raise RuntimeError('A newer verified snapshot is already published')
     # A separate index and an orphan root keep the checkout, user index, and source history out of the feed.
     with tempfile.TemporaryDirectory(prefix='feed-index-') as folder:
         env=noninteractive_env()
@@ -211,9 +282,23 @@ def publish(root, xray, docs):
         git('add','-f','--',SNAPSHOT_WORKFLOW,*[f'docs/{name}' for name in OUTPUTS],env=env)
         tree=git('write-tree',env=env).stdout.strip()
     if parent and tree==git('rev-parse',f'{parent}^{{tree}}').stdout.strip():
+        atomic_write(root/'.local'/'pushed.json',json.dumps({'snapshot':parent,'tested_epoch':report.get('generated_epoch')})+'\n')
         print('[PUBLISH] The verified subscription is already on the publishing branch.',flush=True)
         return
     parents=['-p',parent] if parent else []
     commit=git('commit-tree',tree,*parents,'-m','Publish locally Xray-verified subscription').stdout.strip()
-    git('push','origin',f'{commit}:{ref}')
+    for attempt in range(3):
+        if report.get('nodes') and not any(row['expires_epoch']>time.time() for row in report['nodes']):
+            raise RuntimeError('Verified snapshot has expired; run a new check')
+        try:
+            git('push','origin',f'{commit}:{ref}')
+            break
+        except (subprocess.CalledProcessError,subprocess.TimeoutExpired) as exc:
+            error=str(getattr(exc,'stderr','') or '').lower()
+            if attempt==2 or (not isinstance(exc,subprocess.TimeoutExpired) and not any(
+                    item in error for item in ('resolve','connect','timeout','429','502','503','504','unexpected disconnect'))):
+                raise
+            print('[PUBLISH] Retrying the same verified snapshot.',flush=True)
+            time.sleep(4*(attempt+1))
+    atomic_write(root/'.local'/'pushed.json',json.dumps({'snapshot':commit,'tested_epoch':report.get('generated_epoch')})+'\n')
     print('[PUBLISH] Verified files pushed; check Pages deployment status.',flush=True)
