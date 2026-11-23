@@ -410,7 +410,8 @@ def arguments(argv=None):
                     help='Test even when this machine does not reach the internet from Iran (e.g. through a VPN)')
     ap.add_argument('--probe-control',type=Path,help='Local file containing a known-good proxy share link')
     ap.add_argument('--video-mirror',action='append',default=[],help='HTTPS MP4 range URL, repeatable')
-    ap.add_argument('--stream-segments',type=int,default=1,choices=range(1,9),metavar='1..8')
+    ap.add_argument('--stream-segments',type=int,default=8,choices=range(1,9),metavar='1..8',
+                    help='128 KiB video ranges a config must deliver (8 = 1 MiB); 1 checks only the first')
     ap.add_argument('--check-udp',action='store_true',help='Record a separate UDP relay result')
     ap.add_argument('--check-ipv6',action='store_true',help='Record a separate IPv6 result')
     ap.add_argument('--youtube-id',help='Measure actual playback of an embeddable YouTube video using Playwright')

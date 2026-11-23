@@ -26,7 +26,7 @@ Ranked by importance. Status: `open` / `done` / `skipped (reason)`.
 - With 64 tests in parallel, starting Python can take much of those 4 s, so some are likely false failures.
 - Fix: look each hostname up once per run, in-process (many configs share hosts). Measure before/after.
 
-## 4. The pass bar is light — open (your call)
+## 4. The pass bar is light — done (1 MiB stream, one retry; default --stream-segments 8)
 - A config passes on one small HTTPS fetch plus 128 KB of video. Configs that pass can still be too
   slow for real use.
 - Option: finalists also fetch ~1 MB (e.g. `--stream-segments 2..4`, already supported, off by default).
