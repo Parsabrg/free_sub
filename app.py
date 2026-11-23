@@ -136,7 +136,7 @@ def autostart(root, enabled=None, task=APP_NAME, run_key=RUN_KEY):
 SETTINGS = {
     'limit': (0, 1000, 0, 'Maximum nodes in the list'),
     'interval': (5, 1440, 30, 'Run interval in minutes'),
-    'workers': (0, 64, 0, 'Parallel tests'),   # 0: sized to this PC
+    'workers': (0, 128, 0, 'Parallel tests'),   # 0: sized to this PC
 }
 
 

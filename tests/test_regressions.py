@@ -48,10 +48,10 @@ class RegressionTests(unittest.TestCase):
             defaults=arguments(['--xray', sys.executable])
             from process_guard import auto_workers
             self.assertEqual((defaults.workers, defaults.max_tests, defaults.screen_timeout, defaults.timeout), (auto_workers(), 0, 5, 30))
-            self.assertEqual((auto_workers(4096, 4), auto_workers(2048, 2), auto_workers(65536, 32)), (16, 8, 64))
-            self.assertEqual(arguments(['--xray', sys.executable, '--workers', '64']).workers, 64)
+            self.assertEqual((auto_workers(4096, 4), auto_workers(2048, 2), auto_workers(65536, 32), auto_workers(32560, 20)), (22, 11, 128, 128))
+            self.assertEqual(arguments(['--xray', sys.executable, '--workers', '128']).workers, 128)
             with self.assertRaises(SystemExit), patch('sys.stderr', new=io.StringIO()):
-                arguments(['--xray', sys.executable, '--workers', '65'])
+                arguments(['--xray', sys.executable, '--workers', '129'])
             with self.assertRaises(SystemExit), patch('sys.stderr', new=io.StringIO()):
                 arguments(['--xray', sys.executable, '--screen-timeout', '0.5'])
 

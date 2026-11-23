@@ -388,7 +388,7 @@ def arguments(argv=None):
     ap.add_argument('--mode',choices=('auto','full','health'),default='auto')
     ap.add_argument('--limit',type=int,default=0,help='Most nodes in the published list; 0 lists every working node')
     ap.add_argument('--max-tests',type=int,default=0,help='0 means all supported source entries; no per-source truncation')
-    ap.add_argument('--workers',type=int,default=0,help='Parallel screening tests (1 to 64); 0 sizes them to the RAM and processors of this PC')
+    ap.add_argument('--workers',type=int,default=0,help='Parallel screening tests (1 to 128); 0 sizes them to the RAM and processors of this PC')
     ap.add_argument('--screen-timeout',type=float,default=5,help='Discovery real-delay network deadline after Xray readiness; startup remains bounded by --timeout')
     ap.add_argument('--timeout',type=float,default=30,help='Full verification and health deadline per candidate including DNS and all probes')
     # 600, not 400: 422 to 505 configs passed each screen on 2026-11-12, so 22 to 105 passes a
@@ -435,7 +435,7 @@ def arguments(argv=None):
             ap.error('The control file must contain one supported proxy share link')
     if args.recheck is None:
         args.recheck=max(600,args.limit)
-    if not (0<=args.limit<=1000 and 0<=args.workers<=64 and 1<=args.geo_workers<=8 and
+    if not (0<=args.limit<=1000 and 0<=args.workers<=128 and 1<=args.geo_workers<=8 and
             args.max_tests>=0 and 5<=args.timeout<=120 and 1<=args.screen_timeout<=args.timeout and args.recheck>=args.limit and
             1<=args.discovery_hours<=24 and 1<=args.ttl_hours<=24 and 1<=args.interval_minutes<=1440 and
             0<=args.found_sources<=200 and 0<=args.retry_failed_hours<=168):
