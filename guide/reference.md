@@ -22,7 +22,7 @@
 | `--xray PATH` | `tools\xray.exe` | The Xray binary (`tools/xray` on Linux). |
 | `--limit N` | 0 | Most nodes in the published list (1 to 1000). `0` lists every working node. |
 | `--interval-minutes N` | 30 | How often runs are started (1 to 1440), published in `status.json`. The panel or the scheduled task does the scheduling; this option only states it. |
-| `--workers N` | 0 | Parallel screening tests (1 to 64). 0 sizes them to the PC: a quarter of its RAM at about 45 MB a test, at most four per processor thread, 4 to 64. Verification and health checks use at most 16. |
+| `--workers N` | 0 | Parallel screening tests (1 to 128). 0 sizes them to the PC: a quarter of its RAM at about 45 MB a test, at most eight per processor thread, 4 to 128. Verification and health checks use at most 16. |
 | `--screen-timeout S` | 5 | Network deadline of a screening test, counted from when Xray is ready. |
 | `--timeout S` | 30 | Total deadline of a verification or health test, and of a screening test including startup. |
 | `--recheck N` | 600, or `--limit` if larger | Screen passes verified per discovery; standby nodes rechecked per health run. Not below `--limit`. |

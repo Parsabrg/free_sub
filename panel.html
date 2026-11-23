@@ -120,7 +120,7 @@ pre { margin: 0; background: var(--log-bg); color: var(--log-ink); border-radius
     <div class="settings">
       <label>Max nodes in the list <input type="number" id="limit" min="1" max="1000" step="1" placeholder="all working"></label>
       <label>Run every <input type="number" id="interval" min="5" max="1440" step="1"> minutes</label>
-      <label>Parallel tests <input type="number" id="workers" min="1" max="64" step="1" placeholder="automatic"></label>
+      <label>Parallel tests <input type="number" id="workers" min="1" max="128" step="1" placeholder="automatic"></label>
     </div>
     <p class="note" style="margin:8px 0 0">Leave the maximum empty to list every working node. These apply the next
       time you press Start.</p>
@@ -450,8 +450,8 @@ $('start').onclick = () => {
       ? ['limit', 'Max nodes: enter a whole number from 1 to 1000, or leave it empty to list every working node.']
     : !Number.isInteger(interval) || interval < 5 || interval > 1440
       ? ['interval', 'Run every: enter a whole number of minutes from 5 to 1440.']
-    : !Number.isInteger(workers) || workers < 0 || workers > 64
-      ? ['workers', 'Parallel tests: enter a whole number from 1 to 64, or leave it empty for automatic.'] : null;
+    : !Number.isInteger(workers) || workers < 0 || workers > 128
+      ? ['workers', 'Parallel tests: enter a whole number from 1 to 128, or leave it empty for automatic.'] : null;
   if (problem) {
     $('run-message').textContent = problem[1]; $('run-message').className = 'message bad'; $(problem[0]).focus();
     return;

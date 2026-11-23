@@ -109,7 +109,7 @@ routing to that candidate only. The tester has no direct fallback outbound.
 loopback, link-local and mixed public/private answers are rejected. Xray is pinned
 to the validated public IP while SNI and transport Host values stay as given.
 
-**Screen (discovery, first pass).** Up to 64 workers. Once Xray is ready, the
+**Screen (discovery, first pass).** Up to 128 workers. Once Xray is ready, the
 candidate has five seconds (`--screen-timeout`) to return a certificate-verified
 HTTPS response from Google or Apple. Python, DNS and Xray startup are covered by a separate
 30-second total deadline, so a slow CPU is not mistaken for a slow proxy. The
