@@ -10,6 +10,8 @@ Ranked by importance. Status: `open` / `done` / `skipped (reason)`.
 - Fix: a "Start with Windows" option. At sign-in the panel starts hidden and resumes the saved repeat
   schedule (`.local/panel.json` already holds mode, publish, repeat, interval). No admin, no password.
 - Also: the Documents clone is on b0036e8, without #13 and #14.
+- 2026-11-23: Windows skipped the Run entry at every sign-in after 2026-11-18 (Windscribe's too, per the
+  Shell-Core log), so the feed stopped again. Start with Windows is now a scheduled task at sign-in.
 
 ## 2. A crashed or interrupted run leaves no log on disk — done (run.log, last_error.txt)
 - Run output lives only in the panel's memory (last 2000 lines). After the shutdown above there is

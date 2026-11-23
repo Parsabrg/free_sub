@@ -41,6 +41,9 @@ class PanelTests(unittest.TestCase):
         self.panel = app.Panel(self.root, self.runner)
         # Never the real sign-in list of this PC.
         self.panel.run_key = r'Softwareree-sub-test-' + os.urandom(4).hex()
+        self.panel.autostart_task = 'free-sub-test-' + os.urandom(4).hex()
+        # Known up front: asking Windows starts PowerShell, too slow for every test's first poll.
+        self.panel.autostart_seen = (time.time(), False if os.name == 'nt' else None)
         if os.name == 'nt':
             import winreg
             def drop_key():
@@ -247,12 +250,20 @@ class PanelTests(unittest.TestCase):
             self.assertEqual(self.request('POST', '/api/autostart', {'enabled': True})[0], 400)
             return
         self.assertFalse(self.state()['autostart'])
+        self.addCleanup(lambda: subprocess.run(
+            ['powershell', '-NoProfile', '-Command',
+             f"Unregister-ScheduledTask -TaskName '{self.panel.autostart_task}' -Confirm:$false -ErrorAction SilentlyContinue"],
+            capture_output=True, timeout=60))
+        import winreg   # an entry from the old Run-key version goes when the task comes
+        with winreg.CreateKey(winreg.HKEY_CURRENT_USER, self.panel.run_key) as key:
+            winreg.SetValueEx(key, app.APP_NAME, 0, winreg.REG_SZ, command)
         status, body = self.request('POST', '/api/autostart', {'enabled': True})
         self.assertEqual(status, 200)
         self.assertTrue(json.loads(body)['autostart'])
-        import winreg
-        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, self.panel.run_key) as key:
-            self.assertEqual(winreg.QueryValueEx(key, app.APP_NAME)[0], command)
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, self.panel.run_key) as key, self.assertRaises(FileNotFoundError):
+            winreg.QueryValueEx(key, app.APP_NAME)
+        # Windows holds it: asked afresh, not from the panel's memory.
+        self.assertTrue(app.autostart(self.root, task=self.panel.autostart_task))
         self.assertFalse(json.loads(self.request('POST', '/api/autostart', {'enabled': False})[1])['autostart'])
         self.assertFalse(json.loads(self.request('POST', '/api/autostart', {'enabled': False})[1])['autostart'])
 
