@@ -1,30 +1,34 @@
 {
   "outbounds": [
     {
-      "protocol": "vless",
+      "protocol": "socks",
       "settings": {
-        "vnext": [
-          {
-            "address": "185.233.131.236",
-            "port": 443,
-            "users": [
-              {
-                "id": "b9f5a731-ad7c-4185-9d86-89a4a043961d",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
+        "address": "103.156.238.48",
+        "port": 1080,
+        "user": "11",
+        "pass": "11"
       },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "v3p.sabermusic.ir",
-          "fingerprint": "chrome"
-        }
+      "tag": "🇧🇩 BD-01 | SOCKS5"
+    },
+    {
+      "protocol": "socks",
+      "settings": {
+        "address": "8.209.205.237",
+        "port": 1080,
+        "user": "123456",
+        "pass": "123456"
       },
-      "tag": "🇮🇷 IR-08 | VLESS-TLS"
+      "tag": "🇯🇵 JP-16 | SOCKS5"
+    },
+    {
+      "protocol": "socks",
+      "settings": {
+        "address": "8.210.224.195",
+        "port": 6666,
+        "user": "6666",
+        "pass": "6666"
+      },
+      "tag": "🇭🇰 HK-29 | SOCKS5"
     },
     {
       "protocol": "socks",
@@ -49,26 +53,6 @@
     {
       "protocol": "socks",
       "settings": {
-        "address": "8.210.224.195",
-        "port": 6666,
-        "user": "6666",
-        "pass": "6666"
-      },
-      "tag": "🇭🇰 HK-29 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "8.209.205.237",
-        "port": 1080,
-        "user": "123456",
-        "pass": "123456"
-      },
-      "tag": "🇯🇵 JP-16 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
         "address": "8.210.135.205",
         "port": 1080,
         "user": "myuser",
@@ -79,102 +63,12 @@
     {
       "protocol": "socks",
       "settings": {
-        "address": "103.156.238.48",
-        "port": 1080,
-        "user": "11",
-        "pass": "11"
-      },
-      "tag": "🇧🇩 BD-01 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "165.154.20.162",
-        "port": 1080,
-        "user": "123",
-        "pass": "123"
-      },
-      "tag": "🇭🇰 HK-21 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "101.36.109.158",
-        "port": 1080,
-        "user": "123",
-        "pass": "123"
-      },
-      "tag": "🇭🇰 HK-22 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "118.193.45.130",
-        "port": 1080,
-        "user": "123",
-        "pass": "123"
-      },
-      "tag": "🇭🇰 HK-20 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "101.36.121.221",
-        "port": 1080,
-        "user": "123",
-        "pass": "123"
-      },
-      "tag": "🇭🇰 HK-27 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "101.36.124.157",
-        "port": 1080,
-        "user": "123",
-        "pass": "123"
-      },
-      "tag": "🇭🇰 HK-24 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "152.32.192.43",
-        "port": 1080,
-        "user": "123",
-        "pass": "123"
-      },
-      "tag": "🇭🇰 HK-23 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
         "address": "104.219.233.124",
         "port": 1080,
         "user": "test123",
         "pass": "test123"
       },
       "tag": "🇺🇸 US-92 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "178.92.112.234",
-        "port": 5432,
-        "user": "elm29",
-        "pass": "9m2lazw1"
-      },
-      "tag": "🇬🇧 GB-06 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "47.236.168.243",
-        "port": 1080,
-        "user": "8888",
-        "pass": "8888"
-      },
-      "tag": "🇸🇬 SG-03 | SOCKS5"
     },
     {
       "protocol": "socks",
@@ -217,44 +111,6 @@
     {
       "protocol": "socks",
       "settings": {
-        "address": "45.194.33.12",
-        "port": 30002
-      },
-      "tag": "🇭🇰 HK-04 | SOCKS5"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "185.233.131.236",
-            "port": 443,
-            "users": [
-              {
-                "id": "b9f5a731-ad7c-4185-9d86-89a4a043961d",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "v3p.sabermusic.ir",
-          "fingerprint": "chrome",
-          "alpn": [
-            "h2",
-            "http/1.1"
-          ]
-        }
-      },
-      "tag": "🇮🇷 IR-06 | VLESS-TLS"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
         "address": "66.253.2.69",
         "port": 62000,
         "user": "u_rb1dba2",
@@ -265,10 +121,10 @@
     {
       "protocol": "socks",
       "settings": {
-        "address": "92.5.68.29",
-        "port": 1080
+        "address": "45.194.33.12",
+        "port": 30002
       },
-      "tag": "🇩🇪 DE-01 | SOCKS5"
+      "tag": "🇭🇰 HK-04 | SOCKS5"
     },
     {
       "protocol": "socks",
@@ -277,14 +133,6 @@
         "port": 44499
       },
       "tag": "🇺🇸 US-01 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "82.180.146.251",
-        "port": 10800
-      },
-      "tag": "🇮🇳 IN-01 | SOCKS5"
     },
     {
       "protocol": "shadowsocks",
@@ -299,184 +147,6 @@
         ]
       },
       "tag": "🇳🇱 NL-01 | SS"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "89.163.239.238",
-            "port": 2053,
-            "users": [
-              {
-                "id": "02974d2b-518f-4f95-91cc-b145b6e4805e",
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "www.apple.com",
-          "publicKey": "vZmTxEoOhD-VAACucx2KmzWaKlYyXdkkUUv0RzlDsgo",
-          "shortId": "2fa414c6dd1189db",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-01 | VLESS-REALITY"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "129.159.0.53",
-            "port": 59924,
-            "method": "2022-blake3-chacha20-poly1305",
-            "password": "zpdYERRY+i9wkj3G766aELYAVoITvCv9kKrIGG8ykzY="
-          }
-        ]
-      },
-      "tag": "🌐 XX-02 | SS"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "48.103.133.47",
-            "port": 8443,
-            "users": [
-              {
-                "id": "2ed34e7c-45c5-4e0e-bcab-42fe99a7bd25",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "apple.com",
-          "publicKey": "SbVKOEMjK0sIlbwg4akyBg5mL5KZwwB-ed4eEE7YnRc",
-          "shortId": "6ba85179e30d4fc2",
-          "fingerprint": "firefox",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-03 | VLESS-REALITY"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "dl2.datgame.ir",
-            "port": 8880,
-            "users": [
-              {
-                "id": "c681a2d6-54ad-4ac7-959d-86d82bfa2027",
-                "encryption": "mlkem768x25519plus.native.0rtt.3fUfK2V-zGixYOog_SvPYYa0gA88GjMuXZNRhS2GgAg"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "none"
-      },
-      "tag": "🌐 XX-04 | VLESS"
-    },
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "48.103.133.47",
-            "port": 8443,
-            "users": [
-              {
-                "id": "2ed34e7c-45c5-4e0e-bcab-42fe99a7bd25",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "apple.com",
-          "publicKey": "SbVKOEMjK0sIlbwg4akyBg5mL5KZwwB-ed4eEE7YnRc",
-          "shortId": "6ba85179e30d4fc2",
-          "fingerprint": "chrome",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🌐 XX-05 | VLESS-REALITY"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "208.69.78.133",
-            "port": 443,
-            "method": "chacha20-ietf-poly1305",
-            "password": "ncIkubmoDGsl"
-          }
-        ]
-      },
-      "tag": "🌐 XX-06 | SS"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "47.254.128.109",
-            "port": 443,
-            "method": "2022-blake3-chacha20-poly1305",
-            "password": "8yO3ANWefuuGs1lRKXECQA1FEhxlWFV2ppQMcBaZo5Y="
-          }
-        ]
-      },
-      "tag": "🌐 XX-07 | SS"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "136.176.66.193",
-            "port": 443,
-            "method": "chacha20-ietf-poly1305",
-            "password": "SWBJ2eOCrLJk"
-          }
-        ]
-      },
-      "tag": "🌐 XX-08 | SS"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "178.252.165.226",
-        "port": 1080
-      },
-      "tag": "🇮🇷 IR-01 | SOCKS5"
     }
   ]
 }
