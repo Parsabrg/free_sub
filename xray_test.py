@@ -35,6 +35,7 @@ VIDEO_PROBES = [
     'https://media.w3.org/2010/05/sintel/trailer.mp4',
 ]
 VIDEO_BYTES = 128 * 1024
+SLOW_STREAM = ('StreamSegmentFailed', 'StreamBudgetExhausted')
 YOUTUBE_ID = re.compile(r'[A-Za-z0-9_-]{11}')
 
 @dataclass
@@ -359,16 +360,26 @@ def run_probe(candidate, xray_bin, timeout=30.0, *, quick=False, screen_timeout=
         payload.update(endpoint=result.endpoint_ip, video_probe_index=result.video_probe_index, video_ms=result.video_ms,
                        stream_segments=stream_segments,check_udp=check_udp,check_ipv6=check_ipv6,
                        youtube_id=youtube_id,timeout=max(30,timeout))
-        try:
-            output = communicate_bounded(command,json.dumps(payload),payload['timeout'])
-            diagnostics = json.loads(output)
-            for key in ('stream_segments','stream_kbps','stream_start_ms','stream_stalls','stream_error',
-                        'udp','ipv6','youtube_played','youtube_error'):
-                if key in diagnostics:
-                    setattr(result,key,diagnostics[key])
-        except (OSError,ValueError,RuntimeError,subprocess.TimeoutExpired):
-            if stream_segments>1: result.stream_error='DiagnosticWorkerFailed'
-            if youtube_id: result.youtube_error='DiagnosticWorkerFailed'
+        # A failed stream gets one more try: on 2026-11-23, 4 of 15 live configs that failed
+        # it once delivered all 8 ranges the second time, 11 failed again.
+        for attempt in range(2):
+            try:
+                output = communicate_bounded(command,json.dumps(payload),payload['timeout'])
+                diagnostics = json.loads(output)
+                for key in ('stream_segments','stream_kbps','stream_start_ms','stream_stalls','stream_error',
+                            'udp','ipv6','youtube_played','youtube_error'):
+                    if key in diagnostics:
+                        setattr(result,key,diagnostics[key])
+            except (OSError,ValueError,RuntimeError,subprocess.TimeoutExpired):
+                if stream_segments>1: result.stream_error='DiagnosticWorkerFailed'
+                if youtube_id: result.youtube_error='DiagnosticWorkerFailed'
+            if result.stream_error not in SLOW_STREAM:
+                break
+        if result.stream_error in SLOW_STREAM:
+            # Too slow for video: it carried the first 128 KiB but not the rest of ~1 MB, twice.
+            # A missing mirror or a failed local worker says nothing about the config and passes.
+            result.passed = False
+            result.error, result.stage = result.stream_error, 'stream'
         return result
 
 

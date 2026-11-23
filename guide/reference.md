@@ -16,7 +16,7 @@
 | `--publish` | off | Run the test gate and push the verified files to the `subscriptions` branch. |
 | `--probe-control PATH` | off | Local file holding a known-good share link for identifying a video mirror outage. |
 | `--video-mirror URL` | built-in mirrors | Override the video origins with up to four public HTTPS MP4 range URLs. Repeat the option for each URL. |
-| `--stream-segments N` | 1 | Transfer up to eight consecutive MP4 ranges and record startup, throughput and stalls. |
+| `--stream-segments N` | 8 | Consecutive 128 KiB MP4 ranges a finalist or re-checked config must deliver (8 = 1 MiB; one retry). Records startup, throughput and stalls; 1 turns the check off. |
 | `--check-udp`, `--check-ipv6` | off | Record separate UDP relay and IPv6 destination checks. |
 | `--youtube-id ID` | off | Measure playback of an embeddable YouTube video with Playwright Chromium. |
 | `--xray PATH` | `tools\xray.exe` | The Xray binary (`tools/xray` on Linux). |

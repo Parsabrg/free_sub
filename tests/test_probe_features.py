@@ -47,6 +47,22 @@ class ProbeFeatures(unittest.TestCase):
         self.assertEqual(result.stream_error,'DiagnosticWorkerFailed')
         self.assertEqual(result.youtube_error,'DiagnosticWorkerFailed')
 
+    def test_a_config_too_slow_for_a_megabyte_fails_after_one_retry(self):
+        candidate=parse('trojan://test@proxy.example.org:443?security=tls')
+        slow='{"stream_segments":2,"stream_error":"StreamSegmentFailed"}'
+        full='{"stream_segments":8,"stream_kbps":450,"stream_error":""}'
+        def probe(*answers):
+            with patch('xray_test.communicate_bounded',side_effect=['{"passed":true}',*answers]) as worker:
+                return run_probe(candidate,'xray',stream_segments=8),worker.call_count
+        result,calls=probe(slow,slow)
+        self.assertEqual((result.passed,result.error,result.stage,calls),(False,'StreamSegmentFailed','stream',3))
+        result,calls=probe(slow,full)                     # slow once, then fine: it passes
+        self.assertEqual((result.passed,result.stream_segments,calls),(True,8,3))
+        result,calls=probe(full)                          # fine at once: no second try
+        self.assertEqual((result.passed,calls),(True,2))
+        result,calls=probe('{"stream_error":"VideoMirrorUnavailable"}')   # our mirror, not the config
+        self.assertEqual((result.passed,calls),(True,2))
+
 
 BINARY=os.environ.get('XRAY_E2E_BINARY')
 

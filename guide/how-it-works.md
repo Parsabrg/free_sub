@@ -141,8 +141,13 @@ control can carry HTTPS but every video mirror fails, the run preserves node
 history and lets existing verification timestamps age. A full scan refreshes
 the current feed and up to 20 standby nodes before fetching new sources.
 
-Optional checks use the same verified outbound. `--stream-segments 4` measures
-four ranges from the video, and `--check-udp --check-ipv6` records those
+Each finalist and each re-checked config must also deliver eight consecutive
+128 KiB ranges of the video (1 MiB), each within 4 s (`--stream-segments`, default 8).
+A config that carries the first range but not the rest fails, after one retry; on
+2026-11-23 that was 11 of 40 configs in the live list. A missing mirror or a failed
+local worker does not fail a config. `--stream-segments 1` turns the check off.
+
+Optional checks use the same verified outbound: `--check-udp --check-ipv6` records those
 capabilities separately. For YouTube, install Playwright and its Chromium build
 with `python -m pip install playwright` and `python -m playwright install chromium`,
 then pass `--youtube-id` with an embeddable video ID. The browser check requires
