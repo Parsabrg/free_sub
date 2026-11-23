@@ -81,34 +81,54 @@ def task_installed():
 RUN_KEY = r'Software\Microsoft\Windows\CurrentVersion\Run'
 
 
-def startup_command(root):
+def startup_parts(root):
     """What Windows runs at sign-in: the panel, hidden, carrying on its schedule."""
     exe = Path(sys.executable)
     quiet_exe = exe.with_name('pythonw.exe')   # no console window at sign-in
     exe = quiet_exe if quiet_exe.exists() else exe
-    return subprocess.list2cmdline([str(exe), str(Path(__file__).resolve()), '--no-browser', '--resume',
-                                    '--root', str(Path(root).resolve())])
+    return str(exe), subprocess.list2cmdline([str(Path(__file__).resolve()), '--no-browser', '--resume',
+                                              '--root', str(Path(root).resolve())])
 
 
-def autostart(root, enabled=None, key=RUN_KEY):
+def startup_command(root):
+    return subprocess.list2cmdline([startup_parts(root)[0]]) + ' ' + startup_parts(root)[1]
+
+
+def autostart(root, enabled=None, task=APP_NAME, run_key=RUN_KEY):
     """Whether this panel starts when the operator signs in to Windows; with enabled, set it
-    first. A per-user Run entry: no administrator, no password. None off Windows.
-    Without it the panel ended with the PC on 2026-11-18 and the feed went stale for days."""
+    first. None off Windows.
+
+    A scheduled task at the operator's own sign-in: no administrator, no password, and it may
+    start on battery. It replaces a Run entry, which Windows skipped at every sign-in after
+    2026-11-18 (Windscribe's too), so the feed went stale twice."""
     if os.name != 'nt':
         return None
-    import winreg
-    with winreg.CreateKey(winreg.HKEY_CURRENT_USER, key) as run:
-        if enabled is True:
-            winreg.SetValueEx(run, APP_NAME, 0, winreg.REG_SZ, startup_command(root))
-        elif enabled is False:
-            try:
-                winreg.DeleteValue(run, APP_NAME)
-            except FileNotFoundError:
-                pass
+    exe, args = startup_parts(root)
+    q = lambda text: "'" + str(text).replace("'", "''") + "'"
+    script = '$ErrorActionPreference="Stop";'
+    if enabled is True:
+        script += ('$u=[Security.Principal.WindowsIdentity]::GetCurrent().Name;'
+                   f'Register-ScheduledTask -TaskName {q(task)} -Force'
+                   f' -Action (New-ScheduledTaskAction -Execute {q(exe)} -Argument {q(args)} -WorkingDirectory {q(Path(root).resolve())})'
+                   ' -Trigger (New-ScheduledTaskTrigger -AtLogOn -User $u)'
+                   ' -Principal (New-ScheduledTaskPrincipal -UserId $u -LogonType Interactive -RunLevel Limited)'
+                   ' -Settings (New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries'
+                   ' -ExecutionTimeLimit ([TimeSpan]::Zero))|Out-Null;')
+    elif enabled is False:
+        script += f'Unregister-ScheduledTask -TaskName {q(task)} -Confirm:$false -ErrorAction SilentlyContinue;'
+    script += (f'$t=Get-ScheduledTask -TaskName {q(task)} -ErrorAction SilentlyContinue;'
+               'if($t){$t.Actions[0].Execute+"|"+$t.Actions[0].Arguments};exit 0')   # no task is not a failure
+    result = quiet(['powershell', '-NoProfile', '-NonInteractive', '-Command', script], timeout=60)
+    if enabled is not None:
+        if not result or result.returncode:
+            raise ValueError('Windows did not accept the sign-in task')
+        import winreg   # the old Run entry: never two ways to start
         try:
-            return winreg.QueryValueEx(run, APP_NAME)[0] == startup_command(root)
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, run_key, 0, winreg.KEY_SET_VALUE) as run:
+                winreg.DeleteValue(run, APP_NAME)
         except FileNotFoundError:
-            return False
+            pass
+    return bool(result) and result.stdout.strip() == f'{exe}|{args}'
 
 
 # What the page lets the operator choose: (lowest, highest, default, name). A maximum of 0
@@ -292,7 +312,15 @@ class Panel:
         self.port = None       # set by run_server: where a restarted panel must listen again
         self.restarting = False   # an update was pulled: this program is about to be replaced
         self.respawn = False
-        self.run_key = RUN_KEY   # tests use their own key
+        self.run_key = RUN_KEY   # tests use their own key and task
+        self.autostart_task = APP_NAME
+        self.autostart_seen = (0, None)
+
+    def autostart_on(self, enabled=None):
+        # Asking Windows takes a PowerShell start: at most once a minute, unless it is being set.
+        if enabled is not None or time.time() - self.autostart_seen[0] > 60:
+            self.autostart_seen = (time.time(), autostart(self.root, enabled, self.autostart_task, self.run_key))
+        return self.autostart_seen[1]
 
     def task_active(self):
         # Asked at most once a minute: the page polls far more often than a task changes.
@@ -501,7 +529,7 @@ class Panel:
         return {'run': dict(self.runner.status), 'log': list(self.runner.log)[-400:], 'settings': self.settings(),
                 'now': time.time(), 'sources': rows, 'discovery': discovery,
                 'pages': self.pages, 'task': self.task_active(), 'restarting': self.restarting,
-                'machine': self.machine, 'autostart': autostart(self.root, key=self.run_key),
+                'machine': self.machine, 'autostart': self.autostart_on(),
                 'last': {'published': status.get('published'), 'health': status.get('health'),
                          # Configs that passed in the last run; the list may hold fewer (a maximum)
                          # or, after an outage, older ones kept within their expiry.
@@ -574,7 +602,7 @@ def handler_for(panel, page):
                 elif self.path == '/api/autostart':
                     if os.name != 'nt':
                         raise ValueError('Starting with the computer is set up only on Windows')
-                    autostart(panel.root, bool(body.get('enabled')), panel.run_key)
+                    panel.autostart_on(bool(body.get('enabled')))
                 elif self.path == '/api/update':
                     panel.update()
                 elif self.path == '/api/quit':
