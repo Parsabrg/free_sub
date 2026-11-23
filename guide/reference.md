@@ -65,7 +65,7 @@ an invalid option; the last log line says which.
 | `publishing.py`, `verify.py` | yes | Output validation, the Git push, the pre-push test gate. |
 | `app.py`, `panel.html` | yes | The control panel: launcher, local web server, page. |
 | `tools/xray.exe` | yes | The pinned official Xray binary for Windows; see `tools/README.md`. |
-| `docs/` | yes | The published outputs, deployed by GitHub Pages. Written by the program only. |
+| `docs/` | no | The latest outputs, written by each run and pushed to the `subscriptions` branch, which GitHub Pages deploys. Not kept on `main` (until 2026-11-23 a stale copy was, and runs left it modified in the publishing clone). |
 | `guide/` | yes | This documentation. |
 | `tests/` | yes | Regression and end-to-end tests. |
 | `.local/` | no | History, sources, caches, logs; see [setup](setup.md#local-data). |
