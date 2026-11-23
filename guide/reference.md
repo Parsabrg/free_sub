@@ -33,7 +33,7 @@
 | `--retry-failed-hours H` | 24 | Wait before retesting a configuration that failed three times running. `0` retests every discovery. |
 | `--require-country` | off | List only nodes whose country lookup succeeded. |
 | `--geo-workers N` | 3 | Parallel country lookups (1 to 8). |
-| `--allow-non-iran` | off | Test even when the PC does not reach the internet from Iran. |
+| `--allow-non-iran` | off | Test even when the PC does not reach the internet from Iran, or its country cannot be told. |
 
 Exit code `0` is a completed run, including one that was skipped for the egress
 country. Exit code `2` is a run that failed, found another run active, or was given
@@ -127,7 +127,7 @@ Each entry of `nodes`:
 | Prefix | Meaning |
 |---|---|
 | `[NETWORK]` | The adapter the tests leave through and the egress country. |
-| `[SKIP]` | The egress country is not Iran; nothing was tested or changed. |
+| `[SKIP]` | The egress country is not Iran, or could not be told; nothing was tested or changed. |
 | `[CLEANUP]` | Leftovers removed at the start of a run: stale probe folders in the temp directory, or Xray processes of this clone's binary whose owner had ended. |
 | `[SOURCES]` | How many sources are about to be fetched. The control panel counts the `[SOURCE]` lines after it for its progress bar. |
 | `[SOURCE]` | One line per source, in the order they finish: links found and supported, or `FAILED`. |

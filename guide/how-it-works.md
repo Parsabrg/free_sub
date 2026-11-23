@@ -172,11 +172,11 @@ to the PC's real network adapter (Wi-Fi or Ethernet; VPN, TUN and proxy adapters
 are never chosen), so a VPN such as Nebula or v2rayN's TUN mode can stay on and the
 operator's own network is still what is measured.
 
-Before each run the egress country is checked through that same path. If it is not
-Iran the run is skipped and the published list is left as it is
-(`--allow-non-iran` overrides). A full-tunnel kill switch can still block the
-bypass: the egress check then reads "unknown", every test fails, and the previous
-list is kept until its six-hour expiry.
+Before each run the egress country is checked through that same path, up to four
+times over about a minute. If it is not Iran, or still cannot be told (offline, or a
+full-tunnel kill switch blocking the bypass), the run is skipped and the published list
+and every config's history are left as they are (`--allow-non-iran` overrides). Before
+2026-11-23 an unknown country still ran: every test failed and was recorded as a failure.
 
 Source lists are downloaded with Python's normal HTTP client, which follows the
 system proxy setting. That affects only where the candidate list is fetched from,

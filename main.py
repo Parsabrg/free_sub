@@ -407,7 +407,8 @@ def arguments(argv=None):
     ap.add_argument('--retry-failed-hours',type=float,default=24,
                     help='Wait before retesting a config that failed three times running; 0 retests every run')
     ap.add_argument('--allow-non-iran',action='store_true',
-                    help='Test even when this machine does not reach the internet from Iran (e.g. through a VPN)')
+                    help='Test even when this machine does not reach the internet from Iran (e.g. through a VPN), '
+                         'or when its country cannot be told')
     ap.add_argument('--probe-control',type=Path,help='Local file containing a known-good proxy share link')
     ap.add_argument('--video-mirror',action='append',default=[],help='HTTPS MP4 range URL, repeatable')
     ap.add_argument('--stream-segments',type=int,default=8,choices=range(1,9),metavar='1..8',
@@ -448,6 +449,9 @@ def arguments(argv=None):
     version=subprocess.run([args.xray,'version'],capture_output=True,text=True,timeout=10,check=True)
     args.xray_version=version.stdout.splitlines()[0]
     return args
+
+
+EGRESS_RETRY_WAITS = (10, 20, 30, 0)   # four tries over about a minute
 
 
 def egress_country(xray, interface=None, timeout=10):
@@ -496,12 +500,23 @@ def main(argv=None):
     interface=physical_interface()
     if interface:
         os.environ[BIND_ENV]=interface
-    country=egress_country(args.xray,interface)
+    country=None
+    for wait in EGRESS_RETRY_WAITS:   # Wi-Fi coming back from sleep or a restart needs a moment
+        country=egress_country(args.xray,interface)
+        if country: break
+        time.sleep(wait)
     print(f'[NETWORK] testing through {interface or "the default route"}; egress country {country or "unknown"}',flush=True)
-    if country and country!='IR' and not args.allow_non_iran:
-        print(f'[SKIP] Tests would reach the internet from {country}, not Iran, and no real '
-              'adapter bypasses it; the published list is kept as it is.',flush=True)
-        return
+    if not args.allow_non_iran:
+        if country is None:
+            # Usually no internet at all. A run then failed every config and wrote those
+            # failures into their history: 0 of 502 on 2026-11-20, just before a restart.
+            print('[SKIP] Could not tell which country tests would reach the internet from '
+                  '(offline?); the published list is kept as it is.',flush=True)
+            return
+        if country!='IR':
+            print(f'[SKIP] Tests would reach the internet from {country}, not Iran, and no real '
+                  'adapter bypasses it; the published list is kept as it is.',flush=True)
+            return
     with run_lock(ROOT/'.local'/'run.lock'), keep_awake():
         removed=sweep_stale_probe_dirs()
         if removed: print(f'[CLEANUP] Removed {removed} stale probe folders from the temp directory.',flush=True)
