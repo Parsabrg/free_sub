@@ -113,19 +113,24 @@ def stream_settings(network, q, tls_mode, sni_default):
     if n not in ('tcp','kcp','ws','grpc','httpupgrade','xhttp','splithttp'):
         raise ValueError('Unsupported transport '+n)
     transport_fields = {'serviceName': ('grpc',), 'authority': ('grpc',), 'mode': ('grpc','xhttp','splithttp'),
-                        'extra': ('xhttp','splithttp'), 'mtu': ('kcp',), 'tti': ('kcp',), 'seed': ('kcp',)}
+                        'extra': ('xhttp','splithttp'), 'mtu': ('kcp',), 'tti': ('kcp',), 'seed': ('kcp',),
+                        'ed': ('ws','httpupgrade'), 'eh': ('ws','httpupgrade')}
     if any(nonempty(q,key) and n not in allowed for key, allowed in transport_fields.items()):
         raise ValueError('Parameter used outside its transport')
     if n=='grpc' and nonempty(q,'mode','gun') not in ('gun','multi'):
         raise ValueError('Unknown gRPC mode')
     # REALITY derives ALPN from its ClientHello fingerprint; feeds also carry legacy TLS ALPN hints.
-    security_fields = {'tls': ('ech','pcs','vcn'), 'reality': ('pbk','sid','spx','pqv')}
+    security_fields = {'tls': ('ech','pcs','vcn','cs'), 'reality': ('pbk','sid','spx','pqv')}
     if any(nonempty(q,key) for security, fields in security_fields.items() if tls_mode!=security for key in fields):
         raise ValueError('Parameter used outside its security mode')
     if tls_mode=='none' and any(nonempty(q,key) for key in ('alpn','fp')):
         raise ValueError('TLS parameter used with a clear transport')
-    # RAW reads host/path only for an HTTP header, which parse() rejects: with none they
-    # configure nothing, yet 610 otherwise valid links were rejected for one (measured 2026-11-12).
+    # RAW reads host/path only for an HTTP header: with none they configure nothing, yet 610
+    # otherwise valid links were rejected for one (measured 2026-11-12).
+    header=nonempty(q,'headerType','none').lower()
+    # The disguise is plain HTTP on bare RAW: under TLS or REALITY it is not what clients send.
+    if header not in ('none','http') or (header=='http' and (n!='tcp' or tls_mode!='none')):
+        raise ValueError('Unsupported header type')
     cfg = {'network':n, 'security':tls_mode}
     if tls_mode == 'tls':
         tls={'serverName':nonempty(q,'sni',sni_default)}
@@ -133,6 +138,7 @@ def stream_settings(network, q, tls_mode, sni_default):
         if fp.lower() == 'unsafe': raise ValueError('Unsafe TLS fingerprint')
         if fp: tls['fingerprint'] = fp
         if alpn: tls['alpn'] = [a for a in alpn.split(',') if a]
+        if nonempty(q,'cs'): tls['cipherSuites'] = nonempty(q,'cs')
         pins = nonempty(q,'pcs')
         if pins and any(not re.fullmatch(r'[0-9a-fA-F]{64}', pin.strip().replace(':','')) for pin in pins.split(',')):
             raise ValueError('Invalid SHA-256 certificate pin')
@@ -151,6 +157,19 @@ def stream_settings(network, q, tls_mode, sni_default):
         raise ValueError('Unknown transport security')
     path=nonempty(q,'path','/')
     host=nonempty(q,'host')
+    if nonempty(q,'ed'):
+        # WebSocket early data as v2rayN writes it: Xray reads it from "?ed=" in the path,
+        # always in the Sec-WebSocket-Protocol header (about 600 links, 2026-11-23).
+        if nonempty(q,'eh','Sec-WebSocket-Protocol').lower()!='sec-websocket-protocol':
+            raise ValueError('Unsupported early-data header')
+        path += ('&' if '?' in path else '?') + 'ed=' + str(int(nonempty(q,'ed')))
+    elif nonempty(q,'eh'):
+        raise ValueError('Early-data header without early data')
+    if header=='http':
+        # HTTP/1.1 request disguise on RAW (v2rayN "headerType=http", VMess "type":"http").
+        cfg['tcpSettings']={'header':{'type':'http','request':{
+            'path':[p for p in path.split(',') if p] or ['/'],
+            'headers':{'Host':[h for h in host.split(',') if h]} if host else {}}}}
     if n=='ws':
         cfg['wsSettings']={'path':path}
         if host: cfg['wsSettings']['headers']={'Host':host}
@@ -159,9 +178,16 @@ def stream_settings(network, q, tls_mode, sni_default):
                              'multiMode':nonempty(q,'mode','gun') == 'multi'}
         authority=nonempty(q,'authority',sni_default if tls_mode=='none' else '')
         if authority: cfg['grpcSettings']['authority']=authority
+    if nonempty(q,'fm'):
+        # Xray's own finalmask (e.g. TLS ClientHello fragments), as JSON in the link.
+        mask=json.loads(nonempty(q,'fm'))
+        if not isinstance(mask,dict) or not mask or mask.keys()-{'tcp','udp'}:
+            raise ValueError('Unsupported finalmask')
+        cfg['finalmask']=mask
     if n=='kcp':
         cfg['kcpSettings']={key:int(nonempty(q,key)) for key in ('mtu','tti') if nonempty(q,key)}
         if nonempty(q,'seed'):
+            if 'finalmask' in cfg: raise ValueError('Two finalmasks')
             cfg['finalmask']={'udp':[{'type':'mkcp-aes128gcm','settings':{'password':nonempty(q,'seed')}}]}
     if n=='httpupgrade':
         cfg['httpupgradeSettings']={'path':path,'host':host or sni_default}
@@ -184,9 +210,31 @@ def stream_settings(network, q, tls_mode, sni_default):
 # VMess link, which rejected 1,170 of them (measured 2026-11-12).
 URL_KEYS = {'security','type','sni','fp','alpn','pbk','sid','spx','path','host',
             'serviceName','authority','mode','flow','encryption','allowInsecure','insecure','headerType',
-            'ech','pcs','vcn','pqv','extra','mtu','tti','seed'}
+            'ech','pcs','vcn','pqv','extra','mtu','tti','seed','ed','eh','cs','fm'}
+# Keys no client turns into a different connection, with the values that are inert (None: any).
+# Measured 2026-11-23: packetEncoding rejected 6,481 links (xudp is already Xray's default),
+# quicSecurity 397 (the QUIC transport is gone), labels like "Telegram" a few hundred.
+INERT_KEYS = {'packetEncoding':('xudp','none',''), 'quicSecurity':('none',''), 'Telegram':None,
+              'support-x25519mlkem768':None, 'name':None, 'test_name':None}
+# Older spellings of the same setting (Shadowrocket "peer", a capitalized "Host").
+KEY_ALIASES = {'peer':'sni', 'Host':'host', 'allow_insecure':'allowInsecure'}
+
+
+def drop_inert(fields):
+    """fields: name -> value. Remove inert keys and rename aliases; reject a conflicting alias."""
+    for key, inert in INERT_KEYS.items():
+        if key in fields and (inert is None or str(fields[key]).lower() in inert):
+            del fields[key]
+    for alias, key in KEY_ALIASES.items():
+        if alias in fields:
+            value = fields.pop(alias)
+            if fields.get(key) not in (None, '', value):
+                raise ValueError('Conflicting parameter alias')
+            fields[key] = value
+    return fields
 VMESS_KEYS = {'v','ps','add','port','id','aid','scy','net','type','host','path',
-              'tls','sni','servername','alpn','fp','mode','allowInsecure','insecure','authority','ech','pcs','vcn'}
+              'tls','sni','servername','alpn','fp','mode','allowInsecure','insecure','authority','ech','pcs','vcn',
+              'security','skip-cert-verify'}
 XHTTP_EXTRA = {'headers','xPaddingBytes','xPaddingObfsMode','xPaddingKey','xPaddingHeader',
                'xPaddingPlacement','xPaddingMethod','uplinkHTTPMethod','sessionPlacement',
                'sessionKey','seqPlacement','seqKey','uplinkDataPlacement','uplinkDataKey',
@@ -207,7 +255,15 @@ def link_query(u, allowed):
     if u.path not in ('','/'):
         raise ValueError('Unexpected URI path')
     q=up.parse_qs(u.query,keep_blank_values=True)
-    if any(len(v)!=1 for v in q.values()) or any(q[k][0] for k in set(q)-allowed):
+    if any(len(v)!=1 for v in q.values()):
+        raise ValueError('Unsupported or repeated link parameter')
+    q={key:[value] for key,value in drop_inert({key:v[0] for key,v in q.items()}).items()}
+    if nonempty(q,'ws')=='1':   # old Trojan-Go style: ws=1&wspath=/path
+        del q['ws']
+        if nonempty(q,'type','ws')!='ws': raise ValueError('Conflicting transport')
+        q['type']=['ws']
+        if 'wspath' in q: q['path']=q.pop('wspath')
+    if any(q[k][0] for k in set(q)-allowed):
         raise ValueError('Unsupported or repeated link parameter')
     if any(not safe_tls_flag(nonempty(q,key)) for key in ('allowInsecure','insecure')):
         raise ValueError('Insecure TLS setting')
@@ -237,9 +293,21 @@ def parse(link, source='unknown'):
         payload=link.split('://',1)[1].split('#',1)[0]
         if scheme=='vmess' and '@' not in payload:
             obj=json.loads(b64decode(payload))
-            if not isinstance(obj,dict) or any(obj[k] not in ('',None) for k in set(obj)-VMESS_KEYS): return None
-            if any(not safe_tls_flag(obj.get(k)) for k in ('allowInsecure','insecure')): return None
-            if obj.get('type','none') not in ('','none'): return None
+            if not isinstance(obj,dict): return None
+            obj=drop_inert(obj)
+            if any(obj[k] not in ('',None) for k in set(obj)-VMESS_KEYS): return None
+            if any(not safe_tls_flag(obj.get(k)) for k in ('allowInsecure','insecure','skip-cert-verify')): return None
+            # "security" is another client's name for "scy".
+            if obj.get('security') not in ('',None):
+                if obj.get('scy') not in ('',None,obj['security']): return None
+                obj['scy']=obj['security']
+            # "type" is the RAW header type, or the gRPC mode; clients write "auto", "---" or
+            # "None" for no header (8,400 links rejected for it, 2026-11-23).
+            header=str(obj.get('type') or 'none').lower()
+            if header in ('auto','---','none',''): header='none'
+            if str(obj.get('net') or 'tcp').lower()=='grpc' and header in ('gun','multi'):
+                obj.setdefault('mode',header); header='none'
+            if header not in ('none','http'): return None
             host=str(obj.get('add','')).strip(); port=int(obj.get('port',0))
             uid=str(obj.get('id','')).strip()
             if not uid or int(obj.get('aid') or 0)!=0: return None
@@ -249,7 +317,7 @@ def parse(link, source='unknown'):
                'fp':[str(obj.get('fp') or '')], 'alpn':[str(obj.get('alpn') or '')],
                'path':[str(obj.get('path') or '/')], 'host':[str(obj.get('host') or '')],
                'serviceName':[str(obj.get('path') or '') if obj.get('net')=='grpc' else ''],
-               'mode':[str(obj.get('mode') or '')]}
+               'mode':[str(obj.get('mode') or '')], 'headerType':[header]}
             for key in ('authority','ech','pcs','vcn'):
                 if obj.get(key): q[key]=[str(obj[key])]
             sec=str(obj.get('tls') or 'none').lower()
@@ -275,8 +343,9 @@ def parse(link, source='unknown'):
             outbound={'protocol':'shadowsocks','settings':{'servers':[{'address':host,'port':port,'method':method.lower(),'password':password}]}}
         elif scheme in ('hysteria2','hy2'):
             u=up.urlsplit(link); host=u.hostname or ''; port, hopping=hysteria_port(u)
-            q=link_query(u,{'security','sni','insecure','pinSHA256','obfs','obfs-password'})
-            if nonempty(q,'security','tls')!='tls': return None
+            q=link_query(u,{'security','sni','insecure','pinSHA256','obfs','obfs-password','alpn'})
+            if nonempty(q,'security','tls')!='tls' or nonempty(q,'alpn','h3')!='h3': return None
+            q.pop('alpn',None)
             if nonempty(q,'pinSHA256'): q['pcs']=q['pinSHA256']
             stream=stream_settings('tcp',q,'tls',host)
             stream['tlsSettings']['alpn']=['h3']
@@ -318,7 +387,6 @@ def parse(link, source='unknown'):
             password=up.unquote(u.username or '')
             if not password: return None
             q=link_query(u,URL_KEYS)
-            if nonempty(q,'headerType','none')!='none': return None
             if u.password is not None: return None
             sec=nonempty(q,'security','tls' if scheme=='trojan' else 'none').lower()
             network=nonempty(q,'type','tcp')

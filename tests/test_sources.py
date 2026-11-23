@@ -35,6 +35,42 @@ class ParserCoverageTests(unittest.TestCase):
         self.assertIsNone(parse(encode(dict(obj, pcs='ab12'))))
         self.assertIsNone(parse(encode(dict(obj, **{'skip-cert-verify': True}))))
 
+    def test_what_other_clients_write_is_read_the_same_or_rejected(self):
+        base = 'vless://id@example.com:443?security=tls&type=ws'
+        # Inert keys and their inert values only.
+        self.assertEqual(parse(base + '&packetEncoding=xudp&quicSecurity=none&Telegram=@x').key, parse(base).key)
+        self.assertIsNone(parse(base + '&packetEncoding=packetaddr'))
+        # Aliases, and a conflicting one.
+        trojan = 'trojan://pw@example.com:443?security=tls'
+        self.assertEqual(parse(trojan + '&peer=a.example').key, parse(trojan + '&sni=a.example').key)
+        self.assertIsNone(parse(trojan + '&peer=a.example&sni=b.example'))
+        self.assertEqual(parse(trojan + '&ws=1&wspath=/p').key, parse(trojan + '&type=ws&path=/p').key)
+        self.assertIsNone(parse(trojan + '&allow_insecure=1'))
+        # Early data goes into the WebSocket path, as Xray reads it.
+        ws = parse(base + '&path=/p&ed=2560&eh=Sec-WebSocket-Protocol').outbound['streamSettings']
+        self.assertEqual(ws['wsSettings']['path'], '/p?ed=2560')
+        self.assertIsNone(parse(base + '&ed=2560&eh=X-Other'))
+        # TLS cipher suites and Xray's finalmask.
+        mask = '{"tcp":[{"type":"fragment","settings":{"packets":"tlshello","length":"10-20"}}]}'
+        stream = parse(base + '&cs=TLS_AES_128_GCM_SHA256&fm=' + mask).outbound['streamSettings']
+        self.assertEqual(stream['tlsSettings']['cipherSuites'], 'TLS_AES_128_GCM_SHA256')
+        self.assertEqual(stream['finalmask'], json.loads(mask))
+        self.assertIsNone(parse(base + '&fm=tlshello-0-len'))
+        # VMess: "security" for "scy", "auto"/"---" for no header, an HTTP header on bare RAW.
+        obj = {'add': 'example.com', 'port': 443, 'id': 'id', 'tls': 'tls', 'net': 'ws'}
+        encode = lambda v: 'vmess://' + base64.b64encode(json.dumps(v).encode()).decode()
+        self.assertEqual(parse(encode(dict(obj, security='aes-128-gcm', type='---', name='x'))).key,
+                         parse(encode(dict(obj, scy='aes-128-gcm'))).key)
+        self.assertIsNone(parse(encode(dict(obj, security='aes-128-gcm', scy='auto'))))
+        raw = parse(encode(dict(obj, tls='', net='tcp', type='http', host='h.example', path='/x')))
+        self.assertEqual(raw.outbound['streamSettings']['tcpSettings']['header']['request'],
+                         {'path': ['/x'], 'headers': {'Host': ['h.example']}})
+        self.assertIsNone(parse(encode(dict(obj, net='tcp', type='http'))))   # not under TLS
+        # Hysteria 2 always runs on h3.
+        hy2 = 'hysteria2://auth@example.com:443?sni=example.com'
+        self.assertEqual(parse(hy2 + '&alpn=h3').key, parse(hy2).key)
+        self.assertIsNone(parse(hy2 + '&alpn=h2'))
+
     def test_raw_transport_ignores_a_host_it_never_sends(self):
         base = 'vless://id@1.2.3.4:443?type=tcp&security=reality&sni=a.example&pbk=key'
         self.assertEqual(parse(base + '&host=a.example').key, parse(base).key)
