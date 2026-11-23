@@ -38,14 +38,32 @@ def read_state(path):
     return data
 
 
+# Every config seen in 30 days. It was 20,000 full rows: a discovery tests more than that, so
+# configs tested two runs back were dropped, looked never-tested and were picked again, and the
+# rest after three failures never applied to them (2026-11-23).
+MAX_NODES = 400000
+# A config that never worked keeps only what picking and resting read, and its last three events.
+NEVER_WORKED_KEYS = ('url','source','number','history','verification_history','last_success','last_seen',
+                     'last_attempt','last_error','verified','country_code')
+
+
 def save_state(path, state):
     # Keep recently useful history without growing forever.
     cutoff = time.time()-30*86400
     recent={k:v for k,v in state['nodes'].items() if v.get('last_seen',0)>cutoff}
     published=set(state.get('published',[]))
     ordered=sorted(recent,key=lambda k:(k in published,recent[k].get('last_success',0),recent[k].get('last_seen',0)),reverse=True)
-    state['nodes']={k:recent[k] for k in ordered[:20000]}
-    atomic_write(path, json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+    nodes={}
+    for key in ordered[:MAX_NODES]:
+        row=recent[key]
+        if not row.get('verified') and not row.get('last_success') and key not in published:
+            row={k:row[k] for k in NEVER_WORKED_KEYS if k in row}
+            row['history']=row.get('history',[])[-3:]
+            row['verification_history']=row.get('verification_history',[])[-3:]
+        nodes[key]=row
+    state['nodes']=nodes
+    # Compact: at 100,000+ configs an indented file would pass 100 MB.
+    atomic_write(path, json.dumps(state,ensure_ascii=False,separators=(',',':'))+'\n')
 
 
 @contextmanager

@@ -24,9 +24,11 @@ URLS_PER_SOURCE = 3
 MIN_SUPPORTED = 20                 # smaller feeds are not worth a slot
 # A found feed is unknown until one of its configs works from here. Until then only a
 # sample is tested: 16 collectors screened by hand on 2026-10-26 had 12 with none.
-SAMPLE = 150
-PROMISING = 450
-PROVEN = 1500
+# Raised 2026-11-23: at 150/450/1,500 a discovery tested 6,078 of 88,235 found configs (7%),
+# and a 7,992-config feed took nine days to go through once. Never-tested configs go first.
+SAMPLE = 500
+PROMISING = 3000
+PROVEN = 0                          # all of a feed that has a config in the list
 PROVEN_SECONDS = 7 * 86400
 MAX_REST_SECONDS = 7 * 86400
 PREFIX = 'gh:'

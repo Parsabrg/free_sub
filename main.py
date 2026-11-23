@@ -61,7 +61,7 @@ def resting(row, now, hours):
 
 def pick(candidates, quota, state, rng):
     """Up to quota of a found feed's configs: never-tested ones first, then the longest untested."""
-    if len(candidates)<=quota:
+    if not quota or len(candidates)<=quota:
         return candidates
     shuffled=rng.sample(candidates,len(candidates))
     shuffled.sort(key=lambda c:state['nodes'].get(c.key,{}).get('last_attempt',0))

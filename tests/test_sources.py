@@ -185,6 +185,12 @@ class RegistryTests(unittest.TestCase):
             return feeds['/'.join(url.split('/')[3:5])]
         return sources.Registry(Path(folder) / '.local/sources.json', fetch=fetch, search=search), fetch
 
+    def test_a_feed_with_a_config_in_the_list_is_tested_whole(self):
+        configs = [parse(link(i, 'good.example')) for i in range(5000)]
+        self.assertEqual(sources.PROVEN, 0)
+        self.assertEqual(len(pick(configs, sources.PROVEN, {'nodes': {}}, __import__('random').Random(1))), 5000)
+
+    @patch.multiple('sources', SAMPLE=150, PROMISING=450, PROVEN=1500)   # the logic, at small sizes
     def test_found_feeds_are_sampled_until_one_works_then_tested_wider(self):
         feeds = {'good/feed': '\n'.join(link(i, 'good.example') for i in range(400)),
                  'dud/feed': '\n'.join(link(i, 'dud.example') for i in range(400)) + '\n' + link(0, 'listed.example')}
