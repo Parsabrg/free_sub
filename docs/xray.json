@@ -134,47 +134,12 @@
     {
       "protocol": "socks",
       "settings": {
-        "address": "45.61.188.134",
-        "port": 44499
-      },
-      "tag": "🇺🇸 US-01 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
         "address": "87.84.49.140",
         "port": 62000,
         "user": "ks878449260d",
         "pass": "YlRoWvE0dL_cUqS94wPeKnA4"
       },
       "tag": "🇹🇭 TH-05 | SOCKS5"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "ipfast.kingmna.com",
-            "port": 443,
-            "password": "lDU6Jpl4nSXA-x4sWmb1LQ"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "cdn.akamai.steamstatic.com",
-          "pinnedPeerCertSha256": "cd6e838b9bfe31cab8b3d5c858b0d6223fe84ece236c1fdb281be93c302e1e6e"
-        },
-        "wsSettings": {
-          "path": "/TELEGRAM-@NUFiLTER-TELEGRAM-@NUFiLTER-TELEGRAM-@NUFiLTER-TELEGRAM-@NUFiLTER-TELEGRAM-@NUFiLTER-TELEGRAM-@NUFiLTER-TELEGRAM-@NUFiLTER-TELEGRAM-@NUFiLTER",
-          "headers": {
-            "Host": "copy_az_channel_NUFiLTER_8i.global.ssl.fastly.net."
-          }
-        }
-      },
-      "tag": "🇺🇸 US-02 | TROJAN-WS-TLS"
     },
     {
       "protocol": "socks",
@@ -249,20 +214,6 @@
       "settings": {
         "servers": [
           {
-            "address": "35.178.82.244",
-            "port": 443,
-            "method": "2022-blake3-chacha20-poly1305",
-            "password": "Cg2Dw4OhdBZhqbeO9ZTA3g/Gk/AvsrYZGhAJeGnQIx4="
-          }
-        ]
-      },
-      "tag": "🇬🇧 GB-10 | SS"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
             "address": "18.197.131.255",
             "port": 443,
             "method": "2022-blake3-chacha20-poly1305",
@@ -273,34 +224,18 @@
       "tag": "🇩🇪 DE-07 | SS"
     },
     {
-      "protocol": "vless",
+      "protocol": "shadowsocks",
       "settings": {
-        "vnext": [
+        "servers": [
           {
-            "address": "prim.jafarghasemiturkk.ir",
-            "port": 8080,
-            "users": [
-              {
-                "id": "532f30c0-af1a-4b40-85b6-0c1a1ad26077",
-                "encryption": "none"
-              }
-            ]
+            "address": "35.178.82.244",
+            "port": 443,
+            "method": "2022-blake3-chacha20-poly1305",
+            "password": "Cg2Dw4OhdBZhqbeO9ZTA3g/Gk/AvsrYZGhAJeGnQIx4="
           }
         ]
       },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "play.google.com",
-          "publicKey": "IUx9PcA6L5YQiQeJUREjmm2kL6bfWcwItuZYZvxPJhc",
-          "shortId": "17f04e8b",
-          "fingerprint": "chrome",
-          "spiderX": "/d9f72c40a0b25fa"
-        }
-      },
-      "tag": "🇩🇪 DE-09 | VLESS-REALITY"
+      "tag": "🇬🇧 GB-10 | SS"
     },
     {
       "protocol": "vless",
@@ -331,26 +266,6 @@
         }
       },
       "tag": "🇱🇹 LT-06 | VLESS-REALITY"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "nu3rb.supertoolify.com",
-            "port": 443,
-            "password": "57beeeb0-03fc-4fc9-94da-7604488a7134"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "nu3rb.supertoolify.com"
-        }
-      },
-      "tag": "🇯🇵 JP-06 | TROJAN-TLS"
     },
     {
       "protocol": "vless",
@@ -446,29 +361,15 @@
       "tag": "🇳🇱 NL-02 | VLESS-REALITY"
     },
     {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "netplus.melvona-digital.ir",
-            "port": 1080,
-            "method": "chacha20-ietf-poly1305",
-            "password": "7HKeZHCfH9TFlVbcvdV-zVFWDFs4T7FX"
-          }
-        ]
-      },
-      "tag": "🇸🇪 SE-11 | SS"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "31.76.77.231",
+            "address": "178.236.240.66",
             "port": 443,
             "users": [
               {
-                "id": "e894c08a-fecc-46f5-bf03-c95d0274c79d",
+                "id": "9df9ee1a-0671-4c6c-93c7-65598fb946f7",
                 "encryption": "none",
                 "flow": "xtls-rprx-vision"
               }
@@ -481,14 +382,53 @@
         "security": "reality",
         "realitySettings": {
           "show": false,
-          "serverName": "www.google.com",
-          "publicKey": "PMtmgfkxpREXi51S_EUUi3KbYauQLjGD6c_llKRk8H4",
-          "shortId": "cc85fc7134024405",
+          "serverName": "ruae633.jointaction.am",
+          "publicKey": "2BnTTOS3HvvIbNDEHPrhwnpPBc1HB7gEHkmQfUATkCw",
+          "shortId": "c0a60e2240745383",
           "fingerprint": "firefox",
           "spiderX": "/"
         }
       },
-      "tag": "🇫🇮 FI-05 | VLESS-REALITY"
+      "tag": "🇷🇺 RU-01 | VLESS-REALITY"
+    },
+    {
+      "protocol": "socks",
+      "settings": {
+        "address": "176.9.107.170",
+        "port": 1083
+      },
+      "tag": "🇩🇪 DE-05 | SOCKS5"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "213.171.24.52",
+            "port": 443,
+            "users": [
+              {
+                "id": "9df9ee1a-0671-4c6c-93c7-65598fb946f7",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "sbrussia1.richhoodfoc.com",
+          "publicKey": "NLshsrwmeg_cL7kbLW4sqMfl_Xo6vCOOcB5NcmYhDyE",
+          "shortId": "32cbd8937afcd477",
+          "fingerprint": "qq",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇷🇺 RU-05 | VLESS-REALITY"
     },
     {
       "protocol": "trojan",
@@ -517,6 +457,14 @@
         "port": 20001
       },
       "tag": "🇺🇸 US-05 | SOCKS5"
+    },
+    {
+      "protocol": "socks",
+      "settings": {
+        "address": "178.252.165.226",
+        "port": 1080
+      },
+      "tag": "🇮🇷 IR-07 | SOCKS5"
     }
   ]
 }
