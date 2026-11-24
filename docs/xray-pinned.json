@@ -76,20 +76,20 @@
     {
       "protocol": "socks",
       "settings": {
+        "address": "176.9.107.170",
+        "port": 1081
+      },
+      "tag": "🇩🇪 DE-24 | SOCKS5"
+    },
+    {
+      "protocol": "socks",
+      "settings": {
         "address": "104.219.233.124",
         "port": 1080,
         "user": "test123",
         "pass": "test123"
       },
       "tag": "🇺🇸 US-92 | SOCKS5"
-    },
-    {
-      "protocol": "socks",
-      "settings": {
-        "address": "176.9.107.170",
-        "port": 1081
-      },
-      "tag": "🇩🇪 DE-24 | SOCKS5"
     },
     {
       "protocol": "socks",
@@ -170,6 +170,34 @@
       "settings": {
         "servers": [
           {
+            "address": "18.197.131.255",
+            "port": 443,
+            "method": "2022-blake3-chacha20-poly1305",
+            "password": "8yO3ANWefuuGs1lRKXECQA1FEhxlWFV2ppQMcBaZo5Y="
+          }
+        ]
+      },
+      "tag": "🇩🇪 DE-07 | SS"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
+            "address": "35.178.82.244",
+            "port": 443,
+            "method": "2022-blake3-chacha20-poly1305",
+            "password": "Cg2Dw4OhdBZhqbeO9ZTA3g/Gk/AvsrYZGhAJeGnQIx4="
+          }
+        ]
+      },
+      "tag": "🇬🇧 GB-10 | SS"
+    },
+    {
+      "protocol": "shadowsocks",
+      "settings": {
+        "servers": [
+          {
             "address": "18.169.167.165",
             "port": 443,
             "method": "2022-blake3-chacha20-poly1305",
@@ -210,34 +238,6 @@
       "tag": "🇱🇹 LT-05 | VLESS-REALITY"
     },
     {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "18.197.131.255",
-            "port": 443,
-            "method": "2022-blake3-chacha20-poly1305",
-            "password": "8yO3ANWefuuGs1lRKXECQA1FEhxlWFV2ppQMcBaZo5Y="
-          }
-        ]
-      },
-      "tag": "🇩🇪 DE-07 | SS"
-    },
-    {
-      "protocol": "shadowsocks",
-      "settings": {
-        "servers": [
-          {
-            "address": "35.178.82.244",
-            "port": 443,
-            "method": "2022-blake3-chacha20-poly1305",
-            "password": "Cg2Dw4OhdBZhqbeO9ZTA3g/Gk/AvsrYZGhAJeGnQIx4="
-          }
-        ]
-      },
-      "tag": "🇬🇧 GB-10 | SS"
-    },
-    {
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -268,66 +268,24 @@
       "tag": "🇱🇹 LT-06 | VLESS-REALITY"
     },
     {
-      "protocol": "vless",
+      "protocol": "socks",
       "settings": {
-        "vnext": [
-          {
-            "address": "212.192.3.222",
-            "port": 9543,
-            "users": [
-              {
-                "id": "920b3cd9-4f82-4669-bbd2-d4a28b9052c6",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
+        "address": "192.204.15.135",
+        "port": 42000,
+        "user": "X3s3JteD",
+        "pass": "mpbK00Pl"
       },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "storage.yandexcloud.net",
-          "publicKey": "M6Ck7wUfOLhQl4582CBnaXwscPEP6SCpdEkUDzoj4Fc",
-          "shortId": "123abcdf",
-          "fingerprint": "edge",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🇳🇱 NL-03 | VLESS-REALITY"
+      "tag": "🇹🇭 TH-02 | SOCKS5"
     },
     {
-      "protocol": "vless",
+      "protocol": "socks",
       "settings": {
-        "vnext": [
-          {
-            "address": "52.199.42.25",
-            "port": 46074,
-            "users": [
-              {
-                "id": "c74a51bc-0e10-43e5-b6a8-9395c40f3f54",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
-              }
-            ]
-          }
-        ]
+        "address": "192.204.14.58",
+        "port": 42000,
+        "user": "2FYbAx8H",
+        "pass": "3ahWX7l1"
       },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "serverName": "www.apple.com",
-          "publicKey": "Zpe4RNze71UGv-T9y55k31k9BtY7gS7uvRV5aA7eiWQ",
-          "shortId": "367e3031",
-          "fingerprint": "firefox",
-          "spiderX": "/"
-        }
-      },
-      "tag": "🇯🇵 JP-05 | VLESS-REALITY"
+      "tag": "🇹🇭 TH-04 | SOCKS5"
     },
     {
       "protocol": "vless",
@@ -404,13 +362,12 @@
       "settings": {
         "vnext": [
           {
-            "address": "213.171.24.52",
-            "port": 443,
+            "address": "109.70.74.114",
+            "port": 8080,
             "users": [
               {
-                "id": "9df9ee1a-0671-4c6c-93c7-65598fb946f7",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
+                "id": "532f30c0-af1a-4b40-85b6-0c1a1ad26077",
+                "encryption": "none"
               }
             ]
           }
@@ -421,34 +378,14 @@
         "security": "reality",
         "realitySettings": {
           "show": false,
-          "serverName": "sbrussia1.richhoodfoc.com",
-          "publicKey": "NLshsrwmeg_cL7kbLW4sqMfl_Xo6vCOOcB5NcmYhDyE",
-          "shortId": "32cbd8937afcd477",
-          "fingerprint": "qq",
-          "spiderX": "/"
+          "serverName": "play.google.com",
+          "publicKey": "IUx9PcA6L5YQiQeJUREjmm2kL6bfWcwItuZYZvxPJhc",
+          "shortId": "17f04e8b",
+          "fingerprint": "chrome",
+          "spiderX": "/d9f72c40a0b25fa"
         }
       },
-      "tag": "🇷🇺 RU-05 | VLESS-REALITY"
-    },
-    {
-      "protocol": "trojan",
-      "settings": {
-        "servers": [
-          {
-            "address": "47.245.38.62",
-            "port": 443,
-            "password": "+vuY9gGdZ/h7Yk4Q"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "xinbulongdong.com"
-        }
-      },
-      "tag": "🇯🇵 JP-02 | TROJAN-TLS"
+      "tag": "🇩🇪 DE-09 | VLESS-REALITY"
     },
     {
       "protocol": "socks",
@@ -465,6 +402,143 @@
         "port": 1080
       },
       "tag": "🇮🇷 IR-07 | SOCKS5"
+    },
+    {
+      "protocol": "socks",
+      "settings": {
+        "address": "57.128.249.250",
+        "port": 9052
+      },
+      "tag": "🇵🇱 PL-01 | SOCKS5"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "31.77.158.172",
+            "port": 443,
+            "users": [
+              {
+                "id": "7d63243c-983e-44db-a1b8-13dc3fd6f7a2",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "cdnjs.com",
+          "publicKey": "mg2MoLpb8B51aZiko_nW2SBRoaudv-O6HLHx8VYP7Do",
+          "shortId": "",
+          "fingerprint": "qq",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇸🇪 SE-05 | VLESS-REALITY"
+    },
+    {
+      "protocol": "socks",
+      "settings": {
+        "address": "185.247.141.86",
+        "port": 1080
+      },
+      "tag": "🇫🇮 FI-04 | SOCKS5"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "31.77.158.172",
+            "port": 443,
+            "users": [
+              {
+                "id": "7d63243c-983e-44db-a1b8-13dc3fd6f7a2",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "cdnjs.com",
+          "publicKey": "mg2MoLpb8B51aZiko_nW2SBRoaudv-O6HLHx8VYP7Do",
+          "shortId": "",
+          "fingerprint": "qq",
+          "spiderX": "/"
+        }
+      },
+      "tag": "🇸🇪 SE-01 | VLESS-REALITY"
+    },
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "31.77.158.172",
+            "port": 443,
+            "users": [
+              {
+                "id": "7d63243c-983e-44db-a1b8-13dc3fd6f7a2",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "serverName": "cdnjs.com",
+          "publicKey": "mg2MoLpb8B51aZiko_nW2SBRoaudv-O6HLHx8VYP7Do",
+          "shortId": "",
+          "fingerprint": "qq",
+          "spiderX": "/?TELEGRAM--B2Hub-B2Hub-B2Hub-B2Hub-B2Hub-B2Hub-B2Hub-B2Hub-B2Hub-B2Hub--TELEGRAM"
+        }
+      },
+      "tag": "🇸🇪 SE-03 | VLESS-REALITY"
+    },
+    {
+      "protocol": "trojan",
+      "settings": {
+        "servers": [
+          {
+            "address": "18.183.207.62",
+            "port": 34745,
+            "password": "57beeeb0-03fc-4fc9-94da-7604488a7134"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "nu3rb.supertoolify.com"
+        }
+      },
+      "tag": "🇯🇵 JP-04 | TROJAN-TLS"
+    },
+    {
+      "protocol": "socks",
+      "settings": {
+        "address": "45.194.33.12",
+        "port": 30002
+      },
+      "tag": "🇭🇰 HK-04 | SOCKS5"
     }
   ]
 }
