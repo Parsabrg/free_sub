@@ -1,32 +1,22 @@
 {
   "mode": "health",
-  "health": "ok",
+  "health": "expired_or_empty",
   "tested_on": "operator network; local Xray",
-  "source_retained_24h": {
-    "gh:Maskkost93/kizyak-vpn-4.0": 3,
-    "Bahemmat": 3,
-    "Radikal": 1,
-    "Ermaozi": 4,
-    "gh:rekt0ro/ProxyRift": 13,
-    "gh:Surfboardv2ray/TGParse": 1,
-    "gh:Adan03ac/ADAN-V2Ray-Free-Pack": 1
-  },
+  "source_retained_24h": {},
   "xray_version": "Xray 26.3.27 (Xray, Penetrates Everything.) d2758a0 (go1.26.1 windows/amd64)",
   "source_status": {},
-  "unique_selected_for_test": 534,
+  "unique_selected_for_test": 21,
   "first_pass": {
-    "StreamSegmentFailed": 59,
-    "VideoVerificationFailed": 94,
-    "pass": 1,
-    "TimeoutError": 305,
-    "SSLEOFError": 39,
-    "OSError": 10,
-    "SSLError": 4,
-    "ConnectionResetError": 22
+    "ConnectionResetError": 7,
+    "OSError": 1,
+    "TimeoutError": 10,
+    "SSLEOFError": 1,
+    "SSLError": 1,
+    "VideoVerificationFailed": 1
   },
   "second_pass": {},
   "list_limit": null,
-  "working_this_run": 1,
+  "working_this_run": 0,
   "health_interval_seconds": 7200,
   "discovery_interval_seconds": 14400,
   "resting_skipped": 0,
@@ -36,84 +26,47 @@
   "first_pass_timeout_seconds": 30,
   "screen_network_timeout_seconds": null,
   "verification_timeout_seconds": 30,
-  "failure_reason": null,
+  "failure_reason": "No current verified transfer; previous nodes age normally",
   "video_mirrors": {
     "interactive-examples.mdn.mozilla.net": {
-      "pass": 49,
-      "timeout": 104,
-      "tls_error": 1
+      "timeout": 1
     },
     "media.w3.org": {
-      "timeout": 94,
-      "pass": 11
+      "timeout": 1
     }
   },
   "schema": 2,
-  "generated_epoch": 1795729543.0887482,
-  "generated_utc": "2026-11-26T21:45:43+00:00",
-  "published": 1,
-  "nodes": [
-    {
-      "id": "6ed9bd3a3d639154161e63d81fb29678543f60a3d79002888e3a51a688067d2e",
-      "name": "🇩🇪 DE-04 | SS",
-      "rank": 1,
-      "protocol": "ss",
-      "country_code": "DE",
-      "endpoint_ip": "3.70.132.223",
-      "last_success_epoch": 1795729065.8682394,
-      "expires_epoch": 1795750665.8682394,
-      "success_rate": 0.8174,
-      "latency_ms": 2244.2,
-      "jitter_ms": 1377.3,
-      "body_bytes": 132230,
-      "transfer_kbps_estimate": 235.7,
-      "full_size": true,
-      "video_host": "interactive-examples.mdn.mozilla.net",
-      "video_bytes": 131072,
-      "video_ms": 2932.9,
-      "verified_this_run": true,
-      "stream_segments": 8,
-      "stream_kbps": 331.3,
-      "stream_start_ms": 2932.9,
-      "stream_stalls": 7,
-      "stream_error": "",
-      "udp": null,
-      "ipv6": null,
-      "youtube_played": null,
-      "youtube_error": ""
-    }
-  ],
+  "generated_epoch": 1795801995.301433,
+  "generated_utc": "2026-11-27T17:53:15+00:00",
+  "published": 0,
+  "nodes": [],
   "flag_definition": "IP pinned for the successful proxy connection; may be CDN ingress, not exit",
   "recommended_client_refresh_seconds": 3600,
   "node_ttl_seconds": 21600,
-  "compact_ids": [
-    "6ed9bd3a3d639154161e63d81fb29678543f60a3d79002888e3a51a688067d2e"
-  ],
-  "pinned_ids": [
-    "6ed9bd3a3d639154161e63d81fb29678543f60a3d79002888e3a51a688067d2e"
-  ],
+  "compact_ids": [],
+  "pinned_ids": [],
   "run_comparison": {
-    "previous_generated_epoch": 1795722108.6982124,
+    "previous_generated_epoch": 1795729543.0887482,
     "previous_mode": "health",
-    "published_delta": -21,
-    "working_this_run_delta": -21,
+    "published_delta": -1,
+    "working_this_run_delta": -1,
     "video_mirrors": {
       "interactive-examples.mdn.mozilla.net": {
-        "attempts_delta": 89,
+        "attempts_delta": -153,
         "outcome_deltas": {
-          "pass": 7,
-          "timeout": 81,
-          "tls_error": 1
+          "pass": -49,
+          "timeout": -103,
+          "tls_error": -1
         },
-        "pass_rate_delta_pp": -32.8
+        "pass_rate_delta_pp": -31.8
       },
       "media.w3.org": {
-        "attempts_delta": 82,
+        "attempts_delta": -104,
         "outcome_deltas": {
-          "pass": 8,
-          "timeout": 74
+          "pass": -11,
+          "timeout": -93
         },
-        "pass_rate_delta_pp": -2.6
+        "pass_rate_delta_pp": -10.5
       }
     }
   }
