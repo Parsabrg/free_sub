@@ -5,19 +5,20 @@
   "source_retained_24h": {},
   "xray_version": "Xray 26.3.27 (Xray, Penetrates Everything.) d2758a0 (go1.26.1 windows/amd64)",
   "source_status": {},
-  "unique_selected_for_test": 21,
+  "unique_selected_for_test": 316,
   "first_pass": {
-    "ConnectionResetError": 7,
-    "OSError": 1,
-    "TimeoutError": 10,
-    "SSLEOFError": 1,
-    "SSLError": 1,
-    "VideoVerificationFailed": 1
+    "ConnectionResetError": 49,
+    "TimeoutError": 127,
+    "VideoVerificationFailed": 117,
+    "StreamSegmentFailed": 3,
+    "SSLError": 5,
+    "SSLEOFError": 11,
+    "OSError": 4
   },
   "second_pass": {},
   "list_limit": null,
   "working_this_run": 0,
-  "health_interval_seconds": 7200,
+  "health_interval_seconds": 1800,
   "discovery_interval_seconds": 14400,
   "resting_skipped": 0,
   "max_tests": 0,
@@ -29,15 +30,21 @@
   "failure_reason": "No current verified transfer; previous nodes age normally",
   "video_mirrors": {
     "interactive-examples.mdn.mozilla.net": {
-      "timeout": 1
+      "timeout": 119,
+      "pass": 1,
+      "connection_error": 1,
+      "invalid_body": 4
     },
     "media.w3.org": {
-      "timeout": 1
+      "timeout": 116,
+      "pass": 2,
+      "connection_error": 2,
+      "invalid_body": 4
     }
   },
   "schema": 2,
-  "generated_epoch": 1795801995.301433,
-  "generated_utc": "2026-11-27T17:53:15+00:00",
+  "generated_epoch": 1795803424.277293,
+  "generated_utc": "2026-11-27T18:17:04+00:00",
   "published": 0,
   "nodes": [],
   "flag_definition": "IP pinned for the successful proxy connection; may be CDN ingress, not exit",
@@ -46,28 +53,8 @@
   "compact_ids": [],
   "pinned_ids": [],
   "run_comparison": {
-    "previous_generated_epoch": 1795729543.0887482,
+    "previous_generated_epoch": 1794558329.2213082,
     "previous_mode": "health",
-    "published_delta": -1,
-    "working_this_run_delta": -1,
-    "video_mirrors": {
-      "interactive-examples.mdn.mozilla.net": {
-        "attempts_delta": -153,
-        "outcome_deltas": {
-          "pass": -49,
-          "timeout": -103,
-          "tls_error": -1
-        },
-        "pass_rate_delta_pp": -31.8
-      },
-      "media.w3.org": {
-        "attempts_delta": -104,
-        "outcome_deltas": {
-          "pass": -11,
-          "timeout": -93
-        },
-        "pass_rate_delta_pp": -10.5
-      }
-    }
+    "published_delta": -300
   }
 }
